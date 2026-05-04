@@ -1,5 +1,44 @@
 ---
-- name: Common role placeholder
+- name: Validate ChimerAI action
+  ansible.builtin.assert:
+    that:
+      - chimerai_action in ["validate", "apply", "remove"]
+    fail_msg: "chimerai_action must be one of: validate, apply, remove"
+
+- name: Validate required ChimerAI inventory values
+  ansible.builtin.assert:
+    that:
+      - chimerai_host_name is defined
+      - chimerai_timezone is defined
+      - chimerai_deployment_root is defined
+      - chimerai_state_root is defined
+      - chimerai_enabled_roles is defined
+      - chimerai_runtime is defined
+      - chimerai_networks is defined
+    fail_msg: "The inventory is missing required ChimerAI variables."
+
+- name: Validate target OS family
+  ansible.builtin.assert:
+    that:
+      - ansible_system == "Linux"
+    fail_msg: "Milestone 1 supports Linux targets only."
+
+- name: Report common configuration in validate mode
   ansible.builtin.debug:
-    msg: "common role parsed; no host changes are implemented in milestone 0"
+    msg:
+      - "host={{ chimerai_host_name }}"
+      - "timezone={{ chimerai_timezone }}"
+      - "deployment_root={{ chimerai_deployment_root }}"
+      - "state_root={{ chimerai_state_root }}"
+  when: chimerai_action == "validate"
   changed_when: false
+
+- name: Create ChimerAI root directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ chimerai_deployment_root }}"
+    - "{{ chimerai_state_root }}"
+  when: chimerai_action == "apply"

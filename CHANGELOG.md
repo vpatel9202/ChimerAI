@@ -13,3 +13,5 @@ The project has not published a release yet.
 - Added uv-managed Ansible tooling with a parseable dry-run skeleton.
 - Added GitHub Actions validation for the Milestone 0 Ansible dry run.
 - Added a foundational architecture decision record.
+- Added Milestone 1 core role behavior for validation, Docker checks, networks,
+  diagnostics, and Open WebUI.

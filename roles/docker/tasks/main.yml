@@ -1,5 +1,25 @@
 ---
-- name: Docker role placeholder
+- name: Check Docker CLI
+  ansible.builtin.command: docker --version
+  register: chimerai_docker_version
+  check_mode: false
+  changed_when: false
+
+- name: Check Docker Compose v2
+  ansible.builtin.command: docker compose version
+  register: chimerai_compose_version
+  check_mode: false
+  changed_when: false
+
+- name: Check Docker daemon access
+  ansible.builtin.command: docker info
+  register: chimerai_docker_info
+  check_mode: false
+  changed_when: false
+
+- name: Report Docker versions
   ansible.builtin.debug:
-    msg: "docker role parsed; no Docker installation is implemented in milestone 0"
+    msg:
+      - "{{ chimerai_docker_version.stdout }}"
+      - "{{ chimerai_compose_version.stdout }}"
   changed_when: false

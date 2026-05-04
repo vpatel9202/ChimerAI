@@ -10,12 +10,14 @@ all:
           chimerai_timezone: Etc/UTC
           chimerai_deployment_root: /opt/chimerai
           chimerai_state_root: /opt/chimerai/apps
+          chimerai_action: validate
 
           chimerai_enabled_roles:
             - common
             - docker
             - networks
             - diag
+            - open_webui
 
           chimerai_runtime:
             engine: docker
@@ -29,4 +31,10 @@ all:
             - name: chimerai-mcp
               purpose: mcp
 
-          chimerai_services: {}
+          chimerai_services:
+            open_webui:
+              image: ghcr.io/open-webui/open-webui:main
+              host: 127.0.0.1
+              host_port: 13080
+              container_port: 8080
+              auth_enabled: true

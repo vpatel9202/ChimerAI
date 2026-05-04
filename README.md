@@ -144,7 +144,7 @@ The expected repository shape is:
 │   ├── authentik/
 │   ├── hermes/
 │   ├── n8n/
-│   ├── mcp_todoist/
+│   ├── open_webui/
 │   ├── mcp_google_workspace/
 │   ├── backup/
 │   └── diag/
@@ -208,23 +208,25 @@ mkdir -p inventories/local
 cp inventories/examples/single-server.yml inventories/local/single-server.yml
 
 ./bin/chimerai install core
-./bin/chimerai install hermes mcp-todoist
+./bin/chimerai install hermes open-webui
 ./bin/chimerai validate
 ```
 
 This command set does not exist yet. It describes the target interface for the
 first proof of concept.
 
-For the current Milestone 0 skeleton, use uv to install the local Ansible
-tooling and run the safe dry run:
+For the current proof-of-concept skeleton, use uv to install the local Ansible
+tooling and run validation:
 
 ```bash
 uv sync
+uv run ansible-galaxy collection install -r requirements.yml
 uv run ansible-playbook chimerai.yml --check
 ```
 
-This parses the playbook and placeholder core roles. It does not install
-Docker, create networks, render Compose files, or deploy services yet.
+The default inventory uses `chimerai_action: validate`. To deploy services, use
+a private inventory and set `chimerai_action=apply`; to remove ChimerAI-managed
+resources, set `chimerai_action=remove`.
 
 ## AI-First Development
 
@@ -272,12 +274,12 @@ the tool supports it.
 
 ### Milestone 1: Ansible Proof Of Concept
 
-- [ ] Add `common` role
-- [ ] Add `docker` role
-- [ ] Add `networks` role
-- [ ] Add `mcp_todoist` role
-- [ ] Add `diag` role
-- [ ] Validate a minimal install on Ubuntu 24.04
+- [x] Add `common` role
+- [x] Add `docker` role
+- [x] Add `networks` role
+- [x] Add `open_webui` role
+- [x] Add `diag` role
+- [x] Validate a minimal install on Ubuntu 24.04
 
 ### Milestone 2: First Real Stack
 

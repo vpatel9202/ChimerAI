@@ -1,5 +1,39 @@
 ---
-- name: Diagnostics role placeholder
+- name: Validate Docker runtime setting
+  ansible.builtin.assert:
+    that:
+      - chimerai_runtime.engine == "docker"
+      - chimerai_runtime.compose_command == "docker compose"
+    fail_msg: "Milestone 1 expects Docker and Docker Compose v2."
+
+- name: Inspect configured ChimerAI networks
+  ansible.builtin.command: "docker network inspect {{ item.name }}"
+  register: chimerai_network_inspect
+  loop: "{{ chimerai_networks }}"
+  check_mode: false
+  changed_when: false
+  failed_when:
+    - chimerai_action == "apply"
+    - chimerai_network_inspect.rc != 0
+
+- name: Check Open WebUI HTTP endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_open_webui_host | default(chimerai_services.open_webui.host | default('127.0.0.1')) }}:{{ chimerai_open_webui_host_port | default(chimerai_services.open_webui.host_port | default(13080)) }}/"
+    method: GET
+    status_code:
+      - 200
+      - 302
+      - 307
+    timeout: 10
+  register: chimerai_open_webui_http_check
+  until: chimerai_open_webui_http_check is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - "'open_webui' in chimerai_enabled_roles"
+
+- name: Report validation summary
   ansible.builtin.debug:
-    msg: "diag role parsed; validation commands are minimal in milestone 0"
+    msg: "ChimerAI diagnostics completed for action={{ chimerai_action }}"
   changed_when: false

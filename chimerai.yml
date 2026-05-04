@@ -1,7 +1,9 @@
 ---
-- name: ChimerAI milestone 0 dry run
+- name: ChimerAI
   hosts: chimerai
-  gather_facts: false
+  gather_facts: true
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
 
   roles:
     - role: common
@@ -19,8 +21,38 @@
       tags:
         - networks
         - core
+    - role: open_webui
+      when: "'open_webui' in chimerai_enabled_roles"
+      tags:
+        - open_webui
+        - app
     - role: diag
       when: "'diag' in chimerai_enabled_roles"
       tags:
         - diag
         - validate
+
+  post_tasks:
+    - name: Remove ChimerAI Docker networks after services are removed
+      community.docker.docker_network:
+        name: "{{ item.name }}"
+        state: absent
+      loop: "{{ chimerai_networks | reverse | list }}"
+      when: chimerai_action == "remove"
+      tags:
+        - networks
+        - remove
+
+    - name: Remove ChimerAI roots after services are removed
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ chimerai_deployment_root }}"
+        - "{{ chimerai_state_root }}"
+      when:
+        - chimerai_action == "remove"
+        - chimerai_remove_roots | default(false) | bool
+      tags:
+        - common
+        - remove

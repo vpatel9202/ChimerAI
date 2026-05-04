@@ -1,0 +1,18 @@
+---
+services:
+  open-webui:
+    image: "{{ chimerai_open_webui_image }}"
+    container_name: "{{ chimerai_open_webui_project_name }}"
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "{{ chimerai_open_webui_host }}:{{ chimerai_open_webui_host_port }}:{{ chimerai_open_webui_container_port }}"
+    volumes:
+      - "{{ chimerai_open_webui_data_dir }}:/app/backend/data"
+    networks:
+      - "{{ chimerai_open_webui_network }}"
+
+networks:
+  {{ chimerai_open_webui_network }}:
+    external: true

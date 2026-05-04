@@ -1,0 +1,90 @@
+---
+- name: Validate Open WebUI configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_open_webui_image | length > 0
+      - chimerai_open_webui_host | length > 0
+      - chimerai_open_webui_host_port | int > 0
+      - chimerai_open_webui_container_port | int > 0
+      - chimerai_open_webui_network | length > 0
+    fail_msg: "Open WebUI configuration is incomplete."
+
+- name: Create Open WebUI directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ chimerai_open_webui_app_dir }}"
+    - "{{ chimerai_open_webui_data_dir }}"
+  when: chimerai_action == "apply"
+
+- name: Write persistent Open WebUI secret
+  ansible.builtin.copy:
+    dest: "{{ chimerai_open_webui_secret_file }}"
+    content: "{{ lookup('ansible.builtin.password', chimerai_open_webui_secret_file + ' length=64 chars=ascii_letters,digits') }}\n"
+    mode: "0600"
+  no_log: true
+  when: chimerai_action == "apply"
+
+- name: Render Open WebUI env file
+  ansible.builtin.template:
+    src: open-webui.env.j2
+    dest: "{{ chimerai_open_webui_app_dir }}/.env"
+    mode: "0600"
+  no_log: true
+  when: chimerai_action == "apply"
+
+- name: Render Open WebUI Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_open_webui_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Open WebUI
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_open_webui_app_dir }}"
+    project_name: "{{ chimerai_open_webui_project_name }}"
+    state: present
+    remove_orphans: true
+  when: chimerai_action == "apply"
+
+- name: Check whether Open WebUI Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_open_webui_app_dir }}/compose.yml"
+  register: chimerai_open_webui_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Open WebUI
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_open_webui_app_dir }}"
+    project_name: "{{ chimerai_open_webui_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_open_webui_compose_file.stat.exists
+
+- name: Remove Open WebUI generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_open_webui_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Open WebUI state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/open-webui
+  when:
+    - chimerai_action == "remove"
+    - chimerai_open_webui_remove_state | bool
+  changed_when: true

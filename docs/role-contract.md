@@ -15,6 +15,7 @@ Every role should have one clear responsibility:
 - `docker`: Docker engine and Compose availability.
 - `networks`: shared Docker networks used by service roles.
 - `diag`: safe validation and troubleshooting checks.
+- `open_webui`: first app proof of concept; local-only self-hosted AI web UI.
 - app roles: app-local state, rendered config, rendered Compose, lifecycle, and
   validation for one service or tightly related service group.
 
@@ -66,6 +67,18 @@ Roles that manage services should:
 - create explicit Docker networks rather than relying on accidental defaults;
 - provide a validation path that can run without destructive side effects.
 
+## Lifecycle Interface
+
+Milestone 1 roles use `chimerai_action` for lifecycle control:
+
+- `validate`: inspect prerequisites and report configuration without mutating
+  service state.
+- `apply`: create ChimerAI-managed directories, networks, rendered files, and
+  services.
+- `remove`: stop/remove ChimerAI-managed services and networks.
+
+Destructive state removal must require an explicit service-specific opt-in.
+
 ## Secrets
 
 Public defaults and examples must never contain real credentials. Role defaults
@@ -76,8 +89,8 @@ If a value controls exposure, authentication, provider tokens, OAuth clients, or
 remote access, document where it should live and use an obvious placeholder in
 examples.
 
-## Milestone 0 Boundary
+## Milestone 1 Boundary
 
-Milestone 0 proves that the repository has a coherent contract and a parseable
-Ansible skeleton. It does not install packages, create Docker networks, render
-Compose files, or deploy services.
+Milestone 1 proves the contract with core roles and one local-only app. It does
+not install Docker, configure public ingress, add SSO, deploy model providers,
+or migrate private infrastructure.

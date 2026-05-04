@@ -1,5 +1,17 @@
 ---
-- name: Networks role placeholder
-  ansible.builtin.debug:
-    msg: "networks role parsed; no Docker networks are created in milestone 0"
+- name: Validate configured Docker networks
+  ansible.builtin.assert:
+    that:
+      - item.name is defined
+      - item.purpose is defined
+    fail_msg: "Each chimerai_networks item must define name and purpose."
+  loop: "{{ chimerai_networks }}"
   changed_when: false
+
+- name: Create ChimerAI Docker networks
+  community.docker.docker_network:
+    name: "{{ item.name }}"
+    state: present
+    driver: bridge
+  loop: "{{ chimerai_networks }}"
+  when: chimerai_action == "apply"
