@@ -1,0 +1,20 @@
+# Runtime and local config
+.env
+*.env
+secrets/
+inventories/local/
+
+# Python / Ansible local state
+.venv/
+__pycache__/
+*.pyc
+*.retry
+
+# Logs and temporary files
+*.log
+tmp/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
