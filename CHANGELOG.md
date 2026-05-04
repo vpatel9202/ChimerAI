@@ -9,3 +9,7 @@ The project has not published a release yet.
 - Created initial project README.
 - Added provider-neutral agent instructions and compatibility shims.
 - Added `.local/` workspace convention and templates.
+- Defined the initial role contract and inventory schema.
+- Added uv-managed Ansible tooling with a parseable dry-run skeleton.
+- Added GitHub Actions validation for the Milestone 0 Ansible dry run.
+- Added a foundational architecture decision record.

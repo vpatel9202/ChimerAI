@@ -162,6 +162,7 @@ The initial project definition lives in:
   tags, state, Compose, validation, and secrets expectations.
 - [`docs/inventory-schema.md`](docs/inventory-schema.md) for the first
   single-server inventory shape.
+- [`docs/adr/`](docs/adr/) for durable architecture decisions.
 
 ## Initial App Categories
 
@@ -266,6 +267,8 @@ the tool supports it.
 - [x] Add provider-neutral agent instructions
 - [x] Add local workspace templates
 - [x] Add parseable Ansible dry-run skeleton
+- [x] Add CI validation for the dry-run skeleton
+- [x] Add foundational architecture decision record
 
 ### Milestone 1: Ansible Proof Of Concept
 
@@ -288,7 +291,6 @@ the tool supports it.
 ### Milestone 3: Public Alpha
 
 - [ ] Publish example inventories
-- [ ] Add CI validation
 - [ ] Add issue templates
 - [ ] Add security policy
 - [ ] Add comparison guide against existing self-hosted AI stacks

@@ -25,6 +25,7 @@ Project-level references:
   contract.
 - [`../inventory-schema.md`](../inventory-schema.md) defines the initial
   inventory shape.
+- [`../adr/`](../adr/) records durable architecture decisions.
 
 ## Loading Model
 

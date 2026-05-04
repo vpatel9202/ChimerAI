@@ -23,7 +23,8 @@ Future app roles should follow a consistent contract:
 
 The current public contract is defined in
 [`../role-contract.md`](../role-contract.md). The first inventory shape is
-defined in [`../inventory-schema.md`](../inventory-schema.md).
+defined in [`../inventory-schema.md`](../inventory-schema.md). Durable
+architecture decisions are recorded in [`../adr/`](../adr/).
 
 Do not over-abstract early. A simple role that renders understandable Compose is
 better than a generic framework that hides app behavior.
