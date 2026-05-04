@@ -1,0 +1,5 @@
+---
+- name: Diagnostics role placeholder
+  ansible.builtin.debug:
+    msg: "diag role parsed; validation commands are minimal in milestone 0"
+  changed_when: false

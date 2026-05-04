@@ -1,0 +1,12 @@
+[project]
+name = "chimerai"
+version = "0.0.0"
+description = "A modular self-hosted AI homelab stack for agents, MCP tools, automation, and secure operations."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "ansible-core>=2.16,<2.20",
+]
+
+[tool.uv]
+package = false

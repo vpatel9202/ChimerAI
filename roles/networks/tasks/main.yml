@@ -1,0 +1,5 @@
+---
+- name: Networks role placeholder
+  ansible.builtin.debug:
+    msg: "networks role parsed; no Docker networks are created in milestone 0"
+  changed_when: false

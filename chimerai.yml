@@ -1,0 +1,26 @@
+---
+- name: ChimerAI milestone 0 dry run
+  hosts: chimerai
+  gather_facts: false
+
+  roles:
+    - role: common
+      when: "'common' in chimerai_enabled_roles"
+      tags:
+        - common
+        - core
+    - role: docker
+      when: "'docker' in chimerai_enabled_roles"
+      tags:
+        - docker
+        - core
+    - role: networks
+      when: "'networks' in chimerai_enabled_roles"
+      tags:
+        - networks
+        - core
+    - role: diag
+      when: "'diag' in chimerai_enabled_roles"
+      tags:
+        - diag
+        - validate

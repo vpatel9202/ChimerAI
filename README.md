@@ -156,6 +156,13 @@ The expected repository shape is:
 The `chimerai` command is planned as a thin wrapper around Ansible, not a
 second orchestration system.
 
+The initial project definition lives in:
+
+- [`docs/role-contract.md`](docs/role-contract.md) for role responsibilities,
+  tags, state, Compose, validation, and secrets expectations.
+- [`docs/inventory-schema.md`](docs/inventory-schema.md) for the first
+  single-server inventory shape.
+
 ## Initial App Categories
 
 ChimerAI will start small. The public app catalog should grow only after the
@@ -196,7 +203,8 @@ The intended install flow is:
 git clone https://github.com/vpatel9202/ChimerAI.git
 cd ChimerAI
 
-cp inventories/examples/single-server.yml inventories/local/host_vars/localhost.yml
+mkdir -p inventories/local
+cp inventories/examples/single-server.yml inventories/local/single-server.yml
 
 ./bin/chimerai install core
 ./bin/chimerai install hermes mcp-todoist
@@ -205,6 +213,17 @@ cp inventories/examples/single-server.yml inventories/local/host_vars/localhost.
 
 This command set does not exist yet. It describes the target interface for the
 first proof of concept.
+
+For the current Milestone 0 skeleton, use uv to install the local Ansible
+tooling and run the safe dry run:
+
+```bash
+uv sync
+uv run ansible-playbook chimerai.yml --check
+```
+
+This parses the playbook and placeholder core roles. It does not install
+Docker, create networks, render Compose files, or deploy services yet.
 
 ## AI-First Development
 
@@ -240,12 +259,13 @@ the tool supports it.
 
 - [x] Choose project name
 - [x] Create initial README
-- [ ] Define role contract
-- [ ] Define inventory schema
+- [x] Define role contract
+- [x] Define inventory schema
 - [x] Choose initial license
 - [x] Add contribution guidelines
 - [x] Add provider-neutral agent instructions
 - [x] Add local workspace templates
+- [x] Add parseable Ansible dry-run skeleton
 
 ### Milestone 1: Ansible Proof Of Concept
 

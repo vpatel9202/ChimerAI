@@ -1,0 +1,5 @@
+---
+- name: Common role placeholder
+  ansible.builtin.debug:
+    msg: "common role parsed; no host changes are implemented in milestone 0"
+  changed_when: false

@@ -1,0 +1,32 @@
+---
+all:
+  children:
+    chimerai:
+      hosts:
+        localhost:
+          ansible_connection: local
+
+          chimerai_host_name: localhost
+          chimerai_timezone: Etc/UTC
+          chimerai_deployment_root: /opt/chimerai
+          chimerai_state_root: /opt/chimerai/apps
+
+          chimerai_enabled_roles:
+            - common
+            - docker
+            - networks
+            - diag
+
+          chimerai_runtime:
+            engine: docker
+            compose_command: docker compose
+
+          chimerai_networks:
+            - name: chimerai-public
+              purpose: ingress
+            - name: chimerai-internal
+              purpose: private-service
+            - name: chimerai-mcp
+              purpose: mcp
+
+          chimerai_services: {}

@@ -19,6 +19,13 @@ read only when relevant to the task.
 | [`provider-compatibility.md`](provider-compatibility.md) | Changing agent instruction files or adding tool-specific setup guidance. |
 | [`local-workspace.md`](local-workspace.md) | Using or changing private `.local/` workspace conventions. |
 
+Project-level references:
+
+- [`../role-contract.md`](../role-contract.md) defines the initial role
+  contract.
+- [`../inventory-schema.md`](../inventory-schema.md) defines the initial
+  inventory shape.
+
 ## Loading Model
 
 - `AGENTS.md` should be loaded by default whenever possible.

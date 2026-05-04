@@ -1,0 +1,5 @@
+---
+- name: Docker role placeholder
+  ansible.builtin.debug:
+    msg: "docker role parsed; no Docker installation is implemented in milestone 0"
+  changed_when: false
