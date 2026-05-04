@@ -3,6 +3,7 @@
 *.env
 secrets/
 inventories/local/
+.local/
 
 # Python / Ansible local state
 .venv/

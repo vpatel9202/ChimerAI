@@ -8,3 +8,4 @@ The project has not published a release yet.
 
 - Created initial project README.
 - Added provider-neutral agent instructions and compatibility shims.
+- Added `.local/` workspace convention and templates.

@@ -226,6 +226,9 @@ capable agents should all work from the same canonical instructions:
   that load `AGENTS.md`; they do not define separate policy.
 - [`docs/agents/`](docs/agents/) contains deeper topic-specific context that
   agents should read only when relevant.
+- [`.local/`](docs/agents/local-workspace.md) is the ignored private workspace
+  convention for local handoffs, private context, and operator-specific to-do
+  lists.
 
 Do not ask agents to summarize `AGENTS.md` into a separate instruction source.
 The goal is for each tool to load the canonical instructions directly whenever
@@ -242,6 +245,7 @@ the tool supports it.
 - [x] Choose initial license
 - [x] Add contribution guidelines
 - [x] Add provider-neutral agent instructions
+- [x] Add local workspace templates
 
 ### Milestone 1: Ansible Proof Of Concept
 

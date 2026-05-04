@@ -68,6 +68,21 @@ Read only what is relevant to the task:
 - `docs/agents/documentation-standards.md` before changing public docs.
 - `docs/agents/provider-compatibility.md` before changing agent instruction
   files or provider-specific shims.
+- `docs/agents/local-workspace.md` before changing local-only workspace
+  conventions or `.local/` templates.
+
+## Local Workspace
+
+`.local/` is the gitignored workspace for private operator context, active
+handoffs, local to-do lists, private inventories, and scratch notes.
+
+- If `.local/README.md` exists, read it before non-trivial local work.
+- If `.local/todo.md` exists, read it when choosing or continuing local work.
+- If `.local/handoff.md` exists, read it before taking over a large or
+  interrupted task.
+- Read `.local/context/*` selectively based on the task.
+- Never copy `.local/` content into public docs without explicit user approval.
+- If a local lesson is generally useful, propose a sanitized public-doc update.
 
 ## Validation Expectations
 
