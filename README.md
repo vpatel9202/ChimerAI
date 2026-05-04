@@ -31,6 +31,8 @@ same problem: many powerful services, many sharp edges, and too much glue code.
   workflow.
 - **Secure by design:** ingress, auth, remote access, and exposure policy are
   first-class concerns.
+- **AI-first development:** built so humans can direct coding agents through
+  provider-neutral repo instructions.
 
 ## Status
 
@@ -204,6 +206,31 @@ cp inventories/examples/single-server.yml inventories/local/host_vars/localhost.
 This command set does not exist yet. It describes the target interface for the
 first proof of concept.
 
+## AI-First Development
+
+ChimerAI is intended to be built and operated with AI coding agents as a normal
+part of the workflow.
+
+The expected pattern is:
+
+1. A human states intent, constraints, and acceptance criteria.
+2. A coding agent inspects the repo, proposes or applies a focused change, and
+   runs relevant validation.
+3. A human reviews the diff, tests the behavior, and decides what ships.
+
+The project is provider-neutral. Codex, Claude, Gemini, local models, and other
+capable agents should all work from the same canonical instructions:
+
+- [`AGENTS.md`](AGENTS.md) is the source of truth for agent behavior.
+- [`CLAUDE.md`](CLAUDE.md) and [`GEMINI.md`](GEMINI.md) are thin import shims
+  that load `AGENTS.md`; they do not define separate policy.
+- [`docs/agents/`](docs/agents/) contains deeper topic-specific context that
+  agents should read only when relevant.
+
+Do not ask agents to summarize `AGENTS.md` into a separate instruction source.
+The goal is for each tool to load the canonical instructions directly whenever
+the tool supports it.
+
 ## Roadmap
 
 ### Milestone 0: Project Definition
@@ -213,7 +240,8 @@ first proof of concept.
 - [ ] Define role contract
 - [ ] Define inventory schema
 - [x] Choose initial license
-- [ ] Add contribution guidelines
+- [x] Add contribution guidelines
+- [x] Add provider-neutral agent instructions
 
 ### Milestone 1: Ansible Proof Of Concept
 

@@ -7,3 +7,4 @@ The project has not published a release yet.
 ## Unreleased
 
 - Created initial project README.
+- Added provider-neutral agent instructions and compatibility shims.
