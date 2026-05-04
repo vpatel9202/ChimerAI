@@ -6,9 +6,10 @@ proof of concept clear without freezing the interface too early.
 
 Private deployments should keep real host values and secrets in an ignored
 SOPS-encrypted config file. The preferred path is
-`inventories/local/chimerai.sops.yaml`, loaded by passing
-`-e chimerai_config_file=inventories/local/chimerai.sops.yaml` to the playbook.
-Static public examples stay in `inventories/examples/`.
+`inventories/local/chimerai.sops.yaml`.
+
+Use `chimerai config init` to create that file and `chimerai config edit` to
+modify it. Static public examples stay in `inventories/examples/`.
 
 ## Minimal Shape
 
@@ -64,7 +65,7 @@ all:
 | `chimerai_state_root` | Root directory for app-local runtime state. |
 | `chimerai_action` | Lifecycle action. Milestone 1 supports `validate`, `apply`, and `remove`. |
 | `chimerai_enabled_roles` | Roles intended to run for this host. |
-| `chimerai_runtime.engine` | Container runtime family. Milestone 0 expects `docker`. |
+| `chimerai_runtime.engine` | Container runtime family. Milestone 1 expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
 | `chimerai_services` | Service configuration map. Milestone 1 includes `open_webui`. |
@@ -83,13 +84,20 @@ values. The playbook loads it before roles run when `chimerai_config_file` is
 set:
 
 ```bash
-uv run ansible-playbook chimerai.yml \
-  -e chimerai_config_file=inventories/local/chimerai.sops.yaml
+chimerai validate
 ```
 
 Use [`templates/config/chimerai.yaml`](../templates/config/chimerai.yaml) as
 the starting shape, then encrypt the private copy. Keep committed inventories
 small and generic.
+
+The lower-level equivalent is:
+
+```bash
+uv run ansible-playbook chimerai.yml \
+  -e chimerai_config_file=inventories/local/chimerai.sops.yaml \
+  -e chimerai_action=validate
+```
 
 ## State Policy
 
@@ -112,6 +120,14 @@ Milestone 1 uses `chimerai_action` as the basic lifecycle interface:
 
 Roles must not remove persistent app state unless the inventory explicitly opts
 into state removal for that service.
+
+The CLI maps these actions directly:
+
+```bash
+chimerai validate
+chimerai apply
+chimerai remove
+```
 
 ## Secrets And Private Values
 

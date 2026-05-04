@@ -2,7 +2,7 @@
 
 This reference defines the first ChimerAI role contract. It is intentionally
 small and optimized for the Milestone 1 core roles: `common`, `docker`,
-`networks`, and `diag`.
+`networks`, `diag`, and `open_webui`.
 
 ChimerAI roles should make host state reproducible while keeping Docker Compose
 output visible and debuggable.
@@ -35,8 +35,8 @@ roles/<role_name>/
 └── README.md
 ```
 
-Milestone 0 includes task-only placeholders so the project can parse. Milestone
-1 should expand roles only as needed for real behavior.
+Early roles should expand only as needed for real behavior. Avoid adding
+framework machinery before at least two roles need the same abstraction.
 
 ## Tags
 
@@ -96,5 +96,8 @@ config, and rendered with `no_log: true` when secret values are involved.
 ## Milestone 1 Boundary
 
 Milestone 1 proves the contract with core roles and one local-only app. It does
-not install Docker, configure public ingress, add SSO, deploy model providers,
-or migrate private infrastructure.
+not configure public ingress, add SSO, deploy model providers, or migrate
+private infrastructure.
+
+The current installer bootstraps local control tooling only. It does not make
+host-level changes such as Docker installation or firewall configuration.

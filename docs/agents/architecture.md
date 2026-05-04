@@ -3,6 +3,15 @@
 ChimerAI is planned as an Ansible-first framework with Docker Compose as the
 service runtime.
 
+The current operator entry points are:
+
+- `./install.sh` for repo-local tooling bootstrap only;
+- `chimerai config ...` for SOPS/age config lifecycle;
+- `chimerai validate|apply|remove` for Ansible lifecycle actions.
+
+These commands are wrappers. They should not become a separate orchestration
+layer or a second source of truth.
+
 ## Layer Model
 
 - Host provisioning: packages, users, Docker, systemd, firewall, and base
@@ -44,3 +53,6 @@ better than a generic framework that hides app behavior.
 Public ChimerAI should contain reusable roles, defaults, and examples. Private
 deployments should contain inventories, secrets, local app selections, local
 policy, and private runtime data.
+
+The preferred private config file is
+`inventories/local/chimerai.sops.yaml`, created by `chimerai config init`.

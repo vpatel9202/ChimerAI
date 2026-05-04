@@ -1,41 +1,34 @@
 # Configuration And Secrets
 
-ChimerAI uses a single private YAML file for local deployment configuration.
-That file should be encrypted with SOPS and age before it contains real
-secrets.
-
-This keeps non-secret structure readable while protecting API keys, passwords,
-OAuth secrets, and bot tokens at rest.
-
-## Default Pattern
-
-Use this layout for a private deployment:
+ChimerAI uses one private YAML file for local deployment configuration:
 
 ```text
 inventories/local/chimerai.sops.yaml
 ```
 
-The file contains normal ChimerAI inventory variables, including service
-configuration and secrets:
+That file is ignored by git and encrypted with SOPS + age. It is where local
+host settings, enabled services, ports, and secrets belong.
+
+## Why SOPS + age
+
+ChimerAI is meant to be edited by humans and AI coding agents. A fully opaque
+encrypted file would protect secrets, but it would also make reviews and
+agent-assisted edits painful.
+
+SOPS lets the YAML structure remain readable while encrypting only sensitive
+values:
 
 ```yaml
-chimerai_host_name: my-server
 chimerai_timezone: America/Chicago
-chimerai_deployment_root: /opt/chimerai
-chimerai_state_root: /opt/chimerai/apps
-
 chimerai_services:
   openclaw:
     enabled: true
     provider:
       anthropic_api_key: ENC[AES256_GCM,...]
-    discord:
-      enabled: true
-      bot_token: ENC[AES256_GCM,...]
 ```
 
-Only sensitive values should be encrypted. Hostnames, ports, enabled roles,
-network names, and other non-secret settings should remain readable.
+This gives users one config file without committing plaintext API keys,
+passwords, OAuth client secrets, or bot tokens.
 
 ## Create A Local Config
 
@@ -45,8 +38,7 @@ Run the repo-local installer first if you have not already:
 ./install.sh
 ```
 
-The installer adds the `chimerai` wrapper to `~/.local/bin` and installs
-`sops` and `age` there if they are missing. Then run:
+Then create the encrypted config:
 
 ```bash
 chimerai config init
@@ -61,23 +53,61 @@ That command:
 - encrypts the private config file;
 - verifies that SOPS can decrypt it.
 
-Edit the encrypted config with:
+`config init` is safe to rerun. It reuses an existing age key, SOPS rules file,
+and encrypted config unless `--force` is provided.
+
+## Edit And Validate Config
+
+Edit the encrypted config:
 
 ```bash
 chimerai config edit
 ```
 
-Validate that it decrypts cleanly with:
+Verify it can decrypt:
 
 ```bash
 chimerai config validate
 ```
 
+Run the normal ChimerAI validation flow:
+
+```bash
+chimerai validate
+```
+
+The wrapper passes `chimerai_config_file` to Ansible. Ansible loads the file
+with `community.sops.load_vars` before roles run.
+
+## What Gets Encrypted
+
+The generated `.sops.yaml` encrypts values whose key names look secret-like:
+
+```yaml
+api_key: ENC[AES256_GCM,...]
+client_secret: ENC[AES256_GCM,...]
+bot_token: ENC[AES256_GCM,...]
+bootstrap_password: ENC[AES256_GCM,...]
+```
+
+Non-secret structure remains readable:
+
+```yaml
+chimerai_enabled_roles:
+  - common
+  - docker
+  - networks
+  - diag
+  - open_webui
+```
+
+When adding new secret fields, use explicit names such as `api_key`,
+`client_secret`, `secret_key`, `password`, or `token` so SOPS encrypts them.
+
 ## Manual SOPS Flow
 
 The wrapper above is preferred. If you need to perform the steps manually,
 generate an age key:
-
 
 ```bash
 age-keygen -o ~/.config/sops/age/keys.txt
@@ -90,33 +120,15 @@ public key printed by `age-keygen`:
 cp .sops.yaml.example .sops.yaml
 ```
 
-Create your private config:
+Create and encrypt your private config:
 
 ```bash
 mkdir -p inventories/local
 cp templates/config/chimerai.yaml inventories/local/chimerai.sops.yaml
-sops --encrypt --in-place inventories/local/chimerai.sops.yaml
+sops --config .sops.yaml --encrypt --in-place inventories/local/chimerai.sops.yaml
 ```
 
-Edit it later with:
-
-```bash
-chimerai config edit
-```
-
-## Run With The Encrypted Config
-
-Use a minimal inventory host and pass the encrypted config path:
-
-```bash
-bin/chimerai validate
-bin/chimerai apply
-```
-
-The wrapper passes `chimerai_config_file` to Ansible. Ansible loads the file
-with `community.sops.load_vars` before roles run.
-
-The lower-level equivalent is:
+The lower-level Ansible equivalent of `chimerai validate` is:
 
 ```bash
 uv run ansible-playbook chimerai.yml \
@@ -124,11 +136,16 @@ uv run ansible-playbook chimerai.yml \
   -e chimerai_action=validate
 ```
 
+Use `chimerai_action=apply` or `chimerai_action=remove` for other lifecycle
+actions.
+
 ## Rules
 
 - Do not commit `.sops.yaml`; it contains local recipient policy.
 - Do not commit `inventories/local/`; it contains private deployment config.
 - Do not commit age private keys.
+- Back up the age identity. If you lose `~/.config/sops/age/keys.txt`, you lose
+  the ability to decrypt files encrypted only to that recipient.
 - Use obvious placeholders in public examples.
 - Keep `no_log: true` on tasks that render or manipulate secrets.
 

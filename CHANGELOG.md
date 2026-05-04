@@ -21,3 +21,5 @@ The project has not published a release yet.
   validation, and basic Ansible lifecycle actions.
 - Added repo-local `install.sh` bootstrap script for local tooling, CLI linking,
   and Ansible dependency setup.
+- Reworked user-facing and agent-facing documentation around the current
+  installer, CLI, SOPS config, and Milestone 1 proof of concept.

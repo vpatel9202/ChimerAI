@@ -23,6 +23,10 @@ The project also adopts these foundational rules:
   agents;
 - provider-specific agent files may exist only as import shims;
 - uv manages the local Python/Ansible validation toolchain;
+- `install.sh` bootstraps repo-local control tooling without deploying
+  services;
+- `bin/chimerai` wraps common Ansible and SOPS workflows for operator
+  convenience;
 - early roles should prioritize clarity and inspectability over generic
   abstraction.
 
@@ -37,6 +41,6 @@ policy outside the public repo. Public examples must use placeholders and stay
 safe for contributors to copy.
 
 This decision intentionally avoids Kubernetes, Nix/NixOS, a pure Compose
-catalog, and a custom orchestration CLI as the default path. A future
-`chimerai` command may wrap Ansible for convenience, but it should not become a
-second orchestration system.
+catalog, and a custom orchestration system as the default path. The `chimerai`
+command exists for convenience, but it must remain a thin wrapper around
+Ansible and SOPS rather than becoming a second source of lifecycle truth.

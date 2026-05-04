@@ -21,6 +21,8 @@ read only when relevant to the task.
 
 Project-level references:
 
+- [`../installation.md`](../installation.md) defines the repo-local bootstrap
+  flow.
 - [`../role-contract.md`](../role-contract.md) defines the initial role
   contract.
 - [`../inventory-schema.md`](../inventory-schema.md) defines the initial
@@ -39,3 +41,6 @@ Project-level references:
   then attach only the specific files from this directory that match the task.
 - If `.local/README.md` exists, read it before non-trivial local work. Treat
   `.local/` as private operator context that must not be committed.
+- For user-facing setup questions, prefer the current `./install.sh` and
+  `chimerai ...` commands over lower-level `uv run ansible-playbook` examples
+  unless the user is troubleshooting internals.

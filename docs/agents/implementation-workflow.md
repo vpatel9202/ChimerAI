@@ -23,7 +23,11 @@ scratch repo.
 
 - Run the most relevant validation available.
 - For docs, check links and read the changed section for clarity.
-- For future Ansible work, run syntax checks or dry-runs where available.
+- For shell changes, run `bash -n install.sh` or `bash -n bin/chimerai` as
+  relevant.
+- For Ansible work, run `uv run ansible-playbook chimerai.yml --syntax-check`.
+- For lifecycle behavior, prefer `chimerai validate` when an encrypted local
+  config exists; otherwise use `uv run ansible-playbook chimerai.yml --check`.
 - Leave the worktree state clear in the final report.
 
 ## Commit Guidance
@@ -34,3 +38,16 @@ example:
 - `Add provider-neutral agent instructions`
 - `Define initial Ansible role contract`
 - `Document Todoist MCP role design`
+
+## Public Setup Commands
+
+When writing user-facing docs, prefer the high-level flow:
+
+```bash
+./install.sh
+chimerai config init
+chimerai validate
+```
+
+Use lower-level `uv run ansible-playbook ...` examples only when documenting
+internals or troubleshooting.

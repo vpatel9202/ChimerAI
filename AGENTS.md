@@ -95,6 +95,11 @@ handoffs, local to-do lists, private inventories, and scratch notes.
 
 - For documentation-only changes, check links and read the rendered section for
   clarity.
+- For shell-script changes, run `bash -n` against the changed script.
+- For current Ansible changes, run
+  `uv run ansible-playbook chimerai.yml --syntax-check`.
+- Use `chimerai validate` for full wrapper-backed validation when local
+  encrypted config exists.
 - For future code or Ansible changes, run the most specific validation command
   available and report anything that could not be tested.
 - If no validation exists yet, say that plainly and avoid inventing confidence.

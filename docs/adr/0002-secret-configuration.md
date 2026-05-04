@@ -28,12 +28,21 @@ age is the default local key mechanism.
 Ansible loads the file through `community.sops.load_vars` when
 `chimerai_config_file` is provided.
 
+The `chimerai` CLI is the preferred user interface for this workflow:
+
+```bash
+chimerai config init
+chimerai config edit
+chimerai config validate
+```
+
 ## Consequences
 
 Users get one local configuration file for both normal settings and secrets,
 without storing plaintext credentials. Diffs remain useful because most of the
 YAML structure is readable.
 
-This adds external tooling: users need `sops` and `age` on the controller.
+This adds external tooling: users need `sops` and `age` on the controller. The
+repo-local installer can install both to `~/.local/bin` when they are missing.
 Ansible Vault remains documented as a fallback, but it is not the preferred
 public ChimerAI workflow.

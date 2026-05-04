@@ -18,6 +18,10 @@ powerful automation tools. Security guidance must be conservative by default.
   encrypted config.
 - Keep the age private key outside the repository. If a user needs help setting
   up SOPS, direct them to [`../configuration-and-secrets.md`](../configuration-and-secrets.md).
+- Remind users to back up `~/.config/sops/age/keys.txt`; without the age
+  identity, encrypted local config cannot be decrypted.
+- The installer may install `sops` and `age` into `~/.local/bin`, but it must
+  not generate private deployment config or deploy services.
 
 ## Ingress And Auth
 

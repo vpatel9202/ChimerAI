@@ -16,6 +16,8 @@ operate safely, and make changes without rediscovering project decisions.
 The README should be a landing page:
 
 - what ChimerAI is
+- how to get started
+- what works today
 - why it exists
 - who it is for
 - current status
@@ -23,7 +25,13 @@ The README should be a landing page:
 - roadmap
 - contribution path
 
-Avoid burying the README in implementation detail. Link to deeper docs instead.
+Put the current quickstart near the top. Many homelab users will skim, so do
+not bury the working install path below long conceptual sections. Avoid
+implementation detail in the README; link to deeper docs instead.
+
+Do not include future commands in the main quickstart unless they exist. Planned
+interfaces can be discussed in roadmap or explanation docs, clearly marked as
+planned.
 
 ## Agent Docs
 

@@ -36,6 +36,8 @@ chimerai_services:
     auth_enabled: true
 
   # Milestone 2 target shape. Keep disabled until the role exists.
+  # Provider keys are app-local for now. A future provider registry may let
+  # multiple apps inherit shared credentials without duplicating values.
   openclaw:
     enabled: false
     provider:

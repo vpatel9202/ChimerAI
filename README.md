@@ -3,224 +3,24 @@
 > A modular self-hosted AI homelab stack for agents, MCP tools, automation, and secure operations.
 
 [![Project status: design prototype](https://img.shields.io/badge/status-design%20prototype-orange)](#status)
-[![Ansible first](https://img.shields.io/badge/Ansible-first-ee0000?logo=ansible&logoColor=white)](#what-it-is)
-[![Docker Compose runtime](https://img.shields.io/badge/runtime-Docker%20Compose-2496ed?logo=docker&logoColor=white)](#what-it-is)
-[![Target OS: Ubuntu 24.04](https://img.shields.io/badge/target-Ubuntu%2024.04-e95420?logo=ubuntu&logoColor=white)](#roadmap)
+[![Ansible first](https://img.shields.io/badge/Ansible-first-ee0000?logo=ansible&logoColor=white)](#architecture)
+[![Docker Compose runtime](https://img.shields.io/badge/runtime-Docker%20Compose-2496ed?logo=docker&logoColor=white)](#architecture)
+[![Target OS: Ubuntu 24.04](https://img.shields.io/badge/target-Ubuntu%2024.04-e95420?logo=ubuntu&logoColor=white)](#status)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
 ChimerAI is an early-stage infrastructure project for people who want their AI
 tools to work together instead of living as disconnected Docker examples.
 
-The goal is to make it practical to deploy and operate a private AI stack that
-can run agent runtimes, MCP servers, workflow automation, model gateways,
-memory systems, document ingestion, secure ingress, backups, and diagnostics
-from one reproducible control plane.
+It is inspired by mature homelab projects like Saltbox, but it targets the
+AI-era version of that problem: agents, MCP servers, model providers, workflow
+automation, memory, ingress, auth, backups, and diagnostics under one
+reproducible control plane.
 
-ChimerAI is inspired by mature homelab projects like Saltbox, but it is not a
-media-server stack and it is not a fork. It targets the AI-era version of the
-same problem: many powerful services, many sharp edges, and too much glue code.
+## Quick Start
 
-## At A Glance
-
-- **One control plane:** Ansible-first lifecycle for setup, deployment,
-  validation, backup, and recovery.
-- **Compose-native runtime:** service definitions stay visible and debuggable.
-- **AI stack focus:** agents, MCP servers, model gateways, automation, memory,
-  document pipelines, and operations tooling.
-- **Homelab-first:** designed for a VPS or home server, not a cloud-only SaaS
-  workflow.
-- **Secure by design:** ingress, auth, remote access, and exposure policy are
-  first-class concerns.
-- **AI-first development:** built so humans can direct coding agents through
-  provider-neutral repo instructions.
-
-## Status
-
-ChimerAI is in design/prototype stage.
-
-This repository is being built in public from a real working deployment. The
-first milestone is a small Ansible-first proof of concept. Do not use this yet
-for production systems unless you are comfortable reading the code and helping
-shape the project.
-
-## Why ChimerAI?
-
-Self-hosted AI has a packaging problem.
-
-There are excellent tools for chat, local models, workflow automation, RAG,
-browser control, task management, calendars, memory, and MCP. But deploying
-them as a coherent system still usually means manually combining:
-
-- Docker Compose files from many projects
-- reverse proxy and TLS configuration
-- authentication and SSO
-- model provider secrets
-- local and API model routing
-- MCP server wiring
-- OAuth flows for calendars, tasks, email, and files
-- backup and restore boundaries
-- health checks and diagnostics
-- safe remote access
-
-ChimerAI aims to make that stack reproducible, inspectable, and operable.
-
-## What It Is
-
-ChimerAI is planned as an Ansible-first deployment framework that keeps Docker
-Compose as the service runtime.
-
-Ansible should own:
-
-- host bootstrap
-- users, directories, permissions, and packages
-- Docker and network setup
-- config and secret template rendering
-- app lifecycle commands
-- firewall and ingress setup
-- backups and restore workflows
-- diagnostics and validation
-
-Docker Compose should remain visible:
-
-- app services stay understandable
-- users can inspect and debug containers directly
-- community contributors can adapt existing Compose examples
-- advanced users can override service definitions without fighting a black box
-
-## What It Is Not
-
-ChimerAI is not:
-
-- a Kubernetes distribution
-- a hosted SaaS platform
-- a single monolithic AI app
-- another "one huge compose file" demo
-- a replacement for every app's native UI
-- a promise that all AI tools should be exposed publicly
-
-The goal is operational glue, not hiding the system from the operator.
-
-## Target Users
-
-ChimerAI is for:
-
-- homelab operators who want a private AI stack
-- developers running agent tooling on a VPS or home server
-- people experimenting with MCP servers and agent runtimes
-- users who want secure remote access to AI tools
-- operators who care about backup, restore, and diagnostics from day one
-
-It is probably not for someone who only wants to run a single local chat UI.
-
-## Planned Architecture
-
-```text
-ChimerAI
-  -> host provisioning
-  -> Docker and networks
-  -> ingress and authentication
-  -> agent runtimes
-  -> MCP tools
-  -> model gateways and local models
-  -> workflow automation
-  -> memory and document pipelines
-  -> backup, restore, and diagnostics
-```
-
-The expected repository shape is:
-
-```text
-.
-├── ansible.cfg
-├── chimerai.yml
-├── inventories/
-│   ├── examples/
-│   └── local/
-├── roles/
-│   ├── common/
-│   ├── docker/
-│   ├── networks/
-│   ├── traefik/
-│   ├── authentik/
-│   ├── hermes/
-│   ├── n8n/
-│   ├── open_webui/
-│   ├── mcp_google_workspace/
-│   ├── backup/
-│   └── diag/
-├── docs/
-└── bin/
-    └── chimerai
-```
-
-The `chimerai` command is planned as a thin wrapper around Ansible, not a
-second orchestration system.
-
-The initial project definition lives in:
-
-- [`docs/installation.md`](docs/installation.md) for the repo-local bootstrap
-  flow.
-- [`docs/role-contract.md`](docs/role-contract.md) for role responsibilities,
-  tags, state, Compose, validation, and secrets expectations.
-- [`docs/inventory-schema.md`](docs/inventory-schema.md) for the first
-  single-server inventory shape.
-- [`docs/configuration-and-secrets.md`](docs/configuration-and-secrets.md) for
-  the SOPS + age encrypted single-file configuration pattern.
-- [`docs/adr/`](docs/adr/) for durable architecture decisions.
-
-## Initial App Categories
-
-ChimerAI will start small. The public app catalog should grow only after the
-core lifecycle is reliable.
-
-Planned categories:
-
-- **Core:** Docker, networks, backup, diagnostics
-- **Ingress and Auth:** Traefik, Caddy, Authentik, Authelia
-- **Remote Access:** Tailscale, Cloudflare Tunnel, Cloudflare DNS/firewall
-- **Agent Runtimes:** Hermes Agent, Open WebUI, OpenClaw-compatible runtimes
-- **MCP Servers:** Google Workspace, Todoist, Playwright, GitHub, filesystem
-- **Model Layer:** Ollama, LiteLLM, OpenRouter/API-provider configuration
-- **Automation:** n8n, Node-RED, Activepieces
-- **Memory and Knowledge:** Honcho, vector stores, document ingestion tools
-- **Operations:** Dockge, Dozzle, Uptime Kuma, Prometheus/Grafana
-
-## Design Principles
-
-- **Composable:** enable the pieces you want; skip the rest.
-- **Inspectable:** generated Compose and env files should be easy to read.
-- **Secure by default:** do not expose internal services without a deliberate
-  ingress and auth policy.
-- **App-local state:** runtime data should live in predictable directories,
-  not opaque Docker volumes.
-- **One control plane:** prefer Ansible roles and tags over multiple competing
-  orchestration systems.
-- **Validation matters:** every service role should have a health check or
-  diagnostic path.
-- **Escape hatches are allowed:** advanced users should be able to override
-  Compose, env, routing, and service choices.
-
-## Planned User Experience
-
-The intended install flow is:
-
-```bash
-git clone https://github.com/vpatel9202/ChimerAI.git
-cd ChimerAI
-
-mkdir -p inventories/local
-cp inventories/examples/single-server.yml inventories/local/single-server.yml
-
-./bin/chimerai install core
-./bin/chimerai install hermes open-webui
-./bin/chimerai validate
-```
-
-This command set does not exist yet. It describes the target interface for the
-first proof of concept.
-
-For the current proof-of-concept skeleton, use the repo-local installer to
-bootstrap tooling, initialize encrypted local config, and run validation:
+Current state: ChimerAI can bootstrap its local control tooling, create an
+encrypted private config file, validate the host, and deploy/remove the first
+Open WebUI proof-of-concept role.
 
 ```bash
 git clone https://github.com/vpatel9202/ChimerAI.git
@@ -230,20 +30,202 @@ chimerai config init
 chimerai validate
 ```
 
-The default inventory uses `chimerai_action: validate`. To deploy services, use
-`bin/chimerai apply`; to remove ChimerAI-managed resources, use
-`bin/chimerai remove`.
-
-Private deployment values should live in one ignored SOPS-encrypted YAML file
-rather than scattered plaintext `.env` files. The preferred path is
-`inventories/local/chimerai.sops.yaml`. Edit it with:
+When you are ready to deploy the current proof of concept:
 
 ```bash
-bin/chimerai config edit
+chimerai apply
 ```
 
-See [`docs/configuration-and-secrets.md`](docs/configuration-and-secrets.md)
-for the full setup flow.
+To remove ChimerAI-managed services:
+
+```bash
+chimerai remove
+```
+
+The installer does not deploy services. It only prepares local tooling, links
+the `chimerai` command into `~/.local/bin`, installs Python/Ansible
+dependencies, and installs `sops`/`age` if they are missing.
+
+See [Installation](docs/installation.md) for details and troubleshooting.
+
+## Current Capabilities
+
+Implemented today:
+
+- repo-local bootstrap with [install.sh](install.sh);
+- `chimerai` CLI wrapper for config initialization, editing, validation,
+  apply, and remove;
+- SOPS + age encrypted private config at
+  `inventories/local/chimerai.sops.yaml`;
+- Ansible roles for `common`, `docker`, `networks`, `diag`, and `open_webui`;
+- Docker Compose output for Open WebUI in a predictable deployment directory;
+- app-local bind-mounted state for Open WebUI;
+- GitHub Actions validation for shell syntax, Ansible syntax, and safe dry-run.
+
+Not implemented yet:
+
+- public ingress and TLS;
+- SSO/authentication profiles;
+- backup and restore workflows;
+- production-ready agent runtime roles;
+- MCP server roles;
+- model provider abstraction or inherited API key configuration.
+
+## Status
+
+ChimerAI is in design/prototype stage. It is being built in public from lessons
+learned on a real private homelab deployment, but the public repo is not yet a
+complete turnkey AI stack.
+
+Primary test target:
+
+- Ubuntu 24.04
+- Docker with Compose v2
+- single-server homelab or VPS
+
+Use it now if you are comfortable reading the code and helping shape the
+project. If you want a fully supported appliance, wait for a later public alpha.
+
+## Why ChimerAI?
+
+Self-hosted AI has a packaging problem.
+
+There are excellent tools for chat, local models, workflow automation, RAG,
+browser control, task management, calendars, memory, and MCP. But deploying
+them as a coherent system still usually means manually combining:
+
+- Docker Compose files from many projects;
+- reverse proxy and TLS configuration;
+- authentication and SSO;
+- model provider secrets;
+- local and API model routing;
+- MCP server wiring;
+- OAuth flows for calendars, tasks, email, and files;
+- backup and restore boundaries;
+- health checks and diagnostics;
+- safe remote access.
+
+ChimerAI aims to make that stack reproducible, inspectable, and operable.
+
+## Architecture
+
+ChimerAI is Ansible-first and Docker Compose-native.
+
+Ansible owns lifecycle work:
+
+- host bootstrap;
+- users, directories, permissions, and packages;
+- Docker and network setup;
+- config and secret template rendering;
+- app lifecycle commands;
+- firewall and ingress setup;
+- backups and restore workflows;
+- diagnostics and validation.
+
+Docker Compose stays visible because homelab operators need to debug real
+containers with familiar tools. ChimerAI should generate understandable Compose,
+not hide services behind an opaque abstraction.
+
+The current shape is:
+
+```text
+.
+├── install.sh
+├── bin/
+│   └── chimerai
+├── ansible.cfg
+├── chimerai.yml
+├── inventories/
+│   └── examples/
+├── roles/
+│   ├── common/
+│   ├── docker/
+│   ├── networks/
+│   ├── diag/
+│   └── open_webui/
+├── templates/
+│   └── config/
+└── docs/
+```
+
+Planned role categories include ingress/auth, remote access, agent runtimes,
+MCP servers, model gateways, local models, automation, memory, document
+ingestion, backups, and operations tooling.
+
+## Key Decisions
+
+ChimerAI makes a few opinionated choices.
+
+- **Ansible instead of a custom orchestrator:** Ansible is boring, inspectable,
+  and already good at host state. The `chimerai` CLI is only a wrapper around
+  common workflows.
+- **Docker Compose instead of Kubernetes:** most homelab AI services already
+  publish Compose examples, and Compose is easier for single-server operators
+  to debug.
+- **SOPS + age for secrets:** users get one private YAML config file while
+  sensitive values stay encrypted at rest.
+- **App-local state instead of opaque Docker volumes:** runtime files should
+  be easy to find, inspect, back up, and migrate.
+- **Provider-neutral agent instructions:** Codex, Claude, Gemini, local models,
+  and other coding agents should all read the same project policy.
+
+See [Architecture Decision Records](docs/adr/) for the durable rationale.
+
+## Common Commands
+
+Bootstrap local tooling:
+
+```bash
+./install.sh
+```
+
+Create encrypted local config:
+
+```bash
+chimerai config init
+```
+
+Edit encrypted config:
+
+```bash
+chimerai config edit
+```
+
+Validate the host and config:
+
+```bash
+chimerai validate
+```
+
+Apply the configured stack:
+
+```bash
+chimerai apply
+```
+
+Remove ChimerAI-managed services:
+
+```bash
+chimerai remove
+```
+
+Run the lower-level Ansible validation directly:
+
+```bash
+uv run ansible-playbook chimerai.yml --check
+```
+
+## Documentation
+
+Start here:
+
+- [Installation](docs/installation.md): bootstrap a fresh local checkout.
+- [Configuration and Secrets](docs/configuration-and-secrets.md): encrypted
+  config, SOPS, age, and editing secrets.
+- [Inventory Schema](docs/inventory-schema.md): current variable shape.
+- [Role Contract](docs/role-contract.md): expectations for future roles.
+- [Architecture Decisions](docs/adr/): why major choices were made.
+- [Agent Context](docs/agents/): instructions for AI coding agents.
 
 ## AI-First Development
 
@@ -257,21 +239,14 @@ The expected pattern is:
    runs relevant validation.
 3. A human reviews the diff, tests the behavior, and decides what ships.
 
-The project is provider-neutral. Codex, Claude, Gemini, local models, and other
-capable agents should all work from the same canonical instructions:
+The project is provider-neutral:
 
-- [`AGENTS.md`](AGENTS.md) is the source of truth for agent behavior.
-- [`CLAUDE.md`](CLAUDE.md) and [`GEMINI.md`](GEMINI.md) are thin import shims
-  that load `AGENTS.md`; they do not define separate policy.
-- [`docs/agents/`](docs/agents/) contains deeper topic-specific context that
-  agents should read only when relevant.
-- [`.local/`](docs/agents/local-workspace.md) is the ignored private workspace
-  convention for local handoffs, private context, and operator-specific to-do
-  lists.
-
-Do not ask agents to summarize `AGENTS.md` into a separate instruction source.
-The goal is for each tool to load the canonical instructions directly whenever
-the tool supports it.
+- [AGENTS.md](AGENTS.md) is the source of truth for agent behavior.
+- [CLAUDE.md](CLAUDE.md) and [GEMINI.md](GEMINI.md) are thin import shims that
+  load `AGENTS.md`; they do not define separate policy.
+- [docs/agents/](docs/agents/) contains deeper topic-specific context.
+- `.local/` is the ignored private workspace convention for local handoffs,
+  private context, and operator-specific to-do lists.
 
 ## Roadmap
 
@@ -318,34 +293,21 @@ the tool supports it.
 - [ ] Add security policy
 - [ ] Add comparison guide against existing self-hosted AI stacks
 
-## Comparison To Existing Projects
-
-ChimerAI overlaps with projects such as n8n self-hosted AI starter kits,
-local-AI Compose bundles, LLemonStack-style service catalogs, and Saltbox-style
-homelab automation.
-
-The intended difference is focus:
-
-- not just AI demos
-- not just local model chat
-- not just workflow automation
-- not just a service catalog
-
-ChimerAI is intended to be an operations framework for self-hosted AI systems:
-agents, MCP tools, secure access, memory, automation, backup, and diagnostics.
-
 ## Contributing
 
-This project is not ready for broad contribution yet, but early design feedback
-is welcome.
+ChimerAI is not ready for broad contribution yet, but early design feedback is
+welcome.
 
 Good early contributions:
 
-- propose role structure improvements
-- identify existing projects worth integrating with instead of duplicating
-- suggest app categories and profiles
-- test the first proof of concept when available
-- improve documentation clarity
+- propose role structure improvements;
+- identify existing projects worth integrating instead of duplicating;
+- suggest app categories and profiles;
+- test the current proof of concept;
+- improve documentation clarity.
+
+Before proposing role changes, read [Role Contract](docs/role-contract.md) and
+[Inventory Schema](docs/inventory-schema.md).
 
 ## Name
 
