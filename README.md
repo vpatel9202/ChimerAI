@@ -218,25 +218,25 @@ This command set does not exist yet. It describes the target interface for the
 first proof of concept.
 
 For the current proof-of-concept skeleton, use uv to install the local Ansible
-tooling and run validation:
+tooling, initialize encrypted local config, and run validation:
 
 ```bash
 uv sync
 uv run ansible-galaxy collection install -r requirements.yml
-uv run ansible-playbook chimerai.yml --check
+bin/chimerai config init
+bin/chimerai validate
 ```
 
 The default inventory uses `chimerai_action: validate`. To deploy services, use
-a private inventory and set `chimerai_action=apply`; to remove ChimerAI-managed
-resources, set `chimerai_action=remove`.
+`bin/chimerai apply`; to remove ChimerAI-managed resources, use
+`bin/chimerai remove`.
 
 Private deployment values should live in one ignored SOPS-encrypted YAML file
 rather than scattered plaintext `.env` files. The preferred path is
-`inventories/local/chimerai.sops.yaml`, loaded with:
+`inventories/local/chimerai.sops.yaml`. Edit it with:
 
 ```bash
-uv run ansible-playbook chimerai.yml \
-  -e chimerai_config_file=inventories/local/chimerai.sops.yaml
+bin/chimerai config edit
 ```
 
 See [`docs/configuration-and-secrets.md`](docs/configuration-and-secrets.md)
@@ -295,6 +295,7 @@ the tool supports it.
 - [x] Add `diag` role
 - [x] Validate a minimal install on Ubuntu 24.04
 - [x] Define encrypted single-file configuration with SOPS + age
+- [x] Add `bin/chimerai` wrapper for config init/edit/validate
 
 ### Milestone 2: First Real Stack
 

@@ -39,9 +39,38 @@ network names, and other non-secret settings should remain readable.
 
 ## Create A Local Config
 
-Install `sops` and `age` using your operating system package manager.
+Install `sops` and `age` using your operating system package manager, then run:
 
-Generate an age key:
+```bash
+bin/chimerai config init
+```
+
+That command:
+
+- creates an age identity at `~/.config/sops/age/keys.txt` if one does not
+  already exist;
+- writes `.sops.yaml` with the public age recipient;
+- creates `inventories/local/chimerai.sops.yaml` from the template;
+- encrypts the private config file;
+- verifies that SOPS can decrypt it.
+
+Edit the encrypted config with:
+
+```bash
+bin/chimerai config edit
+```
+
+Validate that it decrypts cleanly with:
+
+```bash
+bin/chimerai config validate
+```
+
+## Manual SOPS Flow
+
+The wrapper above is preferred. If you need to perform the steps manually,
+generate an age key:
+
 
 ```bash
 age-keygen -o ~/.config/sops/age/keys.txt
@@ -65,7 +94,7 @@ sops --encrypt --in-place inventories/local/chimerai.sops.yaml
 Edit it later with:
 
 ```bash
-sops inventories/local/chimerai.sops.yaml
+bin/chimerai config edit
 ```
 
 ## Run With The Encrypted Config
@@ -73,11 +102,20 @@ sops inventories/local/chimerai.sops.yaml
 Use a minimal inventory host and pass the encrypted config path:
 
 ```bash
-uv run ansible-playbook chimerai.yml \
-  -e chimerai_config_file=inventories/local/chimerai.sops.yaml
+bin/chimerai validate
+bin/chimerai apply
 ```
 
-Ansible loads the file with `community.sops.load_vars` before roles run.
+The wrapper passes `chimerai_config_file` to Ansible. Ansible loads the file
+with `community.sops.load_vars` before roles run.
+
+The lower-level equivalent is:
+
+```bash
+uv run ansible-playbook chimerai.yml \
+  -e chimerai_config_file=inventories/local/chimerai.sops.yaml \
+  -e chimerai_action=validate
+```
 
 ## Rules
 

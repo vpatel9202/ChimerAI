@@ -23,6 +23,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
+      - name: Check CLI wrapper syntax
+        run: |
+          bash -n bin/chimerai
+          bin/chimerai --help
+
       - name: Install Ansible collections
         run: uv run ansible-galaxy collection install -r requirements.yml
 

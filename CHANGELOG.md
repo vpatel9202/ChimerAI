@@ -17,3 +17,5 @@ The project has not published a release yet.
   diagnostics, and Open WebUI.
 - Added SOPS + age support for an encrypted single-file private configuration
   workflow.
+- Added `bin/chimerai` wrapper commands for config initialization, editing,
+  validation, and basic Ansible lifecycle actions.

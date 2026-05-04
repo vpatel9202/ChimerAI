@@ -1,0 +1,265 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+
+readonly DEFAULT_CONFIG_FILE="${REPO_ROOT}/inventories/local/chimerai.sops.yaml"
+readonly DEFAULT_SOPS_FILE="${REPO_ROOT}/.sops.yaml"
+readonly DEFAULT_AGE_KEY_FILE="${HOME}/.config/sops/age/keys.txt"
+
+CONFIG_FILE="${CHIMERAI_CONFIG_FILE:-${DEFAULT_CONFIG_FILE}}"
+SOPS_FILE="${CHIMERAI_SOPS_FILE:-${DEFAULT_SOPS_FILE}}"
+AGE_KEY_FILE="${SOPS_AGE_KEY_FILE:-${DEFAULT_AGE_KEY_FILE}}"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  bin/chimerai config init [--force]
+  bin/chimerai config edit
+  bin/chimerai config validate
+  bin/chimerai validate
+  bin/chimerai apply
+  bin/chimerai remove
+
+Environment overrides:
+  CHIMERAI_CONFIG_FILE    Path to the private SOPS config file.
+  CHIMERAI_SOPS_FILE      Path to the local SOPS creation-rules file.
+  SOPS_AGE_KEY_FILE       Path to the local age identity file.
+
+Commands:
+  config init       Create age key, .sops.yaml, encrypted private config.
+  config edit       Open the encrypted private config with sops.
+  config validate   Verify the encrypted private config can decrypt.
+  validate          Run the ChimerAI Ansible validation action.
+  apply             Run the ChimerAI Ansible apply action.
+  remove            Run the ChimerAI Ansible remove action.
+EOF
+}
+
+die() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
+
+info() {
+  printf '%s\n' "$*"
+}
+
+require_cmd() {
+  command -v "$1" >/dev/null 2>&1 || die "missing required command: $1"
+}
+
+repo_relative_path() {
+  local path="$1"
+  if [[ "${path}" == "${REPO_ROOT}/"* ]]; then
+    printf '%s\n' "${path#"${REPO_ROOT}/"}"
+  else
+    printf '%s\n' "${path}"
+  fi
+}
+
+regex_escape() {
+  sed 's/[.[\*^$()+?{}|]/\\&/g'
+}
+
+age_recipient() {
+  [[ -f "${AGE_KEY_FILE}" ]] || die "age key file does not exist: ${AGE_KEY_FILE}"
+  age-keygen -y "${AGE_KEY_FILE}" | sed -n '1p'
+}
+
+ensure_age_key() {
+  require_cmd age-keygen
+
+  if [[ -f "${AGE_KEY_FILE}" ]]; then
+    info "Using existing age key: ${AGE_KEY_FILE}"
+    return
+  fi
+
+  mkdir -p "$(dirname -- "${AGE_KEY_FILE}")"
+  chmod 700 "$(dirname -- "${AGE_KEY_FILE}")"
+  age-keygen -o "${AGE_KEY_FILE}" >/dev/null
+  chmod 600 "${AGE_KEY_FILE}"
+  info "Created age key: ${AGE_KEY_FILE}"
+}
+
+write_sops_file() {
+  local force="$1"
+  local recipient="$2"
+  local config_pattern
+  if [[ "${CONFIG_FILE}" == "${REPO_ROOT}/"* ]]; then
+    config_pattern="(^|.*/)$(repo_relative_path "${CONFIG_FILE}" | regex_escape)$"
+  else
+    config_pattern=".*$(basename -- "${CONFIG_FILE}" | regex_escape)$"
+  fi
+
+  if [[ -f "${SOPS_FILE}" && "${force}" != "true" ]]; then
+    info "Using existing SOPS rules: ${SOPS_FILE}"
+    return
+  fi
+
+  mkdir -p "$(dirname -- "${SOPS_FILE}")"
+  cat >"${SOPS_FILE}" <<EOF
+# Local SOPS creation rules for ChimerAI.
+# This file is ignored by git because it contains operator-local recipient policy.
+creation_rules:
+  - path_regex: ${config_pattern}
+    age: ${recipient}
+    encrypted_regex: "(?i)(password|passphrase|secret|token|api_key|client_secret|private_key|webhook_secret)$"
+EOF
+  info "Wrote SOPS rules: ${SOPS_FILE}"
+}
+
+config_is_encrypted() {
+  [[ -f "${CONFIG_FILE}" ]] && grep -q '^sops:' "${CONFIG_FILE}"
+}
+
+encrypt_config_file() {
+  [[ -f "${SOPS_FILE}" ]] || die "SOPS rules file does not exist: ${SOPS_FILE}"
+  sops --config "${SOPS_FILE}" --encrypt --in-place "${CONFIG_FILE}"
+}
+
+edit_config_file() {
+  if [[ -f "${SOPS_FILE}" ]]; then
+    sops --config "${SOPS_FILE}" "${CONFIG_FILE}"
+  else
+    sops "${CONFIG_FILE}"
+  fi
+}
+
+decrypt_config_file() {
+  if [[ -f "${SOPS_FILE}" ]]; then
+    sops --config "${SOPS_FILE}" --decrypt "${CONFIG_FILE}" >/dev/null
+  else
+    sops --decrypt "${CONFIG_FILE}" >/dev/null
+  fi
+}
+
+create_config_file() {
+  local force="$1"
+  require_cmd sops
+
+  if [[ -f "${CONFIG_FILE}" && "${force}" != "true" ]]; then
+    if config_is_encrypted; then
+      info "Using existing encrypted config: ${CONFIG_FILE}"
+    else
+      encrypt_config_file
+      info "Encrypted existing config: ${CONFIG_FILE}"
+    fi
+    return
+  fi
+
+  mkdir -p "$(dirname -- "${CONFIG_FILE}")"
+  cp "${REPO_ROOT}/templates/config/chimerai.yaml" "${CONFIG_FILE}"
+  info "Created config from template: ${CONFIG_FILE}"
+
+  encrypt_config_file
+  info "Encrypted config: ${CONFIG_FILE}"
+}
+
+config_init() {
+  local force="false"
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --force)
+        force="true"
+        shift
+        ;;
+      *)
+        die "unknown config init option: $1"
+        ;;
+    esac
+  done
+
+  require_cmd sops
+  ensure_age_key
+
+  local recipient
+  recipient="$(age_recipient)"
+  [[ -n "${recipient}" ]] || die "could not derive age recipient from ${AGE_KEY_FILE}"
+
+  write_sops_file "${force}" "${recipient}"
+  create_config_file "${force}"
+  config_validate
+}
+
+config_edit() {
+  require_cmd sops
+  [[ -f "${CONFIG_FILE}" ]] || die "config file does not exist; run: bin/chimerai config init"
+  edit_config_file
+}
+
+config_validate() {
+  require_cmd sops
+  [[ -f "${CONFIG_FILE}" ]] || die "config file does not exist; run: bin/chimerai config init"
+  decrypt_config_file
+  info "Config decrypt check passed: ${CONFIG_FILE}"
+}
+
+ansible_playbook() {
+  local action="$1"
+  require_cmd uv
+  config_validate
+
+  cd "${REPO_ROOT}"
+  uv run ansible-playbook chimerai.yml \
+    -e "chimerai_config_file=${CONFIG_FILE}" \
+    -e "chimerai_action=${action}"
+}
+
+main() {
+  local command="${1:-}"
+  case "${command}" in
+    -h|--help|help)
+      usage
+      ;;
+    config)
+      shift
+      case "${1:-}" in
+        init)
+          shift
+          config_init "$@"
+          ;;
+        edit)
+          shift
+          [[ $# -eq 0 ]] || die "config edit does not accept arguments"
+          config_edit
+          ;;
+        validate)
+          shift
+          [[ $# -eq 0 ]] || die "config validate does not accept arguments"
+          config_validate
+          ;;
+        *)
+          usage
+          exit 1
+          ;;
+      esac
+      ;;
+    validate)
+      shift
+      [[ $# -eq 0 ]] || die "validate does not accept arguments"
+      ansible_playbook validate
+      ;;
+    apply)
+      shift
+      [[ $# -eq 0 ]] || die "apply does not accept arguments"
+      ansible_playbook apply
+      ;;
+    remove)
+      shift
+      [[ $# -eq 0 ]] || die "remove does not accept arguments"
+      ansible_playbook remove
+      ;;
+    "")
+      usage
+      exit 1
+      ;;
+    *)
+      die "unknown command: ${command}"
+      ;;
+  esac
+}
+
+main "$@"
