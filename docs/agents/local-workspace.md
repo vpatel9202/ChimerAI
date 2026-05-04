@@ -57,27 +57,27 @@ Agents should:
 
 Copy these templates into `.local/` and fill them with private context:
 
-- [`templates/local/README.md`](templates/local/README.md)
-- [`templates/local/handoff.md`](templates/local/handoff.md)
-- [`templates/local/todo.md`](templates/local/todo.md)
-- [`templates/local/host.md`](templates/local/host.md)
-- [`templates/local/network.md`](templates/local/network.md)
-- [`templates/local/agents.md`](templates/local/agents.md)
-- [`templates/local/mcp-and-tools.md`](templates/local/mcp-and-tools.md)
-- [`templates/local/deployment.md`](templates/local/deployment.md)
-- [`templates/local/decisions.md`](templates/local/decisions.md)
+- [`templates/local-workspace/README.md`](../../templates/local-workspace/README.md)
+- [`templates/local-workspace/handoff.md`](../../templates/local-workspace/handoff.md)
+- [`templates/local-workspace/todo.md`](../../templates/local-workspace/todo.md)
+- [`templates/local-workspace/host.md`](../../templates/local-workspace/host.md)
+- [`templates/local-workspace/network.md`](../../templates/local-workspace/network.md)
+- [`templates/local-workspace/agents.md`](../../templates/local-workspace/agents.md)
+- [`templates/local-workspace/mcp-and-tools.md`](../../templates/local-workspace/mcp-and-tools.md)
+- [`templates/local-workspace/deployment.md`](../../templates/local-workspace/deployment.md)
+- [`templates/local-workspace/decisions.md`](../../templates/local-workspace/decisions.md)
 
 Example setup:
 
 ```bash
 mkdir -p .local/context .local/scratch
-cp docs/agents/templates/local/README.md .local/README.md
-cp docs/agents/templates/local/handoff.md .local/handoff.md
-cp docs/agents/templates/local/todo.md .local/todo.md
-cp docs/agents/templates/local/host.md .local/context/host.md
-cp docs/agents/templates/local/network.md .local/context/network.md
-cp docs/agents/templates/local/agents.md .local/context/agents.md
-cp docs/agents/templates/local/mcp-and-tools.md .local/context/mcp-and-tools.md
-cp docs/agents/templates/local/deployment.md .local/context/deployment.md
-cp docs/agents/templates/local/decisions.md .local/context/decisions.md
+cp templates/local-workspace/README.md .local/README.md
+cp templates/local-workspace/handoff.md .local/handoff.md
+cp templates/local-workspace/todo.md .local/todo.md
+cp templates/local-workspace/host.md .local/context/host.md
+cp templates/local-workspace/network.md .local/context/network.md
+cp templates/local-workspace/agents.md .local/context/agents.md
+cp templates/local-workspace/mcp-and-tools.md .local/context/mcp-and-tools.md
+cp templates/local-workspace/deployment.md .local/context/deployment.md
+cp templates/local-workspace/decisions.md .local/context/decisions.md
 ```

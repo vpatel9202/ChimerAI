@@ -76,6 +76,13 @@ Read only what is relevant to the task:
 `.local/` is the gitignored workspace for private operator context, active
 handoffs, local to-do lists, private inventories, and scratch notes.
 
+- If `.local/README.md` is absent, briefly tell the user that ChimerAI supports
+  an optional ignored `.local/` workspace for private host context, handoffs,
+  local to-do lists, and deployment notes.
+- Ask whether they want help generating it from `templates/local-workspace/`.
+- Do not block unrelated work on this setup.
+- Do not create `.local/` without user approval.
+- If the user declines, continue with the requested task.
 - If `.local/README.md` exists, read it before non-trivial local work.
 - If `.local/todo.md` exists, read it when choosing or continuing local work.
 - If `.local/handoff.md` exists, read it before taking over a large or
