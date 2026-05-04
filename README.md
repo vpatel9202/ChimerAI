@@ -158,6 +158,8 @@ second orchestration system.
 
 The initial project definition lives in:
 
+- [`docs/installation.md`](docs/installation.md) for the repo-local bootstrap
+  flow.
 - [`docs/role-contract.md`](docs/role-contract.md) for role responsibilities,
   tags, state, Compose, validation, and secrets expectations.
 - [`docs/inventory-schema.md`](docs/inventory-schema.md) for the first
@@ -217,14 +219,15 @@ cp inventories/examples/single-server.yml inventories/local/single-server.yml
 This command set does not exist yet. It describes the target interface for the
 first proof of concept.
 
-For the current proof-of-concept skeleton, use uv to install the local Ansible
-tooling, initialize encrypted local config, and run validation:
+For the current proof-of-concept skeleton, use the repo-local installer to
+bootstrap tooling, initialize encrypted local config, and run validation:
 
 ```bash
-uv sync
-uv run ansible-galaxy collection install -r requirements.yml
-bin/chimerai config init
-bin/chimerai validate
+git clone https://github.com/vpatel9202/ChimerAI.git
+cd ChimerAI
+./install.sh
+chimerai config init
+chimerai validate
 ```
 
 The default inventory uses `chimerai_action: validate`. To deploy services, use
@@ -296,6 +299,7 @@ the tool supports it.
 - [x] Validate a minimal install on Ubuntu 24.04
 - [x] Define encrypted single-file configuration with SOPS + age
 - [x] Add `bin/chimerai` wrapper for config init/edit/validate
+- [x] Add repo-local bootstrap installer
 
 ### Milestone 2: First Real Stack
 

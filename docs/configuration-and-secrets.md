@@ -39,10 +39,17 @@ network names, and other non-secret settings should remain readable.
 
 ## Create A Local Config
 
-Install `sops` and `age` using your operating system package manager, then run:
+Run the repo-local installer first if you have not already:
 
 ```bash
-bin/chimerai config init
+./install.sh
+```
+
+The installer adds the `chimerai` wrapper to `~/.local/bin` and installs
+`sops` and `age` there if they are missing. Then run:
+
+```bash
+chimerai config init
 ```
 
 That command:
@@ -57,13 +64,13 @@ That command:
 Edit the encrypted config with:
 
 ```bash
-bin/chimerai config edit
+chimerai config edit
 ```
 
 Validate that it decrypts cleanly with:
 
 ```bash
-bin/chimerai config validate
+chimerai config validate
 ```
 
 ## Manual SOPS Flow
@@ -94,7 +101,7 @@ sops --encrypt --in-place inventories/local/chimerai.sops.yaml
 Edit it later with:
 
 ```bash
-bin/chimerai config edit
+chimerai config edit
 ```
 
 ## Run With The Encrypted Config

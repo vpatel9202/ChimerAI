@@ -19,3 +19,5 @@ The project has not published a release yet.
   workflow.
 - Added `bin/chimerai` wrapper commands for config initialization, editing,
   validation, and basic Ansible lifecycle actions.
+- Added repo-local `install.sh` bootstrap script for local tooling, CLI linking,
+  and Ansible dependency setup.
