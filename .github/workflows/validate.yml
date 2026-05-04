@@ -28,6 +28,8 @@ jobs:
           bash -n bin/chimerai
           bash -n install.sh
           bin/chimerai --help
+          ln -s "$PWD/bin/chimerai" /tmp/chimerai
+          /tmp/chimerai --help
           ./install.sh --help
 
       - name: Install Ansible collections

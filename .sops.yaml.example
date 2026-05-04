@@ -3,4 +3,4 @@
 creation_rules:
   - path_regex: inventories/local/.*\.sops\.ya?ml$
     age: age1replace_this_with_your_public_age_recipient
-    encrypted_regex: "(?i)(password|passphrase|secret|token|api_key|client_secret|private_key|webhook_secret)$"
+    encrypted_regex: "(?i)(password|passphrase|secret|secret_key|token|api_key|client_secret|private_key|webhook_secret)$"

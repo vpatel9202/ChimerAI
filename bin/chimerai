@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SOURCE_PATH="${BASH_SOURCE[0]}"
+while [[ -L "${SOURCE_PATH}" ]]; do
+  SOURCE_DIR="$(cd -- "$(dirname -- "${SOURCE_PATH}")" && pwd)"
+  SOURCE_PATH="$(readlink "${SOURCE_PATH}")"
+  [[ "${SOURCE_PATH}" == /* ]] || SOURCE_PATH="${SOURCE_DIR}/${SOURCE_PATH}"
+done
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${SOURCE_PATH}")" && pwd)"
 readonly REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 
 readonly DEFAULT_CONFIG_FILE="${REPO_ROOT}/inventories/local/chimerai.sops.yaml"
@@ -105,7 +112,7 @@ write_sops_file() {
 creation_rules:
   - path_regex: ${config_pattern}
     age: ${recipient}
-    encrypted_regex: "(?i)(password|passphrase|secret|token|api_key|client_secret|private_key|webhook_secret)$"
+    encrypted_regex: "(?i)(password|passphrase|secret|secret_key|token|api_key|client_secret|private_key|webhook_secret)$"
 EOF
   info "Wrote SOPS rules: ${SOPS_FILE}"
 }

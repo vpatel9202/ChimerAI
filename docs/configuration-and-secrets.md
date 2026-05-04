@@ -86,6 +86,7 @@ The generated `.sops.yaml` encrypts values whose key names look secret-like:
 ```yaml
 api_key: ENC[AES256_GCM,...]
 client_secret: ENC[AES256_GCM,...]
+secret_key: ENC[AES256_GCM,...]
 bot_token: ENC[AES256_GCM,...]
 bootstrap_password: ENC[AES256_GCM,...]
 ```
