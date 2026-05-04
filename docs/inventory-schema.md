@@ -4,9 +4,11 @@ This reference defines the first public ChimerAI inventory shape. It is a human
 schema, not a JSON Schema file. The goal is to make the first single-server
 proof of concept clear without freezing the interface too early.
 
-Private deployments should copy the example inventory into `inventories/local/`
-or another ignored/private location before adding real domains, secrets, or
-host-specific values.
+Private deployments should keep real host values and secrets in an ignored
+SOPS-encrypted config file. The preferred path is
+`inventories/local/chimerai.sops.yaml`, loaded by passing
+`-e chimerai_config_file=inventories/local/chimerai.sops.yaml` to the playbook.
+Static public examples stay in `inventories/examples/`.
 
 ## Minimal Shape
 
@@ -67,6 +69,28 @@ all:
 | `chimerai_networks` | Shared networks roles may create or reference. |
 | `chimerai_services` | Service configuration map. Milestone 1 includes `open_webui`. |
 
+## Preferred Private Config File
+
+ChimerAI's preferred private deployment format is a single YAML file encrypted
+with SOPS + age:
+
+```text
+inventories/local/chimerai.sops.yaml
+```
+
+That file can contain both non-secret deployment choices and encrypted secret
+values. The playbook loads it before roles run when `chimerai_config_file` is
+set:
+
+```bash
+uv run ansible-playbook chimerai.yml \
+  -e chimerai_config_file=inventories/local/chimerai.sops.yaml
+```
+
+Use [`templates/config/chimerai.yaml`](../templates/config/chimerai.yaml) as
+the starting shape, then encrypt the private copy. Keep committed inventories
+small and generic.
+
 ## State Policy
 
 Service roles should place app state under `chimerai_state_root` unless a role
@@ -99,11 +123,13 @@ Do not put real secrets in committed inventories. Private values include:
 - passwords and bootstrap credentials;
 - private network policy.
 
-Use `inventories/local/` or another ignored private inventory location for real
-deployments.
+Use `inventories/local/chimerai.sops.yaml` for real deployments. The
+repository's `.sops.yaml.example` shows how to encrypt sensitive keys while
+leaving non-secret structure readable in diffs.
 
-## Milestone 0 Boundary
+## Current Boundary
 
-The example inventory exists so Ansible can parse the playbook and so future
-roles have a starting contract. Milestone 0 does not validate every field
-semantically and does not deploy services.
+The example inventory exists so Ansible can parse the playbook and roles have a
+starting contract. Milestone 1 validates the core role shape and Open WebUI
+proof of concept; it does not yet configure ingress, SSO, backups, or a full
+agent/MCP stack.

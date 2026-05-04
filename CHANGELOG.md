@@ -15,3 +15,5 @@ The project has not published a release yet.
 - Added a foundational architecture decision record.
 - Added Milestone 1 core role behavior for validation, Docker checks, networks,
   diagnostics, and Open WebUI.
+- Added SOPS + age support for an encrypted single-file private configuration
+  workflow.

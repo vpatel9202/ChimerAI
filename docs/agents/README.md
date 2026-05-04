@@ -25,6 +25,8 @@ Project-level references:
   contract.
 - [`../inventory-schema.md`](../inventory-schema.md) defines the initial
   inventory shape.
+- [`../configuration-and-secrets.md`](../configuration-and-secrets.md) defines
+  the SOPS + age encrypted config workflow.
 - [`../adr/`](../adr/) records durable architecture decisions.
 
 ## Loading Model

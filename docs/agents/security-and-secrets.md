@@ -8,8 +8,16 @@ powerful automation tools. Security guidance must be conservative by default.
 - Never commit API keys, OAuth tokens, passwords, private inventories, provider
   credentials, `.env` files, or generated runtime state.
 - Examples should use placeholders and explain where real values belong.
-- Prefer local ignored files, environment variables, or documented secret
-  managers for real deployments.
+- Prefer one ignored SOPS-encrypted YAML file for deployment configuration:
+  `inventories/local/chimerai.sops.yaml`.
+- Use SOPS + age as the default secret workflow. Ansible Vault is acceptable as
+  a fallback, but do not introduce a second default path without an ADR.
+- Keep role tasks that load or render secrets behind `no_log: true`.
+- Do not scatter user-facing secrets across app-specific plaintext `.env`
+  files unless the generated runtime file is ignored and derived from the
+  encrypted config.
+- Keep the age private key outside the repository. If a user needs help setting
+  up SOPS, direct them to [`../configuration-and-secrets.md`](../configuration-and-secrets.md).
 
 ## Ingress And Auth
 

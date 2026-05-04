@@ -4,6 +4,7 @@
 secrets/
 inventories/local/
 .local/
+.sops.yaml
 
 # Python / Ansible local state
 .venv/

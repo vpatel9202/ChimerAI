@@ -10,3 +10,4 @@ small documentation changes, or choices that are still experimental.
 ## Records
 
 - [0001: Foundational architecture](0001-foundational-architecture.md)
+- [0002: Secret configuration](0002-secret-configuration.md)

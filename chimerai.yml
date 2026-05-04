@@ -5,6 +5,17 @@
   vars:
     ansible_python_interpreter: "{{ ansible_playbook_python }}"
 
+  pre_tasks:
+    - name: Load SOPS-encrypted ChimerAI config file
+      community.sops.load_vars:
+        file: "{{ chimerai_config_file }}"
+      no_log: true
+      when:
+        - chimerai_config_file is defined
+        - chimerai_config_file | length > 0
+      tags:
+        - always
+
   roles:
     - role: common
       when: "'common' in chimerai_enabled_roles"

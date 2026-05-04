@@ -162,6 +162,8 @@ The initial project definition lives in:
   tags, state, Compose, validation, and secrets expectations.
 - [`docs/inventory-schema.md`](docs/inventory-schema.md) for the first
   single-server inventory shape.
+- [`docs/configuration-and-secrets.md`](docs/configuration-and-secrets.md) for
+  the SOPS + age encrypted single-file configuration pattern.
 - [`docs/adr/`](docs/adr/) for durable architecture decisions.
 
 ## Initial App Categories
@@ -228,6 +230,18 @@ The default inventory uses `chimerai_action: validate`. To deploy services, use
 a private inventory and set `chimerai_action=apply`; to remove ChimerAI-managed
 resources, set `chimerai_action=remove`.
 
+Private deployment values should live in one ignored SOPS-encrypted YAML file
+rather than scattered plaintext `.env` files. The preferred path is
+`inventories/local/chimerai.sops.yaml`, loaded with:
+
+```bash
+uv run ansible-playbook chimerai.yml \
+  -e chimerai_config_file=inventories/local/chimerai.sops.yaml
+```
+
+See [`docs/configuration-and-secrets.md`](docs/configuration-and-secrets.md)
+for the full setup flow.
+
 ## AI-First Development
 
 ChimerAI is intended to be built and operated with AI coding agents as a normal
@@ -280,13 +294,15 @@ the tool supports it.
 - [x] Add `open_webui` role
 - [x] Add `diag` role
 - [x] Validate a minimal install on Ubuntu 24.04
+- [x] Define encrypted single-file configuration with SOPS + age
 
 ### Milestone 2: First Real Stack
 
+- [ ] Choose the first real AI stack role set
 - [ ] Add ingress profile
 - [ ] Add authentication profile
-- [ ] Add Hermes Agent role
-- [ ] Add Google Workspace MCP role
+- [ ] Add the first agent/runtime role beyond Open WebUI
+- [ ] Add the first MCP server role
 - [ ] Add backup and restore workflows
 - [ ] Document a complete fresh-server install
 

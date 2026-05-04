@@ -1,0 +1,54 @@
+---
+# Copy this file to inventories/local/chimerai.sops.yaml, fill in your local
+# values, then encrypt it with SOPS.
+
+chimerai_host_name: localhost
+chimerai_timezone: Etc/UTC
+chimerai_deployment_root: /opt/chimerai
+chimerai_state_root: /opt/chimerai/apps
+chimerai_action: validate
+
+chimerai_enabled_roles:
+  - common
+  - docker
+  - networks
+  - diag
+  - open_webui
+
+chimerai_runtime:
+  engine: docker
+  compose_command: docker compose
+
+chimerai_networks:
+  - name: chimerai-public
+    purpose: ingress
+  - name: chimerai-internal
+    purpose: private-service
+  - name: chimerai-mcp
+    purpose: mcp
+
+chimerai_services:
+  open_webui:
+    image: ghcr.io/open-webui/open-webui:main
+    host: 127.0.0.1
+    host_port: 13080
+    container_port: 8080
+    auth_enabled: true
+
+  # Milestone 2 target shape. Keep disabled until the role exists.
+  openclaw:
+    enabled: false
+    provider:
+      anthropic_api_key: replace-me
+      openai_api_key: replace-me
+    discord:
+      enabled: false
+      bot_token: replace-me
+
+  # Milestone 2 target shape. Keep disabled until the role exists.
+  authentik:
+    enabled: false
+    bootstrap_email: admin@example.com
+    bootstrap_password: replace-me
+    postgres_password: replace-me
+    secret_key: replace-me

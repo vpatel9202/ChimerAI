@@ -82,12 +82,16 @@ Destructive state removal must require an explicit service-specific opt-in.
 ## Secrets
 
 Public defaults and examples must never contain real credentials. Role defaults
-may define non-secret values, but secret values belong in private inventories,
-ignored env files, or a documented secret manager.
+may define non-secret values, but secret values belong in the ignored
+SOPS-encrypted private config file loaded through `chimerai_config_file`.
 
 If a value controls exposure, authentication, provider tokens, OAuth clients, or
 remote access, document where it should live and use an obvious placeholder in
 examples.
+
+Roles that render app-specific runtime `.env` files should treat those files as
+generated artifacts. They must be ignored, derived from the private encrypted
+config, and rendered with `no_log: true` when secret values are involved.
 
 ## Milestone 1 Boundary
 
