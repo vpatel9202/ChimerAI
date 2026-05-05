@@ -23,6 +23,8 @@ all:
 
           chimerai_host_name: localhost
           chimerai_timezone: Etc/UTC
+          chimerai_domain: example.com
+          chimerai_acme_email: admin@example.com
           chimerai_deployment_root: /opt/chimerai
           chimerai_state_root: /opt/chimerai/apps
           chimerai_action: validate
@@ -31,8 +33,21 @@ all:
             - common
             - docker
             - networks
+            - traefik
+            - authentik
+            - openclaw
             - diag
             - open_webui
+
+          chimerai_ingress:
+            tls:
+              enabled: true
+              resolver: letsencrypt
+              challenge: http-01
+              staging: true
+            auth:
+              provider: authentik
+              protect_apps_by_default: true
 
           chimerai_runtime:
             engine: docker
@@ -53,6 +68,21 @@ all:
               host_port: 13080
               container_port: 8080
               auth_enabled: true
+              ingress:
+                enabled: true
+                host: open-webui.example.com
+                auth_required: true
+            openclaw:
+              image: ghcr.io/openclaw/openclaw:latest
+              host: openclaw.example.com
+              auth_required: true
+            authentik:
+              image: ghcr.io/goauthentik/server:2025.10
+              host: auth.example.com
+              bootstrap_email: admin@example.com
+              bootstrap_password: replace-me
+              secret_key: replace-me
+              postgres_password: replace-me
 ```
 
 ## Required Fields
@@ -61,14 +91,17 @@ all:
 | --- | --- |
 | `chimerai_host_name` | Human-readable name for the target host. |
 | `chimerai_timezone` | Timezone roles should apply or assume. |
+| `chimerai_domain` | Base DNS domain used by ingress-aware roles. |
+| `chimerai_acme_email` | Contact email for Let's Encrypt ACME registration. |
 | `chimerai_deployment_root` | Root directory for generated ChimerAI files. |
 | `chimerai_state_root` | Root directory for app-local runtime state. |
 | `chimerai_action` | Lifecycle action. Milestone 1 supports `validate`, `apply`, and `remove`. |
 | `chimerai_enabled_roles` | Roles intended to run for this host. |
+| `chimerai_ingress` | Shared ingress, TLS, and auth defaults. |
 | `chimerai_runtime.engine` | Container runtime family. Milestone 1 expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Milestone 1 includes `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, and `open_webui`. |
 
 ## Preferred Private Config File
 
@@ -110,6 +143,11 @@ explicitly documents another path. The default design preference is:
 
 This keeps runtime state discoverable and backup-friendly.
 
+By default, `chimerai_state_root` is `/opt/chimerai/apps`, so OpenClaw state
+would live under `/opt/chimerai/apps/openclaw/`, Authentik state under
+`/opt/chimerai/apps/authentik/`, and Traefik ACME state under
+`/opt/chimerai/apps/traefik/`.
+
 ## Lifecycle Actions
 
 Milestone 1 uses `chimerai_action` as the basic lifecycle interface:
@@ -146,6 +184,6 @@ leaving non-secret structure readable in diffs.
 ## Current Boundary
 
 The example inventory exists so Ansible can parse the playbook and roles have a
-starting contract. Milestone 1 validates the core role shape and Open WebUI
-proof of concept; it does not yet configure ingress, SSO, backups, or a full
-agent/MCP stack.
+starting contract. The current public stack configures first-pass ingress,
+shared auth, and OpenClaw, but it still expects manual Authentik provider and
+application setup after first deployment.

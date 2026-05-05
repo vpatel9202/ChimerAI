@@ -7,6 +7,8 @@
       - chimerai_open_webui_host_port | int > 0
       - chimerai_open_webui_container_port | int > 0
       - chimerai_open_webui_network | length > 0
+      - not (chimerai_open_webui_ingress_enabled | bool) or chimerai_open_webui_ingress_host | length > 0
+      - not (chimerai_open_webui_ingress_enabled | bool) or chimerai_open_webui_ingress_network | length > 0
     fail_msg: "Open WebUI configuration is incomplete."
 
 - name: Create Open WebUI directories
@@ -48,7 +50,9 @@
     project_name: "{{ chimerai_open_webui_project_name }}"
     state: present
     remove_orphans: true
-  when: chimerai_action == "apply"
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
 
 - name: Check whether Open WebUI Compose file exists
   ansible.builtin.stat:

@@ -20,6 +20,8 @@ values:
 
 ```yaml
 chimerai_timezone: America/Chicago
+chimerai_domain: example.com
+chimerai_acme_email: admin@example.com
 chimerai_services:
   openclaw:
     enabled: true
@@ -98,12 +100,39 @@ chimerai_enabled_roles:
   - common
   - docker
   - networks
-  - diag
-  - open_webui
+  - traefik
+  - authentik
+  - openclaw
 ```
 
 When adding new secret fields, use explicit names such as `api_key`,
 `client_secret`, `secret_key`, `password`, or `token` so SOPS encrypts them.
+
+## Public Ingress Settings
+
+The first real stack uses Traefik and Let's Encrypt HTTP-01. These values are
+not secrets, but they are deployment-specific:
+
+```yaml
+chimerai_domain: example.com
+chimerai_acme_email: admin@example.com
+chimerai_ingress:
+  tls:
+    enabled: true
+    resolver: letsencrypt
+    challenge: http-01
+    staging: true
+  auth:
+    provider: authentik
+    protect_apps_by_default: true
+```
+
+Set `staging: true` for first tests. After DNS, firewall, and routing are
+confirmed, switch to `staging: false` and run `chimerai apply` again to request
+production certificates.
+
+HTTP-01 requires public inbound access to ports `80` and `443`. If another
+service already owns those ports, Traefik will not start.
 
 ## Manual SOPS Flow
 

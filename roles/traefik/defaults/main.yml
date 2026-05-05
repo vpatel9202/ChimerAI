@@ -1,0 +1,17 @@
+---
+chimerai_traefik_name: traefik
+chimerai_traefik_project_name: chimerai-traefik
+chimerai_traefik_image: "{{ chimerai_services.traefik.image | default('traefik:v3') }}"
+chimerai_traefik_enabled: "{{ chimerai_services.traefik.enabled | default(true) }}"
+chimerai_traefik_dashboard_enabled: "{{ chimerai_services.traefik.dashboard.enabled | default(false) }}"
+chimerai_traefik_public_network: "{{ chimerai_services.traefik.public_network | default('chimerai-public') }}"
+chimerai_traefik_internal_network: "{{ chimerai_services.traefik.internal_network | default('chimerai-internal') }}"
+chimerai_traefik_app_dir: "{{ chimerai_deployment_root }}/traefik"
+chimerai_traefik_state_dir: "{{ chimerai_state_root }}/traefik"
+chimerai_traefik_config_dir: "{{ chimerai_traefik_app_dir }}/config"
+chimerai_traefik_acme_dir: "{{ chimerai_traefik_state_dir }}/acme"
+chimerai_traefik_acme_file: "{{ chimerai_traefik_acme_dir }}/acme.json"
+chimerai_traefik_acme_email: "{{ chimerai_acme_email | default('admin@example.com') }}"
+chimerai_traefik_acme_resolver: "{{ chimerai_ingress.tls.resolver | default('letsencrypt') }}"
+chimerai_traefik_acme_staging: "{{ chimerai_ingress.tls.staging | default(true) }}"
+chimerai_traefik_remove_state: "{{ chimerai_services.traefik.remove_state | default(false) }}"

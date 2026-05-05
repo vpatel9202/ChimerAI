@@ -32,10 +32,25 @@
       tags:
         - networks
         - core
+    - role: traefik
+      when: "'traefik' in chimerai_enabled_roles"
+      tags:
+        - traefik
+        - ingress
+    - role: authentik
+      when: "'authentik' in chimerai_enabled_roles"
+      tags:
+        - authentik
+        - auth
     - role: open_webui
       when: "'open_webui' in chimerai_enabled_roles"
       tags:
         - open_webui
+        - app
+    - role: openclaw
+      when: "'openclaw' in chimerai_enabled_roles"
+      tags:
+        - openclaw
         - app
     - role: diag
       when: "'diag' in chimerai_enabled_roles"

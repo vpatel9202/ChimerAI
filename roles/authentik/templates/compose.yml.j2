@@ -1,0 +1,93 @@
+---
+services:
+  postgresql:
+    image: "{{ chimerai_authentik_postgres_image }}"
+    container_name: "{{ chimerai_authentik_project_name }}-postgresql"
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_DB: ${PG_DB}
+    volumes:
+      - "{{ chimerai_authentik_postgresql_dir }}:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${PG_DB} -U ${PG_USER}"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - "{{ chimerai_authentik_internal_network }}"
+
+  redis:
+    image: "{{ chimerai_authentik_redis_image }}"
+    container_name: "{{ chimerai_authentik_project_name }}-redis"
+    restart: unless-stopped
+    command: --save 60 1 --loglevel warning
+    volumes:
+      - "{{ chimerai_authentik_redis_dir }}:/data"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - "{{ chimerai_authentik_internal_network }}"
+
+  server:
+    image: "{{ chimerai_authentik_image }}"
+    container_name: "{{ chimerai_authentik_project_name }}-server"
+    restart: unless-stopped
+    command: server
+    env_file:
+      - .env
+    volumes:
+      - "{{ chimerai_authentik_media_dir }}:/media"
+      - "{{ chimerai_authentik_templates_dir }}:/templates"
+      - "{{ chimerai_authentik_certs_dir }}:/certs"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network={{ chimerai_authentik_public_network }}"
+      - "traefik.http.routers.authentik.rule=Host(`{{ chimerai_authentik_host }}`)"
+      - "traefik.http.routers.authentik.entrypoints=websecure"
+      - "traefik.http.routers.authentik.tls=true"
+      - "traefik.http.routers.authentik.tls.certresolver={{ chimerai_authentik_acme_resolver }}"
+      - "traefik.http.routers.authentik.service=authentik"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
+      - "traefik.http.middlewares.authentik.forwardauth.address=http://{{ chimerai_authentik_project_name }}-server:9000/outpost.goauthentik.io/auth/traefik"
+      - "traefik.http.middlewares.authentik.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authentik.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
+    networks:
+      - "{{ chimerai_authentik_public_network }}"
+      - "{{ chimerai_authentik_internal_network }}"
+
+  worker:
+    image: "{{ chimerai_authentik_image }}"
+    container_name: "{{ chimerai_authentik_project_name }}-worker"
+    restart: unless-stopped
+    command: worker
+    env_file:
+      - .env
+    volumes:
+      - "{{ chimerai_authentik_media_dir }}:/media"
+      - "{{ chimerai_authentik_templates_dir }}:/templates"
+      - "{{ chimerai_authentik_certs_dir }}:/certs"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - "{{ chimerai_authentik_internal_network }}"
+
+networks:
+  {{ chimerai_authentik_public_network }}:
+    external: true
+  {{ chimerai_authentik_internal_network }}:
+    external: true

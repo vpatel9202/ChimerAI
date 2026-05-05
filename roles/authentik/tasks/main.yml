@@ -1,0 +1,107 @@
+---
+- name: Validate Authentik configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_authentik_image | length > 0
+      - chimerai_authentik_host | length > 0
+      - chimerai_authentik_bootstrap_email | length > 0
+      - chimerai_authentik_public_network | length > 0
+      - chimerai_authentik_internal_network | length > 0
+    fail_msg: "Authentik requires image, host, bootstrap email, and Docker networks."
+
+- name: Validate Authentik secrets before apply
+  ansible.builtin.assert:
+    that:
+      - chimerai_authentik_bootstrap_password | length > 0
+      - chimerai_authentik_secret_key | length > 0
+      - chimerai_authentik_postgres_password | length > 0
+      - chimerai_authentik_bootstrap_password != 'replace-me'
+      - chimerai_authentik_secret_key != 'replace-me'
+      - chimerai_authentik_postgres_password != 'replace-me'
+    fail_msg: "Authentik apply requires real bootstrap password, secret key, and Postgres password in the encrypted config."
+  when: chimerai_action == "apply"
+
+- name: Create Authentik directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ chimerai_authentik_app_dir }}"
+    - "{{ chimerai_authentik_postgresql_dir }}"
+    - "{{ chimerai_authentik_redis_dir }}"
+    - "{{ chimerai_authentik_media_dir }}"
+    - "{{ chimerai_authentik_templates_dir }}"
+    - "{{ chimerai_authentik_certs_dir }}"
+  when: chimerai_action == "apply"
+
+- name: Render Authentik env file
+  ansible.builtin.template:
+    src: authentik.env.j2
+    dest: "{{ chimerai_authentik_app_dir }}/.env"
+    mode: "0600"
+  no_log: true
+  when: chimerai_action == "apply"
+
+- name: Render Authentik setup checklist
+  ansible.builtin.template:
+    src: authentik-setup.md.j2
+    dest: "{{ chimerai_authentik_app_dir }}/AUTHENTIK_SETUP.md"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Render Authentik Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_authentik_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Authentik
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_authentik_app_dir }}"
+    project_name: "{{ chimerai_authentik_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether Authentik Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_authentik_app_dir }}/compose.yml"
+  register: chimerai_authentik_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Authentik
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_authentik_app_dir }}"
+    project_name: "{{ chimerai_authentik_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_authentik_compose_file.stat.exists
+
+- name: Remove Authentik generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_authentik_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Authentik state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/authentik
+  when:
+    - chimerai_action == "remove"
+    - chimerai_authentik_remove_state | bool
+  changed_when: true

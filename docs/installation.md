@@ -24,6 +24,8 @@ Install these before starting:
 - `curl`
 - `tar`
 - Docker with Compose v2, if you want validation to check the Docker runtime
+- a DNS zone you control, if you want public Traefik ingress and Let's Encrypt
+- public inbound access to ports `80` and `443`, if you use HTTP-01
 
 Why Docker is not installed here: the current installer bootstraps the local
 ChimerAI control environment. Docker installation and hardening belong in the
@@ -84,6 +86,28 @@ Verify it can decrypt:
 chimerai config validate
 ```
 
+For the first public stack, edit at least these values before applying:
+
+```yaml
+chimerai_domain: example.com
+chimerai_acme_email: admin@example.com
+chimerai_ingress:
+  tls:
+    staging: true
+chimerai_services:
+  authentik:
+    host: auth.example.com
+    bootstrap_email: admin@example.com
+    bootstrap_password: replace-me
+    secret_key: replace-me
+    postgres_password: replace-me
+  openclaw:
+    host: openclaw.example.com
+```
+
+Keep `staging: true` until DNS and routing are known-good, then switch it to
+`false` to request production Let's Encrypt certificates.
+
 ## Validate The Host
 
 Run validation before applying anything:
@@ -106,6 +130,24 @@ Only apply once the config is correct:
 ```bash
 chimerai apply
 ```
+
+After the first apply, finish Authentik setup in the browser at the configured
+auth hostname. ChimerAI writes a generated setup checklist under the Authentik
+deployment directory, normally:
+
+```text
+/opt/chimerai/authentik/AUTHENTIK_SETUP.md
+```
+
+Run OpenClaw's first-time onboarding in the generated gateway container:
+
+```bash
+chimerai openclaw onboard
+```
+
+That helper runs OpenClaw's pre-start onboarding path through the generated
+`openclaw-gateway` service, then starts the gateway service again so it can use
+the generated config.
 
 Remove ChimerAI-managed services with:
 

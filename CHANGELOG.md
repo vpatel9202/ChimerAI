@@ -23,3 +23,5 @@ The project has not published a release yet.
   and Ansible dependency setup.
 - Reworked user-facing and agent-facing documentation around the current
   installer, CLI, SOPS config, and Milestone 1 proof of concept.
+- Added Milestone 2 roles for Traefik ingress, Authentik shared auth, and
+  OpenClaw, with bind-mounted app state and an OpenClaw onboarding helper.

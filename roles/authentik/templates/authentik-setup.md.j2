@@ -1,0 +1,34 @@
+# Authentik Setup Checklist
+
+ChimerAI deploys Authentik and wires Traefik forward-auth middleware. Authentik
+still needs an application/provider/outpost configuration that matches the apps
+you expose.
+
+## Admin URL
+
+```text
+https://{{ chimerai_authentik_host }}/
+```
+
+Bootstrap email:
+
+```text
+{{ chimerai_authentik_bootstrap_email }}
+```
+
+## OpenClaw Proxy Provider
+
+Create or verify a proxy provider for OpenClaw:
+
+- External host: `https://{{ chimerai_services.openclaw.host | default('openclaw.' + chimerai_domain) }}`
+- Mode: forward auth / single application
+- Outpost: embedded or Traefik-compatible outpost
+
+The Traefik middleware expected by ChimerAI is named:
+
+```text
+authentik@docker
+```
+
+Future ChimerAI versions should automate this setup once the blueprint/API
+contract is stable enough for public defaults.

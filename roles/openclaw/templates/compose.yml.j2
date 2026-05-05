@@ -1,0 +1,90 @@
+---
+services:
+  openclaw-gateway:
+    image: "{{ chimerai_openclaw_image }}"
+    container_name: "{{ chimerai_openclaw_project_name }}-gateway"
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      OPENCLAW_DISABLE_BONJOUR: "1"
+      TZ: "{{ chimerai_timezone }}"
+    volumes:
+      - "{{ chimerai_openclaw_config_dir }}:/home/node/.openclaw"
+      - "{{ chimerai_openclaw_workspace_dir }}:/home/node/.openclaw/workspace"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:{{ chimerai_openclaw_gateway_port }}:18789"
+      - "127.0.0.1:{{ chimerai_openclaw_bridge_port }}:18790"
+    init: true
+    command:
+      - node
+      - dist/index.js
+      - gateway
+      - --bind
+      - "{{ chimerai_openclaw_bind }}"
+      - --port
+      - "18789"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network={{ chimerai_openclaw_public_network }}"
+      - "traefik.http.routers.openclaw.rule=Host(`{{ chimerai_openclaw_host }}`)"
+      - "traefik.http.routers.openclaw.entrypoints=websecure"
+      - "traefik.http.routers.openclaw.tls=true"
+      - "traefik.http.routers.openclaw.tls.certresolver={{ chimerai_openclaw_acme_resolver }}"
+{% if chimerai_openclaw_auth_required | bool %}
+      - "traefik.http.routers.openclaw.middlewares=authentik@docker"
+{% endif %}
+      - "traefik.http.services.openclaw.loadbalancer.server.port=18789"
+    networks:
+      - "{{ chimerai_openclaw_public_network }}"
+
+  openclaw-cli:
+    image: "{{ chimerai_openclaw_image }}"
+    network_mode: "service:openclaw-gateway"
+    env_file:
+      - .env
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      BROWSER: echo
+      TZ: "{{ chimerai_timezone }}"
+    volumes:
+      - "{{ chimerai_openclaw_config_dir }}:/home/node/.openclaw"
+      - "{{ chimerai_openclaw_workspace_dir }}:/home/node/.openclaw/workspace"
+    stdin_open: true
+    tty: true
+    init: true
+    entrypoint:
+      - node
+      - dist/index.js
+    depends_on:
+      - openclaw-gateway
+    profiles:
+      - tools
+
+networks:
+  {{ chimerai_openclaw_public_network }}:
+    external: true

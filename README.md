@@ -18,9 +18,9 @@ reproducible control plane.
 
 ## Quick Start
 
-Current state: ChimerAI can bootstrap its local control tooling, create an
-encrypted private config file, validate the host, and deploy/remove the first
-Open WebUI proof-of-concept role.
+Current state: ChimerAI can bootstrap local control tooling, create an
+encrypted private config file, validate the host, and deploy/remove an early
+single-server stack with Traefik, Authentik, OpenClaw, and Open WebUI.
 
 ```bash
 git clone https://github.com/vpatel9202/ChimerAI.git
@@ -35,6 +35,11 @@ When you are ready to deploy the current proof of concept:
 ```bash
 chimerai apply
 ```
+
+The default public-ingress template expects a real domain pointed at the host,
+ports `80` and `443` reachable from the internet, and `chimerai_acme_email`
+set for Let's Encrypt. The template starts with Let's Encrypt staging enabled
+so first runs do not burn production certificate rate limits.
 
 To remove ChimerAI-managed services:
 
@@ -57,19 +62,21 @@ Implemented today:
   apply, and remove;
 - SOPS + age encrypted private config at
   `inventories/local/chimerai.sops.yaml`;
-- Ansible roles for `common`, `docker`, `networks`, `diag`, and `open_webui`;
+- Ansible roles for `common`, `docker`, `networks`, `traefik`, `authentik`,
+  `openclaw`, `diag`, and `open_webui`;
+- Traefik public ingress with Let's Encrypt HTTP-01 certificate management;
+- Authentik as the shared forward-auth layer for Traefik-routed apps;
+- OpenClaw gateway deployment plus `chimerai openclaw onboard` helper;
 - Docker Compose output for Open WebUI in a predictable deployment directory;
-- app-local bind-mounted state for Open WebUI;
+- app-local bind-mounted state under the configured state root;
 - GitHub Actions validation for shell syntax, Ansible syntax, and safe dry-run.
 
-Not implemented yet:
+Still rough or intentionally incomplete:
 
-- public ingress and TLS;
-- SSO/authentication profiles;
 - backup and restore workflows;
-- production-ready agent runtime roles;
 - MCP server roles;
 - model provider abstraction or inherited API key configuration.
+- fully automated Authentik provider/application wiring.
 
 ## Status
 
@@ -141,6 +148,9 @@ The current shape is:
 │   ├── common/
 │   ├── docker/
 │   ├── networks/
+│   ├── traefik/
+│   ├── authentik/
+│   ├── openclaw/
 │   ├── diag/
 │   └── open_webui/
 ├── templates/
@@ -215,6 +225,12 @@ Run the lower-level Ansible validation directly:
 uv run ansible-playbook chimerai.yml --check
 ```
 
+Run the generated OpenClaw tools container for first-time onboarding:
+
+```bash
+chimerai openclaw onboard
+```
+
 ## Documentation
 
 Start here:
@@ -224,6 +240,8 @@ Start here:
   config, SOPS, age, and editing secrets.
 - [Inventory Schema](docs/inventory-schema.md): current variable shape.
 - [Role Contract](docs/role-contract.md): expectations for future roles.
+- [Milestone 2 Stack Plan](docs/milestones/0002-first-real-stack.md): first
+  Traefik + Authentik + OpenClaw stack rationale.
 - [Architecture Decisions](docs/adr/): why major choices were made.
 - [Agent Context](docs/agents/): instructions for AI coding agents.
 

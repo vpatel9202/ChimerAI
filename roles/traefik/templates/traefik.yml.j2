@@ -1,0 +1,29 @@
+api:
+  dashboard: {{ (chimerai_traefik_dashboard_enabled | bool) | ternary('true', 'false') }}
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: "{{ chimerai_traefik_public_network }}"
+
+certificatesResolvers:
+  {{ chimerai_traefik_acme_resolver }}:
+    acme:
+      email: "{{ chimerai_traefik_acme_email }}"
+      storage: "/letsencrypt/acme.json"
+{% if chimerai_traefik_acme_staging | bool %}
+      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+{% endif %}
+      httpChallenge:
+        entryPoint: web

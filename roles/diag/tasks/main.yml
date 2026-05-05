@@ -14,6 +14,7 @@
   changed_when: false
   failed_when:
     - chimerai_action == "apply"
+    - not ansible_check_mode
     - chimerai_network_inspect.rc != 0
 
 - name: Check Open WebUI HTTP endpoint after apply
@@ -31,6 +32,7 @@
   delay: 5
   when:
     - chimerai_action == "apply"
+    - not ansible_check_mode
     - "'open_webui' in chimerai_enabled_roles"
 
 - name: Report validation summary

@@ -1,0 +1,24 @@
+---
+services:
+  traefik:
+    image: "{{ chimerai_traefik_image }}"
+    container_name: "{{ chimerai_traefik_project_name }}"
+    restart: unless-stopped
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "{{ chimerai_traefik_config_dir }}/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "{{ chimerai_traefik_acme_dir }}:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - "{{ chimerai_traefik_public_network }}"
+      - "{{ chimerai_traefik_internal_network }}"
+
+networks:
+  {{ chimerai_traefik_public_network }}:
+    external: true
+  {{ chimerai_traefik_internal_network }}:
+    external: true

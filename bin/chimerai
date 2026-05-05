@@ -28,6 +28,7 @@ Usage:
   bin/chimerai validate
   bin/chimerai apply
   bin/chimerai remove
+  bin/chimerai openclaw onboard [args...]
 
 Environment overrides:
   CHIMERAI_CONFIG_FILE    Path to the private SOPS config file.
@@ -41,6 +42,7 @@ Commands:
   validate          Run the ChimerAI Ansible validation action.
   apply             Run the ChimerAI Ansible apply action.
   remove            Run the ChimerAI Ansible remove action.
+  openclaw onboard  Run OpenClaw onboarding through the generated gateway container.
 EOF
 }
 
@@ -215,6 +217,23 @@ ansible_playbook() {
     -e "chimerai_action=${action}"
 }
 
+openclaw_onboard() {
+  require_cmd docker
+
+  local openclaw_app_dir="${CHIMERAI_OPENCLAW_APP_DIR:-/opt/chimerai/openclaw}"
+  local compose_file="${openclaw_app_dir}/compose.yml"
+
+  [[ -f "${compose_file}" ]] || die "OpenClaw Compose file not found at ${compose_file}; run 'chimerai apply' first or set CHIMERAI_OPENCLAW_APP_DIR"
+
+  if [[ $# -eq 0 ]]; then
+    docker compose --project-directory "${openclaw_app_dir}" run --rm --no-deps --entrypoint node openclaw-gateway \
+      dist/index.js onboard --mode local --no-install-daemon
+    docker compose --project-directory "${openclaw_app_dir}" up -d openclaw-gateway
+  else
+    docker compose --project-directory "${openclaw_app_dir}" run --rm --no-deps --entrypoint node openclaw-gateway "$@"
+  fi
+}
+
 main() {
   local command="${1:-}"
   case "${command}" in
@@ -258,6 +277,19 @@ main() {
       shift
       [[ $# -eq 0 ]] || die "remove does not accept arguments"
       ansible_playbook remove
+      ;;
+    openclaw)
+      shift
+      case "${1:-}" in
+        onboard)
+          shift
+          openclaw_onboard "$@"
+          ;;
+        *)
+          usage
+          exit 1
+          ;;
+      esac
       ;;
     "")
       usage

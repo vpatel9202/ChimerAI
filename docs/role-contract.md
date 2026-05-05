@@ -1,8 +1,8 @@
 # Role Contract
 
 This reference defines the first ChimerAI role contract. It is intentionally
-small and optimized for the Milestone 1 core roles: `common`, `docker`,
-`networks`, `diag`, and `open_webui`.
+small and optimized for the current single-server roles: `common`, `docker`,
+`networks`, `traefik`, `authentik`, `openclaw`, `diag`, and `open_webui`.
 
 ChimerAI roles should make host state reproducible while keeping Docker Compose
 output visible and debuggable.
@@ -14,8 +14,11 @@ Every role should have one clear responsibility:
 - `common`: base users, directories, packages, timezone, and host assumptions.
 - `docker`: Docker engine and Compose availability.
 - `networks`: shared Docker networks used by service roles.
+- `traefik`: public ingress, ACME storage, and shared routing defaults.
+- `authentik`: shared authentication layer for Traefik-routed apps.
 - `diag`: safe validation and troubleshooting checks.
 - `open_webui`: first app proof of concept; local-only self-hosted AI web UI.
+- `openclaw`: first agent runtime role and onboarding helper target.
 - app roles: app-local state, rendered config, rendered Compose, lifecycle, and
   validation for one service or tightly related service group.
 
@@ -93,11 +96,12 @@ Roles that render app-specific runtime `.env` files should treat those files as
 generated artifacts. They must be ignored, derived from the private encrypted
 config, and rendered with `no_log: true` when secret values are involved.
 
-## Milestone 1 Boundary
+## Current Boundary
 
-Milestone 1 proves the contract with core roles and one local-only app. It does
-not configure public ingress, add SSO, deploy model providers, or migrate
-private infrastructure.
+The current stack proves the contract with core roles, public ingress, shared
+auth, and a first agent runtime. It still does not automate every app's
+inside-the-UI setup, provide backup/restore, deploy MCP servers, or implement a
+global model-provider registry.
 
 The current installer bootstraps local control tooling only. It does not make
 host-level changes such as Docker installation or firewall configuration.

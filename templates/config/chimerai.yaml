@@ -7,13 +7,31 @@ chimerai_timezone: Etc/UTC
 chimerai_deployment_root: /opt/chimerai
 chimerai_state_root: /opt/chimerai/apps
 chimerai_action: validate
+chimerai_domain: example.com
+chimerai_acme_email: admin@example.com
+
+chimerai_ingress:
+  enabled: true
+  provider: traefik
+  tls:
+    enabled: true
+    ca: letsencrypt
+    resolver: letsencrypt
+    challenge: http-01
+    staging: true
+  auth:
+    provider: authentik
+    protect_apps_by_default: true
 
 chimerai_enabled_roles:
   - common
   - docker
   - networks
+  - traefik
+  - authentik
   - diag
   - open_webui
+  - openclaw
 
 chimerai_runtime:
   engine: docker
@@ -28,29 +46,39 @@ chimerai_networks:
     purpose: mcp
 
 chimerai_services:
+  traefik:
+    enabled: true
+    image: traefik:v3
+    dashboard:
+      enabled: false
+
+  authentik:
+    enabled: true
+    image: ghcr.io/goauthentik/server:2025.10
+    host: auth.example.com
+    bootstrap_email: admin@example.com
+    bootstrap_password: replace-me
+    postgres_password: replace-me
+    secret_key: replace-me
+
   open_webui:
     image: ghcr.io/open-webui/open-webui:main
     host: 127.0.0.1
     host_port: 13080
     container_port: 8080
     auth_enabled: true
+    ingress:
+      enabled: false
+      host: webui.example.com
+      auth_required: true
 
-  # Milestone 2 target shape. Keep disabled until the role exists.
   # Provider keys are app-local for now. A future provider registry may let
   # multiple apps inherit shared credentials without duplicating values.
   openclaw:
-    enabled: false
+    enabled: true
+    image: ghcr.io/openclaw/openclaw:latest
+    host: openclaw.example.com
+    auth_required: true
     provider:
       anthropic_api_key: replace-me
       openai_api_key: replace-me
-    discord:
-      enabled: false
-      bot_token: replace-me
-
-  # Milestone 2 target shape. Keep disabled until the role exists.
-  authentik:
-    enabled: false
-    bootstrap_email: admin@example.com
-    bootstrap_password: replace-me
-    postgres_password: replace-me
-    secret_key: replace-me

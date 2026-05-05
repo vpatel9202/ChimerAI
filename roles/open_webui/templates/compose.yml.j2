@@ -10,9 +10,29 @@ services:
       - "{{ chimerai_open_webui_host }}:{{ chimerai_open_webui_host_port }}:{{ chimerai_open_webui_container_port }}"
     volumes:
       - "{{ chimerai_open_webui_data_dir }}:/app/backend/data"
+{% if chimerai_open_webui_ingress_enabled | bool %}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network={{ chimerai_open_webui_ingress_network }}"
+      - "traefik.http.routers.open-webui.rule=Host(`{{ chimerai_open_webui_ingress_host }}`)"
+      - "traefik.http.routers.open-webui.entrypoints=websecure"
+      - "traefik.http.routers.open-webui.tls=true"
+      - "traefik.http.routers.open-webui.tls.certresolver={{ chimerai_open_webui_ingress_acme_resolver }}"
+{% if chimerai_open_webui_ingress_auth_required | bool %}
+      - "traefik.http.routers.open-webui.middlewares=authentik@docker"
+{% endif %}
+      - "traefik.http.services.open-webui.loadbalancer.server.port={{ chimerai_open_webui_container_port }}"
+{% endif %}
     networks:
       - "{{ chimerai_open_webui_network }}"
+{% if chimerai_open_webui_ingress_enabled | bool and chimerai_open_webui_ingress_network != chimerai_open_webui_network %}
+      - "{{ chimerai_open_webui_ingress_network }}"
+{% endif %}
 
 networks:
   {{ chimerai_open_webui_network }}:
     external: true
+{% if chimerai_open_webui_ingress_enabled | bool and chimerai_open_webui_ingress_network != chimerai_open_webui_network %}
+  {{ chimerai_open_webui_ingress_network }}:
+    external: true
+{% endif %}

@@ -1,0 +1,96 @@
+---
+- name: Validate Traefik configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_traefik_image | length > 0
+      - chimerai_traefik_public_network | length > 0
+      - chimerai_traefik_internal_network | length > 0
+      - chimerai_traefik_acme_email | length > 0
+      - chimerai_ingress.tls.challenge | default('http-01') == 'http-01'
+    fail_msg: "Traefik configuration is incomplete or uses an unsupported TLS challenge."
+
+- name: Create Traefik directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: "{{ item.mode }}"
+  loop:
+    - path: "{{ chimerai_traefik_app_dir }}"
+      mode: "0755"
+    - path: "{{ chimerai_traefik_config_dir }}"
+      mode: "0755"
+    - path: "{{ chimerai_traefik_state_dir }}"
+      mode: "0755"
+    - path: "{{ chimerai_traefik_acme_dir }}"
+      mode: "0700"
+  when: chimerai_action == "apply"
+
+- name: Create Traefik ACME storage file
+  ansible.builtin.file:
+    path: "{{ chimerai_traefik_acme_file }}"
+    state: touch
+    mode: "0600"
+  when: chimerai_action == "apply"
+
+- name: Render Traefik static config
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ chimerai_traefik_config_dir }}/traefik.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Render Traefik Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_traefik_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Traefik
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_traefik_app_dir }}"
+    project_name: "{{ chimerai_traefik_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether Traefik Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_traefik_app_dir }}/compose.yml"
+  register: chimerai_traefik_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Traefik
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_traefik_app_dir }}"
+    project_name: "{{ chimerai_traefik_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_traefik_compose_file.stat.exists
+
+- name: Remove Traefik generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_traefik_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Traefik state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/traefik
+  when:
+    - chimerai_action == "remove"
+    - chimerai_traefik_remove_state | bool
+  changed_when: true
