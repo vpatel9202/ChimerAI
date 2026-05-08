@@ -29,6 +29,7 @@ chimerai_enabled_roles:
   - networks
   - traefik
   - authentik
+  - backup
   - diag
   - open_webui
   - openclaw
@@ -60,6 +61,11 @@ chimerai_services:
     bootstrap_password: replace-me
     postgres_password: replace-me
     secret_key: replace-me
+    postgres_max_connections: 300
+    web_workers: 2
+    web_threads: 2
+    worker_processes: 1
+    worker_threads: 2
 
   open_webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -79,6 +85,17 @@ chimerai_services:
     image: ghcr.io/openclaw/openclaw:latest
     host: openclaw.example.com
     auth_required: true
+    allow_unconfigured: true
     provider:
       anthropic_api_key: replace-me
       openai_api_key: replace-me
+
+chimerai_backup:
+  enabled: false
+  engine: restic
+  # Use an absolute local path for first tests, or a supported Restic remote
+  # such as s3:https://s3.amazonaws.com/bucket-name/prefix.
+  repository: /opt/chimerai/backups/restic
+  password: replace-me
+  tags:
+    - chimerai

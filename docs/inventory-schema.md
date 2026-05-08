@@ -35,6 +35,7 @@ all:
             - networks
             - traefik
             - authentik
+            - backup
             - openclaw
             - diag
             - open_webui
@@ -76,6 +77,7 @@ all:
               image: ghcr.io/openclaw/openclaw:latest
               host: openclaw.example.com
               auth_required: true
+              allow_unconfigured: true
             authentik:
               image: ghcr.io/goauthentik/server:2025.10
               host: auth.example.com
@@ -83,6 +85,19 @@ all:
               bootstrap_password: replace-me
               secret_key: replace-me
               postgres_password: replace-me
+              postgres_max_connections: 300
+              web_workers: 2
+              web_threads: 2
+              worker_processes: 1
+              worker_threads: 2
+
+          chimerai_backup:
+            enabled: false
+            engine: restic
+            repository: /opt/chimerai/backups/restic
+            password: replace-me
+            tags:
+              - chimerai
 ```
 
 ## Required Fields
@@ -95,13 +110,14 @@ all:
 | `chimerai_acme_email` | Contact email for Let's Encrypt ACME registration. |
 | `chimerai_deployment_root` | Root directory for generated ChimerAI files. |
 | `chimerai_state_root` | Root directory for app-local runtime state. |
-| `chimerai_action` | Lifecycle action. Milestone 1 supports `validate`, `apply`, and `remove`. |
+| `chimerai_action` | Lifecycle action. Current alpha actions are `validate`, `apply`, `remove`, `backup`, and `restore`. |
 | `chimerai_enabled_roles` | Roles intended to run for this host. |
 | `chimerai_ingress` | Shared ingress, TLS, and auth defaults. |
 | `chimerai_runtime.engine` | Container runtime family. Milestone 1 expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
 | `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, and `open_webui`. |
+| `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File
 
@@ -155,6 +171,8 @@ Milestone 1 uses `chimerai_action` as the basic lifecycle interface:
 - `validate`: check inventory and host prerequisites without deploying.
 - `apply`: create ChimerAI-managed directories, networks, config, and services.
 - `remove`: remove ChimerAI-managed services and networks.
+- `backup`: snapshot ChimerAI-managed state with Restic.
+- `restore`: restore from the configured Restic repository.
 
 Roles must not remove persistent app state unless the inventory explicitly opts
 into state removal for that service.
@@ -165,6 +183,8 @@ The CLI maps these actions directly:
 chimerai validate
 chimerai apply
 chimerai remove
+chimerai backup
+chimerai restore
 ```
 
 ## Secrets And Private Values
@@ -175,6 +195,7 @@ Do not put real secrets in committed inventories. Private values include:
 - OAuth client secrets and refresh tokens;
 - real domains, account IDs, and tunnel IDs when sensitive;
 - passwords and bootstrap credentials;
+- Restic repository passwords;
 - private network policy.
 
 Use `inventories/local/chimerai.sops.yaml` for real deployments. The
@@ -185,5 +206,7 @@ leaving non-secret structure readable in diffs.
 
 The example inventory exists so Ansible can parse the playbook and roles have a
 starting contract. The current public stack configures first-pass ingress,
-shared auth, and OpenClaw, but it still expects manual Authentik provider and
-application setup after first deployment.
+shared auth, OpenClaw, and Restic-backed state backup, but it still expects
+manual Authentik provider and application setup after first deployment. A
+dedicated `update` action, MCP server roles, and provider-key inheritance are
+post-alpha work.

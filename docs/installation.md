@@ -10,6 +10,7 @@ bootstrapped, the most common commands are:
 chimerai config edit
 chimerai validate
 chimerai apply
+chimerai backup
 ```
 
 ## Prerequisites
@@ -108,6 +109,10 @@ chimerai_services:
 Keep `staging: true` until DNS and routing are known-good, then switch it to
 `false` to request production Let's Encrypt certificates.
 
+Back up the age identity printed by `chimerai config init`, normally
+`~/.config/sops/age/keys.txt`. If that key is lost and the config was not
+encrypted to another recipient, the local ChimerAI config cannot be decrypted.
+
 ## Validate The Host
 
 Run validation before applying anything:
@@ -117,7 +122,9 @@ chimerai validate
 ```
 
 This loads the encrypted config, validates required variables, checks Docker and
-Compose access, and runs safe role diagnostics.
+Compose access, and runs safe role diagnostics. Public deployments should route
+app traffic through Traefik on ports `80` and `443`; validation reports a
+warning when UFW is inactive or port exposure needs review.
 
 If Docker access fails with a socket permission error, fix Docker access for
 your user or run the lower-level Ansible command with the appropriate privilege
@@ -158,6 +165,52 @@ chimerai remove
 Persistent app state should not be deleted unless a role explicitly documents
 and requires an opt-in for state removal.
 
+## Back Up And Restore
+
+ChimerAI alpha backups use Restic. Enable backups in the encrypted config before
+running them:
+
+```yaml
+chimerai_backup:
+  enabled: true
+  engine: restic
+  repository: /opt/chimerai/backups/restic
+  password: replace-me
+```
+
+Use a real Restic password in the encrypted config, or set `password_file` to an
+absolute path that exists on the host. For production-like use, prefer a remote
+Restic repository such as S3 or B2 instead of a local path.
+
+Run:
+
+```bash
+chimerai backup
+```
+
+The backup action snapshots the configured state root and writes a pre-backup
+Authentik Postgres dump when the Authentik Compose project exists. Restore with:
+
+```bash
+chimerai restore
+```
+
+Restore uses the configured repository and restores the latest snapshot to `/`
+by default. Stop affected services first if you are restoring over a live
+deployment.
+
+## Alpha Operational Gates
+
+Before treating a host as alpha-ready:
+
+- run `chimerai apply` twice and confirm the second run has no material changes;
+- finish the generated Authentik setup checklist;
+- verify OpenClaw is reachable only through the Authentik-protected Traefik
+  route;
+- run `chimerai backup` and confirm Restic can list the snapshot;
+- keep Let's Encrypt staging enabled until DNS, firewall, and routing are
+  confirmed, then switch to production certificates.
+
 ## Installer Options
 
 ```bash
@@ -187,8 +240,11 @@ Pull the latest repo changes, then rerun the installer:
 git pull
 ./install.sh
 chimerai validate
+chimerai apply
 ```
 
 Rerunning the installer is safe: it reuses existing tools when possible,
 refreshes Python and Ansible dependencies, and keeps the CLI symlink pointed at
-this checkout.
+this checkout. During alpha, `chimerai apply` is the supported way to re-render
+config and restart managed services after changing image tags or settings; a
+separate `update` action is intentionally not part of the alpha lifecycle.

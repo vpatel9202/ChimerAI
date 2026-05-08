@@ -28,6 +28,8 @@ Usage:
   bin/chimerai validate
   bin/chimerai apply
   bin/chimerai remove
+  bin/chimerai backup
+  bin/chimerai restore
   bin/chimerai openclaw onboard [args...]
 
 Environment overrides:
@@ -42,6 +44,8 @@ Commands:
   validate          Run the ChimerAI Ansible validation action.
   apply             Run the ChimerAI Ansible apply action.
   remove            Run the ChimerAI Ansible remove action.
+  backup            Run the ChimerAI Restic backup action.
+  restore           Run the ChimerAI Restic restore action.
   openclaw onboard  Run OpenClaw onboarding through the generated gateway container.
 EOF
 }
@@ -191,6 +195,12 @@ config_init() {
   write_sops_file "${force}" "${recipient}"
   create_config_file "${force}"
   config_validate
+  cat <<EOF
+
+Important: back up ${AGE_KEY_FILE}. If you lose this age identity, you
+cannot decrypt ChimerAI's local SOPS config unless it was encrypted to another
+recipient.
+EOF
 }
 
 config_edit() {
@@ -277,6 +287,16 @@ main() {
       shift
       [[ $# -eq 0 ]] || die "remove does not accept arguments"
       ansible_playbook remove
+      ;;
+    backup)
+      shift
+      [[ $# -eq 0 ]] || die "backup does not accept arguments"
+      ansible_playbook backup
+      ;;
+    restore)
+      shift
+      [[ $# -eq 0 ]] || die "restore does not accept arguments"
+      ansible_playbook restore
       ;;
     openclaw)
       shift

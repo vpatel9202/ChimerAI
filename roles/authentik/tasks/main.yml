@@ -23,16 +23,26 @@
 
 - name: Create Authentik directories
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: directory
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
     mode: "0755"
   loop:
-    - "{{ chimerai_authentik_app_dir }}"
-    - "{{ chimerai_authentik_postgresql_dir }}"
-    - "{{ chimerai_authentik_redis_dir }}"
-    - "{{ chimerai_authentik_media_dir }}"
-    - "{{ chimerai_authentik_templates_dir }}"
-    - "{{ chimerai_authentik_certs_dir }}"
+    - path: "{{ chimerai_authentik_app_dir }}"
+    - path: "{{ chimerai_authentik_postgresql_dir }}"
+      owner: "{{ chimerai_authentik_postgres_uid }}"
+      group: "{{ chimerai_authentik_postgres_gid }}"
+    - path: "{{ chimerai_authentik_redis_dir }}"
+    - path: "{{ chimerai_authentik_media_dir }}"
+      owner: "{{ chimerai_authentik_container_uid }}"
+      group: "{{ chimerai_authentik_container_gid }}"
+    - path: "{{ chimerai_authentik_templates_dir }}"
+      owner: "{{ chimerai_authentik_container_uid }}"
+      group: "{{ chimerai_authentik_container_gid }}"
+    - path: "{{ chimerai_authentik_certs_dir }}"
+      owner: "{{ chimerai_authentik_container_uid }}"
+      group: "{{ chimerai_authentik_container_gid }}"
   when: chimerai_action == "apply"
 
 - name: Render Authentik env file

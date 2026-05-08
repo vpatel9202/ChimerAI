@@ -2,7 +2,8 @@
 
 This reference defines the first ChimerAI role contract. It is intentionally
 small and optimized for the current single-server roles: `common`, `docker`,
-`networks`, `traefik`, `authentik`, `openclaw`, `diag`, and `open_webui`.
+`networks`, `traefik`, `authentik`, `backup`, `openclaw`, `diag`, and
+`open_webui`.
 
 ChimerAI roles should make host state reproducible while keeping Docker Compose
 output visible and debuggable.
@@ -16,6 +17,7 @@ Every role should have one clear responsibility:
 - `networks`: shared Docker networks used by service roles.
 - `traefik`: public ingress, ACME storage, and shared routing defaults.
 - `authentik`: shared authentication layer for Traefik-routed apps.
+- `backup`: Restic repository checks, consistency dumps, backup, and restore.
 - `diag`: safe validation and troubleshooting checks.
 - `open_webui`: first app proof of concept; local-only self-hosted AI web UI.
 - `openclaw`: first agent runtime role and onboarding helper target.
@@ -79,8 +81,12 @@ Milestone 1 roles use `chimerai_action` for lifecycle control:
 - `apply`: create ChimerAI-managed directories, networks, rendered files, and
   services.
 - `remove`: stop/remove ChimerAI-managed services and networks.
+- `backup`: snapshot ChimerAI-managed state through the backup role.
+- `restore`: restore state from the configured backup repository.
 
 Destructive state removal must require an explicit service-specific opt-in.
+During alpha, `update` is intentionally out of scope; operators should edit
+config or image tags and rerun `chimerai apply`.
 
 ## Secrets
 
@@ -100,8 +106,8 @@ config, and rendered with `no_log: true` when secret values are involved.
 
 The current stack proves the contract with core roles, public ingress, shared
 auth, and a first agent runtime. It still does not automate every app's
-inside-the-UI setup, provide backup/restore, deploy MCP servers, or implement a
-global model-provider registry.
+inside-the-UI setup, deploy MCP servers, implement a global model-provider
+registry, or provide a dedicated update lifecycle.
 
 The current installer bootstraps local control tooling only. It does not make
 host-level changes such as Docker installation or firewall configuration.

@@ -30,6 +30,9 @@ services:
       - "{{ chimerai_openclaw_bind }}"
       - --port
       - "18789"
+{% if chimerai_openclaw_allow_unconfigured | bool %}
+      - --allow-unconfigured
+{% endif %}
     healthcheck:
       test:
         - CMD

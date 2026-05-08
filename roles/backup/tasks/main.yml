@@ -1,0 +1,358 @@
+---
+- name: Validate backup engine
+  ansible.builtin.assert:
+    that:
+      - chimerai_backup_engine == "restic"
+    fail_msg: "ChimerAI alpha backup support currently expects restic."
+  when: chimerai_action in ["validate", "backup", "restore"]
+
+- name: Check Restic CLI
+  ansible.builtin.command: restic version
+  register: chimerai_backup_restic_version
+  check_mode: false
+  changed_when: false
+  failed_when:
+    - chimerai_action in ["backup", "restore"]
+    - chimerai_backup_restic_version.rc != 0
+  when: chimerai_action in ["validate", "backup", "restore"]
+
+- name: Report missing Restic during validate
+  ansible.builtin.debug:
+    msg: "Restic is not installed; install restic before running chimerai backup or chimerai restore."
+  when:
+    - chimerai_action == "validate"
+    - chimerai_backup_restic_version.rc | default(0) != 0
+  changed_when: false
+
+- name: Validate backup configuration for backup and restore
+  ansible.builtin.assert:
+    that:
+      - chimerai_backup_enabled | bool
+      - chimerai_backup_repository | length > 0
+      - (chimerai_backup_password | length > 0) or (chimerai_backup_password_file | length > 0)
+    fail_msg: "Backup and restore require chimerai_backup.enabled, repository, and password or password_file."
+  when: chimerai_action in ["backup", "restore"]
+  no_log: true
+
+- name: Create backup work directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0700"
+  loop:
+    - "{{ chimerai_backup_work_dir }}"
+    - "{{ chimerai_backup_dumps_dir }}"
+  when: chimerai_action == "backup"
+
+- name: Build Restic environment
+  ansible.builtin.set_fact:
+    chimerai_backup_restic_environment: >-
+      {{
+        {'RESTIC_REPOSITORY': chimerai_backup_repository}
+        | combine(
+            (chimerai_backup_password | length > 0)
+            | ternary({'RESTIC_PASSWORD': chimerai_backup_password}, {})
+          )
+        | combine(
+            (chimerai_backup_password_file | length > 0)
+            | ternary({'RESTIC_PASSWORD_FILE': chimerai_backup_password_file}, {})
+          )
+      }}
+  no_log: true
+  when: chimerai_action in ["backup", "restore"]
+
+- name: Resolve Authentik backup restore paths
+  ansible.builtin.set_fact:
+    chimerai_backup_authentik_app_dir: "{{ chimerai_authentik_app_dir | default(chimerai_deployment_root + '/authentik') }}"
+    chimerai_backup_authentik_project_name: "{{ chimerai_authentik_project_name | default('chimerai-authentik') }}"
+    chimerai_backup_restored_authentik_dump: >-
+      {{
+        (
+          (chimerai_backup_restore_target | regex_replace('/+$', ''))
+          + '/'
+          + (chimerai_backup_dumps_dir | regex_replace('^/+', ''))
+          + '/authentik-postgres.sql'
+        )
+        if chimerai_backup_restore_target != '/'
+        else chimerai_backup_dumps_dir + '/authentik-postgres.sql'
+      }}
+  when: chimerai_action in ["backup", "restore"]
+
+- name: Check whether Authentik Compose file exists before backup
+  ansible.builtin.stat:
+    path: "{{ chimerai_backup_authentik_app_dir }}/compose.yml"
+  register: chimerai_backup_authentik_compose
+  when: chimerai_action == "backup"
+
+- name: Dump Authentik Postgres before Restic backup
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - --project-directory
+      - "{{ chimerai_backup_authentik_app_dir }}"
+      - --project-name
+      - "{{ chimerai_backup_authentik_project_name }}"
+      - exec
+      - -T
+      - postgresql
+      - pg_dump
+      - -U
+      - "{{ chimerai_authentik_postgres_user | default('authentik') }}"
+      - "{{ chimerai_authentik_postgres_db | default('authentik') }}"
+  register: chimerai_backup_authentik_dump
+  changed_when: true
+  no_log: true
+  when:
+    - chimerai_action == "backup"
+    - chimerai_backup_authentik_compose.stat.exists
+
+- name: Store Authentik Postgres dump for backup
+  ansible.builtin.copy:
+    dest: "{{ chimerai_backup_dumps_dir }}/authentik-postgres.sql"
+    content: "{{ chimerai_backup_authentik_dump.stdout }}"
+    mode: "0600"
+  no_log: true
+  when:
+    - chimerai_action == "backup"
+    - chimerai_backup_authentik_dump is defined
+    - chimerai_backup_authentik_dump.stdout is defined
+
+- name: Check Restic repository
+  ansible.builtin.command:
+    argv:
+      - restic
+      - snapshots
+  environment: "{{ chimerai_backup_restic_environment }}"
+  register: chimerai_backup_restic_snapshots
+  changed_when: false
+  failed_when: false
+  no_log: true
+  when: chimerai_action == "backup"
+
+- name: Initialize Restic repository when empty
+  ansible.builtin.command:
+    argv:
+      - restic
+      - init
+  environment: "{{ chimerai_backup_restic_environment }}"
+  no_log: true
+  when:
+    - chimerai_action == "backup"
+    - chimerai_backup_restic_snapshots.rc != 0
+
+- name: Run Restic backup
+  ansible.builtin.command:
+    argv: "{{ ['restic', 'backup'] + chimerai_backup_paths + ['--tag', chimerai_backup_tags | join(',')] }}"
+  environment: "{{ chimerai_backup_restic_environment }}"
+  register: chimerai_backup_restic_backup
+  changed_when: true
+  no_log: true
+  when: chimerai_action == "backup"
+
+- name: Report backup completion
+  ansible.builtin.debug:
+    msg: "ChimerAI Restic backup completed for {{ chimerai_state_root }}."
+  changed_when: false
+  when: chimerai_action == "backup"
+
+- name: Check whether Authentik Compose file exists before restore
+  ansible.builtin.stat:
+    path: "{{ chimerai_backup_authentik_app_dir }}/compose.yml"
+  register: chimerai_restore_authentik_compose
+  when: chimerai_action == "restore"
+
+- name: Stop Authentik before Restic restore
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - --project-directory
+      - "{{ chimerai_backup_authentik_app_dir }}"
+      - --project-name
+      - "{{ chimerai_backup_authentik_project_name }}"
+      - stop
+      - server
+      - worker
+      - postgresql
+      - redis
+  changed_when: true
+  when:
+    - chimerai_action == "restore"
+    - chimerai_restore_authentik_compose.stat.exists
+
+- name: Restore Restic snapshot
+  ansible.builtin.command:
+    argv:
+      - restic
+      - restore
+      - "{{ chimerai_backup_restore_snapshot }}"
+      - --target
+      - "{{ chimerai_backup_restore_target }}"
+  environment: "{{ chimerai_backup_restic_environment }}"
+  register: chimerai_backup_restic_restore
+  changed_when: true
+  no_log: true
+  when: chimerai_action == "restore"
+
+- name: Check for restored Authentik Postgres dump
+  ansible.builtin.stat:
+    path: "{{ chimerai_backup_restored_authentik_dump }}"
+  register: chimerai_restore_authentik_dump
+  when: chimerai_action == "restore"
+
+- name: Check whether Authentik Compose file exists after restore
+  ansible.builtin.stat:
+    path: "{{ chimerai_backup_authentik_app_dir }}/compose.yml"
+  register: chimerai_restore_authentik_restored_compose
+  when: chimerai_action == "restore"
+
+- name: Start Authentik database services before logical restore
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - --project-directory
+      - "{{ chimerai_backup_authentik_app_dir }}"
+      - --project-name
+      - "{{ chimerai_backup_authentik_project_name }}"
+      - up
+      - -d
+      - postgresql
+      - redis
+  changed_when: true
+  when:
+    - chimerai_action == "restore"
+    - chimerai_restore_authentik_restored_compose.stat.exists
+    - chimerai_restore_authentik_dump.stat.exists
+
+- name: Wait for Authentik Postgres before logical restore
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - --project-directory
+      - "{{ chimerai_backup_authentik_app_dir }}"
+      - --project-name
+      - "{{ chimerai_backup_authentik_project_name }}"
+      - exec
+      - -T
+      - postgresql
+      - pg_isready
+      - -d
+      - "{{ chimerai_authentik_postgres_db | default('authentik') }}"
+      - -U
+      - "{{ chimerai_authentik_postgres_user | default('authentik') }}"
+  register: chimerai_restore_authentik_pg_ready
+  retries: 20
+  delay: 3
+  until: chimerai_restore_authentik_pg_ready.rc == 0
+  changed_when: false
+  when:
+    - chimerai_action == "restore"
+    - chimerai_restore_authentik_restored_compose.stat.exists
+    - chimerai_restore_authentik_dump.stat.exists
+
+- name: Drop Authentik database before logical restore
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - --project-directory
+      - "{{ chimerai_backup_authentik_app_dir }}"
+      - --project-name
+      - "{{ chimerai_backup_authentik_project_name }}"
+      - exec
+      - -T
+      - postgresql
+      - psql
+      - -U
+      - "{{ chimerai_authentik_postgres_user | default('authentik') }}"
+      - -d
+      - postgres
+      - -v
+      - ON_ERROR_STOP=1
+      - -c
+      - "DROP DATABASE IF EXISTS {{ chimerai_authentik_postgres_db | default('authentik') }} WITH (FORCE);"
+  changed_when: true
+  no_log: true
+  when:
+    - chimerai_action == "restore"
+    - chimerai_restore_authentik_restored_compose.stat.exists
+    - chimerai_restore_authentik_dump.stat.exists
+
+- name: Create Authentik database before logical restore
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - --project-directory
+      - "{{ chimerai_backup_authentik_app_dir }}"
+      - --project-name
+      - "{{ chimerai_backup_authentik_project_name }}"
+      - exec
+      - -T
+      - postgresql
+      - psql
+      - -U
+      - "{{ chimerai_authentik_postgres_user | default('authentik') }}"
+      - -d
+      - postgres
+      - -v
+      - ON_ERROR_STOP=1
+      - -c
+      - "CREATE DATABASE {{ chimerai_authentik_postgres_db | default('authentik') }};"
+  changed_when: true
+  no_log: true
+  when:
+    - chimerai_action == "restore"
+    - chimerai_restore_authentik_restored_compose.stat.exists
+    - chimerai_restore_authentik_dump.stat.exists
+
+- name: Import Authentik Postgres dump after Restic restore
+  ansible.builtin.shell: >-
+    docker compose
+    --project-directory {{ chimerai_backup_authentik_app_dir | quote }}
+    --project-name {{ chimerai_backup_authentik_project_name | quote }}
+    exec -T postgresql
+    psql
+    -U {{ (chimerai_authentik_postgres_user | default('authentik')) | quote }}
+    -d {{ (chimerai_authentik_postgres_db | default('authentik')) | quote }}
+    -v ON_ERROR_STOP=1
+    < {{ chimerai_backup_restored_authentik_dump | quote }}
+  args:
+    executable: /bin/sh
+  changed_when: true
+  no_log: true
+  when:
+    - chimerai_action == "restore"
+    - chimerai_restore_authentik_restored_compose.stat.exists
+    - chimerai_restore_authentik_dump.stat.exists
+
+- name: Start Authentik after logical restore
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - --project-directory
+      - "{{ chimerai_backup_authentik_app_dir }}"
+      - --project-name
+      - "{{ chimerai_backup_authentik_project_name }}"
+      - up
+      - -d
+  changed_when: true
+  when:
+    - chimerai_action == "restore"
+    - chimerai_restore_authentik_restored_compose.stat.exists
+
+- name: Report restore completion
+  ansible.builtin.debug:
+    msg: >-
+      ChimerAI Restic restore completed from snapshot {{ chimerai_backup_restore_snapshot }}.
+      {% if chimerai_restore_authentik_dump.stat.exists | default(false) %}
+      Authentik Postgres was restored from {{ chimerai_backup_restored_authentik_dump }}.
+      {% else %}
+      No Authentik Postgres dump was found at {{ chimerai_backup_restored_authentik_dump }}.
+      {% endif %}
+  changed_when: false
+  when: chimerai_action == "restore"

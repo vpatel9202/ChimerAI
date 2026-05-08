@@ -2,8 +2,8 @@
 - name: Validate ChimerAI action
   ansible.builtin.assert:
     that:
-      - chimerai_action in ["validate", "apply", "remove"]
-    fail_msg: "chimerai_action must be one of: validate, apply, remove"
+      - chimerai_action in ["validate", "apply", "remove", "backup", "restore"]
+    fail_msg: "chimerai_action must be one of: validate, apply, remove, backup, restore"
 
 - name: Validate required ChimerAI inventory values
   ansible.builtin.assert:

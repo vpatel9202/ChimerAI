@@ -1,0 +1,14 @@
+---
+chimerai_backup_enabled: "{{ (chimerai_backup | default({})).enabled | default(false) }}"
+chimerai_backup_engine: "{{ (chimerai_backup | default({})).engine | default('restic') }}"
+chimerai_backup_repository: "{{ (chimerai_backup | default({})).repository | default('') }}"
+chimerai_backup_password: "{{ (chimerai_backup | default({})).password | default('') }}"
+chimerai_backup_password_file: "{{ (chimerai_backup | default({})).password_file | default('') }}"
+chimerai_backup_work_dir: "{{ chimerai_deployment_root }}/backup"
+chimerai_backup_dumps_dir: "{{ chimerai_backup_work_dir }}/dumps"
+chimerai_backup_tags: "{{ (chimerai_backup | default({})).tags | default(['chimerai']) }}"
+chimerai_backup_restore_snapshot: "{{ (chimerai_backup | default({})).restore_snapshot | default('latest') }}"
+chimerai_backup_restore_target: "{{ (chimerai_backup | default({})).restore_target | default('/') }}"
+chimerai_backup_paths:
+  - "{{ chimerai_state_root }}"
+  - "{{ chimerai_backup_work_dir }}"

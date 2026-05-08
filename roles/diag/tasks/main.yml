@@ -6,6 +6,40 @@
       - chimerai_runtime.compose_command == "docker compose"
     fail_msg: "Milestone 1 expects Docker and Docker Compose v2."
 
+- name: Check UFW status when available
+  ansible.builtin.command: ufw status
+  register: chimerai_diag_ufw_status
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  when: chimerai_action == "validate"
+
+- name: Report UFW status warning
+  ansible.builtin.debug:
+    msg: "UFW is not active or not installed. For public alpha deployments, expose only SSH plus Traefik ports 80 and 443."
+  changed_when: false
+  when:
+    - chimerai_action == "validate"
+    - >-
+      (chimerai_diag_ufw_status.rc | default(1) != 0)
+      or ('Status: active' not in (chimerai_diag_ufw_status.stdout | default('')))
+
+- name: Inspect listening TCP ports
+  ansible.builtin.command: ss -H -tln
+  register: chimerai_diag_listening_tcp
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  when: chimerai_action == "validate"
+
+- name: Report public exposure warning
+  ansible.builtin.debug:
+    msg: "Review listening services. Public alpha hosts should route app traffic through Traefik on ports 80 and 443; app ports should bind to localhost or Docker-only networks."
+  changed_when: false
+  when:
+    - chimerai_action == "validate"
+    - chimerai_diag_listening_tcp.rc | default(1) == 0
+
 - name: Inspect configured ChimerAI networks
   ansible.builtin.command: "docker network inspect {{ item.name }}"
   register: chimerai_network_inspect

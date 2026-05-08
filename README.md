@@ -19,8 +19,9 @@ reproducible control plane.
 ## Quick Start
 
 Current state: ChimerAI can bootstrap local control tooling, create an
-encrypted private config file, validate the host, and deploy/remove an early
-single-server stack with Traefik, Authentik, OpenClaw, and Open WebUI.
+encrypted private config file, validate the host, deploy/remove an early
+single-server stack with Traefik, Authentik, OpenClaw, and Open WebUI, and run
+a first Restic-backed backup/restore flow for bind-mounted state.
 
 ```bash
 git clone https://github.com/vpatel9202/ChimerAI.git
@@ -47,6 +48,14 @@ To remove ChimerAI-managed services:
 chimerai remove
 ```
 
+To back up or restore configured state after you have enabled
+`chimerai_backup` in the encrypted config:
+
+```bash
+chimerai backup
+chimerai restore
+```
+
 The installer does not deploy services. It only prepares local tooling, links
 the `chimerai` command into `~/.local/bin`, installs Python/Ansible
 dependencies, and installs `sops`/`age` if they are missing.
@@ -59,24 +68,26 @@ Implemented today:
 
 - repo-local bootstrap with [install.sh](install.sh);
 - `chimerai` CLI wrapper for config initialization, editing, validation,
-  apply, and remove;
+  apply, remove, backup, and restore;
 - SOPS + age encrypted private config at
   `inventories/local/chimerai.sops.yaml`;
 - Ansible roles for `common`, `docker`, `networks`, `traefik`, `authentik`,
-  `openclaw`, `diag`, and `open_webui`;
+  `backup`, `openclaw`, `diag`, and `open_webui`;
 - Traefik public ingress with Let's Encrypt HTTP-01 certificate management;
 - Authentik as the shared forward-auth layer for Traefik-routed apps;
 - OpenClaw gateway deployment plus `chimerai openclaw onboard` helper;
 - Docker Compose output for Open WebUI in a predictable deployment directory;
 - app-local bind-mounted state under the configured state root;
+- Restic-backed backup and restore actions for alpha operators;
 - GitHub Actions validation for shell syntax, Ansible syntax, and safe dry-run.
 
 Still rough or intentionally incomplete:
 
-- backup and restore workflows;
 - MCP server roles;
 - model provider abstraction or inherited API key configuration.
 - fully automated Authentik provider/application wiring.
+- fully automated update lifecycle; rerun `chimerai apply` after changing
+  config or image tags during alpha.
 
 ## Status
 
@@ -150,6 +161,7 @@ The current shape is:
 │   ├── networks/
 │   ├── traefik/
 │   ├── authentik/
+│   ├── backup/
 │   ├── openclaw/
 │   ├── diag/
 │   └── open_webui/
@@ -217,6 +229,13 @@ Remove ChimerAI-managed services:
 
 ```bash
 chimerai remove
+```
+
+Back up and restore ChimerAI-managed state:
+
+```bash
+chimerai backup
+chimerai restore
 ```
 
 Run the lower-level Ansible validation directly:
@@ -296,19 +315,20 @@ The project is provider-neutral:
 
 ### Milestone 2: First Real Stack
 
-- [ ] Choose the first real AI stack role set
-- [ ] Add ingress profile
-- [ ] Add authentication profile
-- [ ] Add the first agent/runtime role beyond Open WebUI
+- [x] Choose the first real AI stack role set
+- [x] Add ingress profile
+- [x] Add authentication profile
+- [x] Add the first agent/runtime role beyond Open WebUI
 - [ ] Add the first MCP server role
-- [ ] Add backup and restore workflows
-- [ ] Document a complete fresh-server install
+- [x] Add backup and restore workflows
+- [ ] Document and test a complete fresh-server install
 
 ### Milestone 3: Public Alpha
 
 - [ ] Publish example inventories
 - [ ] Add issue templates
 - [ ] Add security policy
+- [ ] Prove idempotent `apply` on a clean Ubuntu 24.04 host
 - [ ] Add comparison guide against existing self-hosted AI stacks
 
 ## Contributing

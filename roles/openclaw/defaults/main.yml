@@ -7,6 +7,7 @@ chimerai_openclaw_auth_required: "{{ chimerai_services.openclaw.auth_required | 
 chimerai_openclaw_gateway_port: "{{ chimerai_services.openclaw.gateway_port | default(18789) }}"
 chimerai_openclaw_bridge_port: "{{ chimerai_services.openclaw.bridge_port | default(18790) }}"
 chimerai_openclaw_bind: "{{ chimerai_services.openclaw.bind | default('lan') }}"
+chimerai_openclaw_allow_unconfigured: "{{ chimerai_services.openclaw.allow_unconfigured | default(true) }}"
 chimerai_openclaw_public_network: "{{ chimerai_services.openclaw.public_network | default('chimerai-public') }}"
 chimerai_openclaw_app_dir: "{{ chimerai_deployment_root }}/openclaw"
 chimerai_openclaw_state_dir: "{{ chimerai_state_root }}/openclaw"

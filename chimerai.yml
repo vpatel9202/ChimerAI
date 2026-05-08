@@ -52,6 +52,11 @@
       tags:
         - openclaw
         - app
+    - role: backup
+      when: "'backup' in chimerai_enabled_roles"
+      tags:
+        - backup
+        - restore
     - role: diag
       when: "'diag' in chimerai_enabled_roles"
       tags:

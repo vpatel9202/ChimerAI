@@ -33,6 +33,7 @@ all:
             - networks
             - traefik
             - authentik
+            - backup
             - diag
             - open_webui
             - openclaw
@@ -84,3 +85,11 @@ all:
               provider:
                 anthropic_api_key: replace-me
                 openai_api_key: replace-me
+
+          chimerai_backup:
+            enabled: false
+            engine: restic
+            repository: /opt/chimerai/backups/restic
+            password: replace-me
+            tags:
+              - chimerai

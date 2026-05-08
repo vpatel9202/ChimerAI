@@ -4,6 +4,7 @@ chimerai_traefik_project_name: chimerai-traefik
 chimerai_traefik_image: "{{ chimerai_services.traefik.image | default('traefik:v3') }}"
 chimerai_traefik_enabled: "{{ chimerai_services.traefik.enabled | default(true) }}"
 chimerai_traefik_dashboard_enabled: "{{ chimerai_services.traefik.dashboard.enabled | default(false) }}"
+chimerai_traefik_dashboard_allow_unprotected: "{{ chimerai_services.traefik.dashboard.allow_unprotected | default(false) }}"
 chimerai_traefik_public_network: "{{ chimerai_services.traefik.public_network | default('chimerai-public') }}"
 chimerai_traefik_internal_network: "{{ chimerai_services.traefik.internal_network | default('chimerai-internal') }}"
 chimerai_traefik_app_dir: "{{ chimerai_deployment_root }}/traefik"

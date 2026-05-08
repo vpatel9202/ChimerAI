@@ -4,6 +4,7 @@ services:
     image: "{{ chimerai_authentik_postgres_image }}"
     container_name: "{{ chimerai_authentik_project_name }}-postgresql"
     restart: unless-stopped
+    command: ["postgres", "-c", "max_connections={{ chimerai_authentik_postgres_max_connections }}"]
     env_file:
       - .env
     environment:

@@ -102,6 +102,7 @@ chimerai_enabled_roles:
   - networks
   - traefik
   - authentik
+  - backup
   - openclaw
 ```
 
@@ -133,6 +134,22 @@ production certificates.
 
 HTTP-01 requires public inbound access to ports `80` and `443`. If another
 service already owns those ports, Traefik will not start.
+
+## Backup Settings
+
+The alpha backup workflow uses Restic. Keep the repository password in the
+encrypted config or point `password_file` at a private host-local file:
+
+```yaml
+chimerai_backup:
+  enabled: true
+  engine: restic
+  repository: s3:https://s3.amazonaws.com/example-bucket/chimerai
+  password: ENC[AES256_GCM,...]
+```
+
+Local filesystem repositories are useful for first tests, but public alpha
+operators should use an off-host repository for real recovery.
 
 ## Manual SOPS Flow
 
@@ -166,14 +183,15 @@ uv run ansible-playbook chimerai.yml \
   -e chimerai_action=validate
 ```
 
-Use `chimerai_action=apply` or `chimerai_action=remove` for other lifecycle
-actions.
+Use `chimerai_action=apply`, `remove`, `backup`, or `restore` for other
+lifecycle actions.
 
 ## Rules
 
 - Do not commit `.sops.yaml`; it contains local recipient policy.
 - Do not commit `inventories/local/`; it contains private deployment config.
 - Do not commit age private keys.
+- Do not commit Restic passwords or repository credentials.
 - Back up the age identity. If you lose `~/.config/sops/age/keys.txt`, you lose
   the ability to decrypt files encrypted only to that recipient.
 - Use obvious placeholders in public examples.

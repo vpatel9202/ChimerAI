@@ -7,7 +7,8 @@
       - chimerai_traefik_internal_network | length > 0
       - chimerai_traefik_acme_email | length > 0
       - chimerai_ingress.tls.challenge | default('http-01') == 'http-01'
-    fail_msg: "Traefik configuration is incomplete or uses an unsupported TLS challenge."
+      - not (chimerai_traefik_dashboard_enabled | bool) or (chimerai_traefik_dashboard_allow_unprotected | bool)
+    fail_msg: "Traefik configuration is incomplete, uses an unsupported TLS challenge, or enables an unprotected dashboard."
 
 - name: Create Traefik directories
   ansible.builtin.file:
@@ -25,12 +26,20 @@
       mode: "0700"
   when: chimerai_action == "apply"
 
-- name: Create Traefik ACME storage file
-  ansible.builtin.file:
+- name: Check Traefik ACME storage file
+  ansible.builtin.stat:
     path: "{{ chimerai_traefik_acme_file }}"
-    state: touch
-    mode: "0600"
+  register: chimerai_traefik_acme_stat
   when: chimerai_action == "apply"
+
+- name: Create Traefik ACME storage file
+  ansible.builtin.copy:
+    dest: "{{ chimerai_traefik_acme_file }}"
+    content: ""
+    mode: "0600"
+  when:
+    - chimerai_action == "apply"
+    - not chimerai_traefik_acme_stat.stat.exists
 
 - name: Render Traefik static config
   ansible.builtin.template:
