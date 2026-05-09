@@ -69,6 +69,56 @@
     - not ansible_check_mode
     - "'open_webui' in chimerai_enabled_roles"
 
+- name: Check Todoist MCP health endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_services.mcp_todoist.host | default('127.0.0.1') }}:{{ chimerai_services.mcp_todoist.host_port | default(13002) }}/health"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: chimerai_diag_mcp_todoist_health
+  until: chimerai_diag_mcp_todoist_health is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+    - "'mcp_todoist' in chimerai_enabled_roles"
+
+- name: Check Todoist MCP streamable HTTP endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_services.mcp_todoist.host | default('127.0.0.1') }}:{{ chimerai_services.mcp_todoist.host_port | default(13002) }}/mcp"
+    method: GET
+    status_code: 405
+    timeout: 10
+  register: chimerai_diag_mcp_todoist_endpoint
+  until: chimerai_diag_mcp_todoist_endpoint is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+    - "'mcp_todoist' in chimerai_enabled_roles"
+
+- name: Check OpenClaw Todoist MCP registry entry after apply
+  ansible.builtin.command:
+    argv:
+      - docker
+      - exec
+      - "{{ chimerai_openclaw_project_name | default('chimerai-openclaw') }}-gateway"
+      - node
+      - dist/index.js
+      - mcp
+      - show
+      - "{{ chimerai_services.openclaw.todoist_mcp_name | default('todoist') }}"
+      - --json
+  register: chimerai_diag_openclaw_todoist_mcp
+  changed_when: false
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+    - "'openclaw' in chimerai_enabled_roles"
+    - "'mcp_todoist' in chimerai_enabled_roles"
+
 - name: Report validation summary
   ansible.builtin.debug:
     msg: "ChimerAI diagnostics completed for action={{ chimerai_action }}"

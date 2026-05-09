@@ -87,6 +87,7 @@ chimerai_services:
     image: ghcr.io/openclaw/openclaw:latest
     host: openclaw.example.com
     auth_required: true
+    mcp_network: chimerai-mcp
     allow_unconfigured: true
     provider:
       anthropic_api_key: replace-me

@@ -157,6 +157,12 @@ To enable the optional Todoist MCP role, add `mcp_todoist` to
 config. The service is private by default and exposes
 `http://127.0.0.1:13002/mcp` for host-based MCP clients.
 
+When `openclaw` is enabled with `mcp_todoist`, ChimerAI attaches OpenClaw to the
+private MCP network and registers Todoist at
+`http://chimerai-mcp-todoist:3000/mcp` in OpenClaw's MCP registry. To validate
+an LLM actually using Todoist, configure both a real Todoist API key and a real
+OpenClaw provider key, then run a read-only OpenClaw agent prompt.
+
 Run OpenClaw's first-time onboarding in the generated gateway container:
 
 ```bash
@@ -219,6 +225,9 @@ Before treating a host as alpha-ready:
   protected apps you expect;
 - verify OpenClaw is reachable only through the Authentik-protected Traefik
   route;
+- if Todoist MCP is enabled, verify OpenClaw's MCP registry contains the
+  Todoist server and run a read-only OpenClaw agent prompt with a real provider
+  key;
 - run `chimerai backup` and confirm Restic can list the snapshot;
 - keep Let's Encrypt staging enabled until DNS, firewall, and routing are
   confirmed, then switch to production certificates.

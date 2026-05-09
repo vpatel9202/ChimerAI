@@ -7,6 +7,10 @@
       - chimerai_openclaw_gateway_port | int > 0
       - chimerai_openclaw_bridge_port | int > 0
       - chimerai_openclaw_public_network | length > 0
+      - not (chimerai_openclaw_todoist_mcp_enabled | bool) or chimerai_openclaw_mcp_network | length > 0
+      - not (chimerai_openclaw_todoist_mcp_enabled | bool) or chimerai_openclaw_todoist_mcp_name | length > 0
+      - not (chimerai_openclaw_todoist_mcp_enabled | bool) or chimerai_openclaw_todoist_mcp_url | length > 0
+      - not (chimerai_openclaw_todoist_mcp_enabled | bool) or chimerai_openclaw_todoist_mcp_transport | length > 0
     fail_msg: "OpenClaw configuration is incomplete."
 
 - name: Create OpenClaw directories
@@ -52,6 +56,65 @@
   when:
     - chimerai_action == "apply"
     - not ansible_check_mode
+
+- name: Build OpenClaw Todoist MCP config
+  ansible.builtin.set_fact:
+    chimerai_openclaw_todoist_mcp_config:
+      url: "{{ chimerai_openclaw_todoist_mcp_url }}"
+      transport: "{{ chimerai_openclaw_todoist_mcp_transport }}"
+  when:
+    - chimerai_action == "apply"
+    - chimerai_openclaw_todoist_mcp_enabled | bool
+
+- name: Read OpenClaw Todoist MCP registry entry
+  ansible.builtin.command:
+    argv:
+      - docker
+      - exec
+      - "{{ chimerai_openclaw_project_name }}-gateway"
+      - node
+      - dist/index.js
+      - mcp
+      - show
+      - "{{ chimerai_openclaw_todoist_mcp_name }}"
+      - --json
+  register: chimerai_openclaw_todoist_mcp_show
+  changed_when: false
+  failed_when: false
+  when:
+    - chimerai_action == "apply"
+    - chimerai_openclaw_todoist_mcp_enabled | bool
+    - not ansible_check_mode
+
+- name: Store current OpenClaw Todoist MCP registry entry
+  ansible.builtin.set_fact:
+    chimerai_openclaw_todoist_mcp_current: "{{ chimerai_openclaw_todoist_mcp_show.stdout | from_json }}"
+  when:
+    - chimerai_action == "apply"
+    - chimerai_openclaw_todoist_mcp_enabled | bool
+    - not ansible_check_mode
+    - chimerai_openclaw_todoist_mcp_show.rc == 0
+
+- name: Reconcile OpenClaw Todoist MCP registry entry
+  ansible.builtin.command:
+    argv:
+      - docker
+      - exec
+      - "{{ chimerai_openclaw_project_name }}-gateway"
+      - node
+      - dist/index.js
+      - mcp
+      - set
+      - "{{ chimerai_openclaw_todoist_mcp_name }}"
+      - "{{ chimerai_openclaw_todoist_mcp_config | to_json }}"
+  changed_when: true
+  when:
+    - chimerai_action == "apply"
+    - chimerai_openclaw_todoist_mcp_enabled | bool
+    - not ansible_check_mode
+    - >-
+      chimerai_openclaw_todoist_mcp_show.rc != 0
+      or (chimerai_openclaw_todoist_mcp_current | default({})) != chimerai_openclaw_todoist_mcp_config
 
 - name: Check whether OpenClaw Compose file exists
   ansible.builtin.stat:

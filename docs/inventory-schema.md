@@ -78,6 +78,7 @@ all:
               image: ghcr.io/openclaw/openclaw:latest
               host: openclaw.example.com
               auth_required: true
+              mcp_network: chimerai-mcp
               allow_unconfigured: true
             mcp_todoist:
               enabled: false

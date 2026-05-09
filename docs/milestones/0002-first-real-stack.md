@@ -13,6 +13,8 @@ for SSO/forward-auth, and OpenClaw as the first agent runtime.
 - OpenClaw uses the prebuilt `ghcr.io/openclaw/openclaw` image.
 - OpenClaw onboarding is run through a `chimerai openclaw onboard` helper.
 - Todoist is the first MCP server role and runs privately on the MCP network.
+- OpenClaw is attached to the MCP network and receives a managed Todoist MCP
+  registry entry when both roles are enabled.
 - Persistent Docker data must use bind mounts under `chimerai_state_root`.
 
 ## State Layout
@@ -63,5 +65,6 @@ until ChimerAI has a clearer authorization model.
   provider, and embedded outpost membership during `chimerai apply`.
 - ChimerAI can run the optional Todoist MCP role on `chimerai-mcp` with a
   loopback host bind for local agents.
+- ChimerAI registers the Todoist MCP endpoint in OpenClaw for agent runtimes.
 - All persistent service data lives under `chimerai_state_root`.
 - `chimerai openclaw onboard` runs the documented Docker onboarding flow.

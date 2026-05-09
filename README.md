@@ -80,6 +80,8 @@ Implemented today:
 - OpenClaw gateway deployment plus `chimerai openclaw onboard` helper;
 - optional Todoist MCP server role on a private MCP network with loopback host
   access for local agents;
+- automatic OpenClaw MCP registry wiring for the Todoist MCP server when both
+  roles are enabled;
 - Docker Compose output for Open WebUI in a predictable deployment directory;
 - app-local bind-mounted state under the configured state root;
 - Restic-backed backup and restore actions for alpha operators;
@@ -88,7 +90,8 @@ Implemented today:
 Still rough or intentionally incomplete:
 
 - additional MCP server roles beyond Todoist;
-- model provider abstraction or inherited API key configuration.
+- model provider abstraction or inherited API key configuration;
+- fully automated OpenClaw provider onboarding.
 - automated users, groups, policies, and external identity providers in
   Authentik.
 - fully automated update lifecycle; rerun `chimerai apply` after changing

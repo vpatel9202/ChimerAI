@@ -172,6 +172,19 @@ The role exposes the MCP endpoint on loopback, normally
 `http://127.0.0.1:13002/mcp`, and joins the private `chimerai-mcp` Docker
 network for agent runtimes.
 
+When `openclaw` and `mcp_todoist` are both enabled, ChimerAI also attaches
+OpenClaw to the MCP network and registers Todoist in OpenClaw's MCP registry:
+
+```yaml
+chimerai_services:
+  openclaw:
+    mcp_network: chimerai-mcp
+    todoist_mcp_enabled: true
+```
+
+Real OpenClaw LLM validation additionally requires a provider key under
+`chimerai_services.openclaw.provider`.
+
 ## Backup Settings
 
 The alpha backup workflow uses Restic. Keep the repository password in the

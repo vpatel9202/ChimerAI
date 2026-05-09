@@ -20,6 +20,8 @@ Use this checklist before tagging a public alpha release.
 - Run `chimerai apply` again and confirm the second run has no material changes.
 - Finish `AUTHENTIK_SETUP.md`.
 - Confirm OpenClaw is reachable through Authentik-protected Traefik routing.
+- If Todoist MCP is enabled, confirm OpenClaw can show the managed Todoist MCP
+  registry entry.
 - Run `chimerai backup` and confirm Restic can list the snapshot.
 
 ## Release Boundary

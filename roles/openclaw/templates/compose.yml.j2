@@ -56,6 +56,9 @@ services:
       - "traefik.http.services.openclaw.loadbalancer.server.port=18789"
     networks:
       - "{{ chimerai_openclaw_public_network }}"
+{% if chimerai_openclaw_todoist_mcp_enabled | bool %}
+      - "{{ chimerai_openclaw_mcp_network }}"
+{% endif %}
 
   openclaw-cli:
     image: "{{ chimerai_openclaw_image }}"
@@ -91,3 +94,7 @@ services:
 networks:
   {{ chimerai_openclaw_public_network }}:
     external: true
+{% if chimerai_openclaw_todoist_mcp_enabled | bool and chimerai_openclaw_mcp_network != chimerai_openclaw_public_network %}
+  {{ chimerai_openclaw_mcp_network }}:
+    external: true
+{% endif %}
