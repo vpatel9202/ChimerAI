@@ -37,6 +37,7 @@ all:
             - authentik
             - backup
             - openclaw
+            - mcp_todoist
             - diag
             - open_webui
 
@@ -78,6 +79,15 @@ all:
               host: openclaw.example.com
               auth_required: true
               allow_unconfigured: true
+            mcp_todoist:
+              enabled: false
+              image: node:22-alpine
+              package_version: "8.12.1"
+              host: 127.0.0.1
+              host_port: 13002
+              container_port: 3000
+              session_timeout_ms: 1800000
+              todoist_api_key: replace-me
             authentik:
               image: ghcr.io/goauthentik/server:2025.10
               host: auth.example.com
@@ -118,7 +128,7 @@ all:
 | `chimerai_runtime.engine` | Container runtime family. Milestone 1 expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, and `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `mcp_todoist`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File
@@ -209,5 +219,6 @@ leaving non-secret structure readable in diffs.
 The example inventory exists so Ansible can parse the playbook and roles have a
 starting contract. The current public stack configures first-pass ingress,
 shared auth, Authentik app/provider/outpost automation for managed apps,
-OpenClaw, and Restic-backed state backup. A dedicated `update` action, MCP
-server roles, and provider-key inheritance are post-alpha work.
+OpenClaw, the first Todoist MCP server role, and Restic-backed state backup. A
+dedicated `update` action, additional MCP server roles, and provider-key
+inheritance are post-alpha work.

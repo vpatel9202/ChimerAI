@@ -52,6 +52,12 @@
       tags:
         - openclaw
         - app
+    - role: mcp_todoist
+      when: "'mcp_todoist' in chimerai_enabled_roles"
+      tags:
+        - mcp_todoist
+        - mcp
+        - app
     - role: backup
       when: "'backup' in chimerai_enabled_roles"
       tags:

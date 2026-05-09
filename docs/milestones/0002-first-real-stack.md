@@ -12,6 +12,7 @@ for SSO/forward-auth, and OpenClaw as the first agent runtime.
 - Authentik's own admin and outpost paths are not protected by forward-auth.
 - OpenClaw uses the prebuilt `ghcr.io/openclaw/openclaw` image.
 - OpenClaw onboarding is run through a `chimerai openclaw onboard` helper.
+- Todoist is the first MCP server role and runs privately on the MCP network.
 - Persistent Docker data must use bind mounts under `chimerai_state_root`.
 
 ## State Layout
@@ -37,6 +38,7 @@ Examples:
 /opt/chimerai/apps/authentik/redis/
 /opt/chimerai/apps/openclaw/config/
 /opt/chimerai/apps/openclaw/workspace/
+/opt/chimerai/apps/mcp-todoist/npm-cache/
 ```
 
 Named Docker volumes are not used for ChimerAI-managed persistence.
@@ -59,5 +61,7 @@ until ChimerAI has a clearer authorization model.
 - OpenClaw is routed through Traefik and uses Authentik forward-auth middleware.
 - ChimerAI creates or updates the Authentik OpenClaw application, proxy
   provider, and embedded outpost membership during `chimerai apply`.
+- ChimerAI can run the optional Todoist MCP role on `chimerai-mcp` with a
+  loopback host bind for local agents.
 - All persistent service data lives under `chimerai_state_root`.
 - `chimerai openclaw onboard` runs the documented Docker onboarding flow.

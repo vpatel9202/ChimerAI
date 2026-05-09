@@ -105,6 +105,7 @@ chimerai_enabled_roles:
   - authentik
   - backup
   - openclaw
+  - mcp_todoist
 ```
 
 When adding new secret fields, use explicit names such as `api_key`,
@@ -153,6 +154,23 @@ The token is rendered as `AUTHENTIK_BOOTSTRAP_TOKEN`, which Authentik uses to
 create a bootstrap API token. If an existing Authentik deployment was started
 without a bootstrap token, create an API token in Authentik, store it as
 `bootstrap_token`, and rerun `chimerai apply`.
+
+## Todoist MCP Settings
+
+The Todoist MCP role is optional and private by default. Enable it only after
+adding a real Todoist API key to the encrypted config:
+
+```yaml
+chimerai_enabled_roles:
+  - mcp_todoist
+chimerai_services:
+  mcp_todoist:
+    todoist_api_key: ENC[AES256_GCM,...]
+```
+
+The role exposes the MCP endpoint on loopback, normally
+`http://127.0.0.1:13002/mcp`, and joins the private `chimerai-mcp` Docker
+network for agent runtimes.
 
 ## Backup Settings
 

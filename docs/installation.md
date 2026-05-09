@@ -152,6 +152,11 @@ If Authentik was first started without `bootstrap_token`, create an API token
 manually in Authentik, add it to the encrypted config as
 `chimerai_services.authentik.bootstrap_token`, and rerun `chimerai apply`.
 
+To enable the optional Todoist MCP role, add `mcp_todoist` to
+`chimerai_enabled_roles` and store a real Todoist API key in the encrypted
+config. The service is private by default and exposes
+`http://127.0.0.1:13002/mcp` for host-based MCP clients.
+
 Run OpenClaw's first-time onboarding in the generated gateway container:
 
 ```bash

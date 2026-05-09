@@ -3,7 +3,7 @@
 This reference defines the first ChimerAI role contract. It is intentionally
 small and optimized for the current single-server roles: `common`, `docker`,
 `networks`, `traefik`, `authentik`, `backup`, `openclaw`, `diag`, and
-`open_webui`.
+`open_webui`, plus the first optional MCP role `mcp_todoist`.
 
 ChimerAI roles should make host state reproducible while keeping Docker Compose
 output visible and debuggable.
@@ -21,6 +21,7 @@ Every role should have one clear responsibility:
 - `diag`: safe validation and troubleshooting checks.
 - `open_webui`: first app proof of concept; local-only self-hosted AI web UI.
 - `openclaw`: first agent runtime role and onboarding helper target.
+- `mcp_todoist`: first MCP server role; private Todoist HTTP MCP service.
 - app roles: app-local state, rendered config, rendered Compose, lifecycle, and
   validation for one service or tightly related service group.
 
@@ -105,9 +106,10 @@ config, and rendered with `no_log: true` when secret values are involved.
 ## Current Boundary
 
 The current stack proves the contract with core roles, public ingress, shared
-auth, and a first agent runtime. It still does not automate every app's
-inside-the-UI setup, deploy MCP servers, implement a global model-provider
-registry, or provide a dedicated update lifecycle.
+auth, a first agent runtime, and a first optional MCP server. It still does not
+automate every app's inside-the-UI setup, provide a broader MCP catalog,
+implement a global model-provider registry, or provide a dedicated update
+lifecycle.
 
 The current installer bootstraps local control tooling only. It does not make
 host-level changes such as Docker installation or firewall configuration.

@@ -72,12 +72,14 @@ Implemented today:
 - SOPS + age encrypted private config at
   `inventories/local/chimerai.sops.yaml`;
 - Ansible roles for `common`, `docker`, `networks`, `traefik`, `authentik`,
-  `backup`, `openclaw`, `diag`, and `open_webui`;
+  `backup`, `openclaw`, `mcp_todoist`, `diag`, and `open_webui`;
 - Traefik public ingress with Let's Encrypt HTTP-01 certificate management;
 - Authentik as the shared forward-auth layer for Traefik-routed apps;
 - Authentik app, proxy provider, and embedded outpost automation for managed
   protected apps;
 - OpenClaw gateway deployment plus `chimerai openclaw onboard` helper;
+- optional Todoist MCP server role on a private MCP network with loopback host
+  access for local agents;
 - Docker Compose output for Open WebUI in a predictable deployment directory;
 - app-local bind-mounted state under the configured state root;
 - Restic-backed backup and restore actions for alpha operators;
@@ -85,7 +87,7 @@ Implemented today:
 
 Still rough or intentionally incomplete:
 
-- MCP server roles;
+- additional MCP server roles beyond Todoist;
 - model provider abstraction or inherited API key configuration.
 - automated users, groups, policies, and external identity providers in
   Authentik.
@@ -166,6 +168,7 @@ The current shape is:
 │   ├── authentik/
 │   ├── backup/
 │   ├── openclaw/
+│   ├── mcp_todoist/
 │   ├── diag/
 │   └── open_webui/
 ├── templates/
@@ -322,7 +325,7 @@ The project is provider-neutral:
 - [x] Add ingress profile
 - [x] Add authentication profile
 - [x] Add the first agent/runtime role beyond Open WebUI
-- [ ] Add the first MCP server role
+- [x] Add the first MCP server role
 - [x] Add backup and restore workflows
 - [x] Add Authentik provider/application/outpost automation
 - [ ] Document and test a complete fresh-server install

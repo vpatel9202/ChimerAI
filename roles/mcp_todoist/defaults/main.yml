@@ -1,0 +1,17 @@
+---
+chimerai_mcp_todoist_name: mcp-todoist
+chimerai_mcp_todoist_project_name: chimerai-mcp-todoist
+chimerai_mcp_todoist_image: "{{ chimerai_services.mcp_todoist.image | default('node:22-alpine') }}"
+chimerai_mcp_todoist_package_version: "{{ chimerai_services.mcp_todoist.package_version | default('8.12.1') }}"
+chimerai_mcp_todoist_host: "{{ chimerai_services.mcp_todoist.host | default('127.0.0.1') }}"
+chimerai_mcp_todoist_host_port: "{{ chimerai_services.mcp_todoist.host_port | default(13002) }}"
+chimerai_mcp_todoist_container_port: "{{ chimerai_services.mcp_todoist.container_port | default(3000) }}"
+chimerai_mcp_todoist_session_timeout_ms: "{{ chimerai_services.mcp_todoist.session_timeout_ms | default(1800000) }}"
+chimerai_mcp_todoist_api_key: "{{ chimerai_services.mcp_todoist.todoist_api_key | default('') }}"
+chimerai_mcp_todoist_network: "{{ chimerai_services.mcp_todoist.network | default('chimerai-mcp') }}"
+chimerai_mcp_todoist_app_dir: "{{ chimerai_deployment_root }}/mcp-todoist"
+chimerai_mcp_todoist_state_dir: "{{ chimerai_state_root }}/mcp-todoist"
+chimerai_mcp_todoist_npm_cache_dir: "{{ chimerai_mcp_todoist_state_dir }}/npm-cache"
+chimerai_mcp_todoist_uid: "{{ chimerai_services.mcp_todoist.uid | default('1000') }}"
+chimerai_mcp_todoist_gid: "{{ chimerai_services.mcp_todoist.gid | default('1000') }}"
+chimerai_mcp_todoist_remove_state: "{{ chimerai_services.mcp_todoist.remove_state | default(false) }}"

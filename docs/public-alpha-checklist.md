@@ -24,7 +24,7 @@ Use this checklist before tagging a public alpha release.
 
 ## Release Boundary
 
-- MCP roles are post-alpha.
+- Additional MCP roles beyond Todoist are post-alpha.
 - Provider-key inheritance is post-alpha.
 - Full Authentik API automation is post-alpha.
 - A dedicated `update` lifecycle action is post-alpha.
