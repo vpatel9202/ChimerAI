@@ -126,7 +126,7 @@ all:
 | `chimerai_action` | Lifecycle action. Current alpha actions are `validate`, `apply`, `remove`, `backup`, and `restore`. |
 | `chimerai_enabled_roles` | Roles intended to run for this host. |
 | `chimerai_ingress` | Shared ingress, TLS, and auth defaults. |
-| `chimerai_runtime.engine` | Container runtime family. Milestone 1 expects `docker`. |
+| `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
 | `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `mcp_todoist`, and `open_webui`. |
@@ -179,7 +179,7 @@ would live under `/opt/chimerai/apps/openclaw/`, Authentik state under
 
 ## Lifecycle Actions
 
-Milestone 1 uses `chimerai_action` as the basic lifecycle interface:
+ChimerAI uses `chimerai_action` as the basic lifecycle interface:
 
 - `validate`: check inventory and host prerequisites without deploying.
 - `apply`: create ChimerAI-managed directories, networks, config, and services.

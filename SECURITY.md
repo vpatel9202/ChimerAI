@@ -1,7 +1,7 @@
 # Security Policy
 
 ChimerAI is currently a design/prototype project moving toward public alpha.
-Do not deploy it as a fully supported appliance.
+Do not treat it as a supported appliance.
 
 ## Supported Versions
 
@@ -24,3 +24,5 @@ credentials, tokens, private hostnames, or exploit details.
   verified.
 - Back up the SOPS age identity and Restic credentials before relying on a
   deployment.
+- Rotate API keys and tokens after testing if they were pasted into chat,
+  terminal history, issue trackers, or other shared logs.

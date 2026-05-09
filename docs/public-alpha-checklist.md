@@ -22,7 +22,12 @@ Use this checklist before tagging a public alpha release.
 - Confirm OpenClaw is reachable through Authentik-protected Traefik routing.
 - If Todoist MCP is enabled, confirm OpenClaw can show the managed Todoist MCP
   registry entry.
+- If provider keys are configured, run a read-only OpenClaw agent prompt that
+  uses the managed Todoist MCP server.
 - Run `chimerai backup` and confirm Restic can list the snapshot.
+- Run a restore drill against generated state before tagging the release.
+- Review docs for stale wording, broken links, and examples that imply planned
+  features are already available.
 
 ## Release Boundary
 
@@ -30,3 +35,4 @@ Use this checklist before tagging a public alpha release.
 - Provider-key inheritance is post-alpha.
 - Full Authentik API automation is post-alpha.
 - A dedicated `update` lifecycle action is post-alpha.
+- Multi-host deployments are post-alpha.

@@ -7,6 +7,16 @@ Start with the root [`AGENTS.md`](../../AGENTS.md). It is the canonical source
 of shared instructions. Files here provide deeper context that agents should
 read only when relevant to the task.
 
+## How To Use This Directory
+
+- Load `AGENTS.md` first.
+- Read only the files that match the current task.
+- Prefer current repo files over memory or assumptions.
+- Keep `.local/` private and out of public documentation unless the user
+  explicitly asks to publish sanitized lessons.
+- Do not copy local tool instructions, API keys, hostnames, or runtime state
+  into tracked files.
+
 ## Context Map
 
 | File | Use when |
@@ -30,6 +40,8 @@ Project-level references:
 - [`../configuration-and-secrets.md`](../configuration-and-secrets.md) defines
   the SOPS + age encrypted config workflow.
 - [`../adr/`](../adr/) records durable architecture decisions.
+- [`../milestones/`](../milestones/) records current and planned roadmap
+  milestones.
 
 ## Loading Model
 
@@ -44,3 +56,12 @@ Project-level references:
 - For user-facing setup questions, prefer the current `./install.sh` and
   `chimerai ...` commands over lower-level `uv run ansible-playbook` examples
   unless the user is troubleshooting internals.
+
+## LLM-Friendly Writing Rules
+
+- Use short sections with specific headings.
+- State whether behavior is available now or planned.
+- Link to canonical docs instead of duplicating long instructions.
+- Keep examples safe to copy and free of real secrets.
+- Prefer explicit acceptance criteria over vague phrases such as "best
+  practices" or "production ready."

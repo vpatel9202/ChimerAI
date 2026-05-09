@@ -25,3 +25,7 @@ The project has not published a release yet.
   installer, CLI, SOPS config, and Milestone 1 proof of concept.
 - Added Milestone 2 roles for Traefik ingress, Authentik shared auth, and
   OpenClaw, with bind-mounted app state and an OpenClaw onboarding helper.
+- Added Todoist MCP role wiring for OpenClaw, including private MCP networking,
+  managed registry configuration, and diagnostics.
+- Tightened user-facing and agent-facing documentation for durable roadmap,
+  alpha boundaries, and LLM-ingestion guidance.

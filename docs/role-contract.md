@@ -75,7 +75,7 @@ Roles that manage services should:
 
 ## Lifecycle Interface
 
-Milestone 1 roles use `chimerai_action` for lifecycle control:
+Roles use `chimerai_action` for lifecycle control:
 
 - `validate`: inspect prerequisites and report configuration without mutating
   service state.

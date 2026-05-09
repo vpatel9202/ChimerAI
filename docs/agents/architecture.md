@@ -35,8 +35,8 @@ The current public contract is defined in
 defined in [`../inventory-schema.md`](../inventory-schema.md). Durable
 architecture decisions are recorded in [`../adr/`](../adr/).
 
-Milestone 1 validates the contract with core roles and Open WebUI as the first
-local-only app proof of concept.
+The current stack validates the contract with core roles, Open WebUI, Traefik,
+Authentik, OpenClaw, Todoist MCP, diagnostics, and backup/restore behavior.
 
 Do not over-abstract early. A simple role that renders understandable Compose is
 better than a generic framework that hides app behavior.

@@ -64,7 +64,7 @@ See [Installation](docs/installation.md) for details and troubleshooting.
 
 ## Current Capabilities
 
-Implemented today:
+Available now:
 
 - repo-local bootstrap with [install.sh](install.sh);
 - `chimerai` CLI wrapper for config initialization, editing, validation,
@@ -91,9 +91,9 @@ Still rough or intentionally incomplete:
 
 - additional MCP server roles beyond Todoist;
 - model provider abstraction or inherited API key configuration;
-- fully automated OpenClaw provider onboarding.
+- fully automated OpenClaw provider onboarding;
 - automated users, groups, policies, and external identity providers in
-  Authentik.
+  Authentik;
 - fully automated update lifecycle; rerun `chimerai apply` after changing
   config or image tags during alpha.
 
@@ -109,8 +109,9 @@ Primary test target:
 - Docker with Compose v2
 - single-server homelab or VPS
 
-Use it now if you are comfortable reading the code and helping shape the
-project. If you want a fully supported appliance, wait for a later public alpha.
+Use it now if you are comfortable reading the code, reviewing generated
+configuration, and helping shape the project. If you want a supported appliance,
+wait for a later release.
 
 ## Why ChimerAI?
 
@@ -268,8 +269,15 @@ Start here:
   config, SOPS, age, and editing secrets.
 - [Inventory Schema](docs/inventory-schema.md): current variable shape.
 - [Role Contract](docs/role-contract.md): expectations for future roles.
-- [Milestone 2 Stack Plan](docs/milestones/0002-first-real-stack.md): first
+- [Milestones](docs/milestones/): current and planned roadmap documents.
+- [Milestone 2 Stack Plan](docs/milestones/0002-first-real-stack.md): current
   Traefik + Authentik + OpenClaw stack rationale.
+- [Public Alpha Plan](docs/milestones/0003-public-alpha.md): release-readiness
+  work before a first public alpha tag.
+- [MCP and Agent Catalog Plan](docs/milestones/0004-mcp-and-agent-catalog.md):
+  planned MCP/runtime expansion.
+- [Operations Maturity Plan](docs/milestones/0005-operations-maturity.md):
+  planned update, diagnostics, and recovery work.
 - [Architecture Decisions](docs/adr/): why major choices were made.
 - [Agent Context](docs/agents/): instructions for AI coding agents.
 
@@ -331,15 +339,42 @@ The project is provider-neutral:
 - [x] Add the first MCP server role
 - [x] Add backup and restore workflows
 - [x] Add Authentik provider/application/outpost automation
-- [ ] Document and test a complete fresh-server install
+- [x] Wire OpenClaw to the Todoist MCP role
+- [ ] Document and test a complete fresh-host install
 
 ### Milestone 3: Public Alpha
 
-- [ ] Publish example inventories
-- [x] Add issue templates
-- [x] Add security policy
-- [ ] Prove idempotent `apply` on a clean Ubuntu 24.04 host
-- [ ] Add comparison guide against existing self-hosted AI stacks
+- [ ] Complete clean Ubuntu 24.04 install validation in Incus or equivalent
+- [ ] Prove idempotent `apply` for the enabled alpha role set
+- [ ] Prove backup and restore on generated bind-mounted state
+- [ ] Finish public install, security, and troubleshooting docs
+- [ ] Publish a comparison guide against adjacent self-hosted AI stacks
+- [ ] Tag the first public alpha only after the checklist passes
+
+### Milestone 4: MCP And Agent Runtime Catalog
+
+- [ ] Add a repeatable pattern for additional MCP server roles
+- [ ] Add at least two more MCP integrations with private-by-default exposure
+- [ ] Define provider-key inheritance only after multiple roles need it
+- [ ] Document safe read-only and mutating validation prompts for agent runtimes
+- [ ] Keep OpenClaw as the first supported runtime while preserving room for
+  other agent runtimes
+
+### Milestone 5: Operations Maturity
+
+- [ ] Add an explicit update strategy for image tags and rendered config
+- [ ] Expand diagnostics into actionable service-specific checks
+- [ ] Add restore drills and operator runbooks
+- [ ] Improve observability guidance for logs, health checks, and exposed ports
+- [ ] Define remote access profiles after ingress/auth behavior is stable
+
+### Later Milestones
+
+- app catalog and role selection UX;
+- local model and model gateway profiles;
+- memory and document-ingestion roles;
+- multi-host or split-controller deployments;
+- private deployment migration and dogfooding guides.
 
 ## Contributing
 

@@ -7,9 +7,13 @@ operate safely, and make changes without rediscovering project decisions.
 
 - Be direct and concrete.
 - Say when a feature is planned rather than implemented.
+- Avoid time-bound release phrasing such as "implemented today"; use durable
+  wording such as "available now" or "planned."
 - Prefer short sections and task-oriented headings.
 - Use examples that are safe to copy.
 - Keep public docs provider-neutral unless documenting compatibility.
+- Avoid "production ready" unless the repo has a defined support and release
+  policy for that claim.
 
 ## README
 
@@ -17,7 +21,7 @@ The README should be a landing page:
 
 - what ChimerAI is
 - how to get started
-- what works today
+- what is available now
 - why it exists
 - who it is for
 - current status
@@ -41,6 +45,8 @@ Agent docs should:
 - be split by topic for context management
 - clearly state when an agent should read each file
 - keep secrets and local deployment details out of source control
+- optimize for selective loading by LLMs: short files, clear headings, direct
+  constraints, and links to canonical references
 
 ## Future Diataxis Shape
 

@@ -1,6 +1,6 @@
 # Milestone 2: First Real Stack
 
-Milestone 2 introduces the first ChimerAI stack that looks like the intended
+Milestone 2 introduced the first ChimerAI stack that looks like the intended
 public project: Traefik for ingress, Let's Encrypt for certificates, Authentik
 for SSO/forward-auth, and OpenClaw as the first agent runtime.
 

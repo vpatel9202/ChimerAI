@@ -2,7 +2,7 @@
 
 ChimerAI exists because self-hosted AI tooling is powerful but fragmented.
 Users can deploy chat UIs, local models, automation engines, MCP servers,
-memory systems, and reverse proxies today, but turning those pieces into an
+memory systems, and reverse proxies, but turning those pieces into an
 operable stack still requires too much manual glue.
 
 ## Goal
