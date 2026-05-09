@@ -100,6 +100,7 @@ chimerai_services:
     host: auth.example.com
     bootstrap_email: admin@example.com
     bootstrap_password: replace-me
+    bootstrap_token: replace-me
     secret_key: replace-me
     postgres_password: replace-me
   openclaw:
@@ -138,13 +139,18 @@ Only apply once the config is correct:
 chimerai apply
 ```
 
-After the first apply, finish Authentik setup in the browser at the configured
-auth hostname. ChimerAI writes a generated setup checklist under the Authentik
-deployment directory, normally:
+During apply, ChimerAI uses the encrypted Authentik bootstrap token to create
+or update proxy providers, applications, and embedded outpost membership for
+ChimerAI-managed apps that require ingress auth. It also writes a generated
+verification note under the Authentik deployment directory, normally:
 
 ```text
 /opt/chimerai/authentik/AUTHENTIK_SETUP.md
 ```
+
+If Authentik was first started without `bootstrap_token`, create an API token
+manually in Authentik, add it to the encrypted config as
+`chimerai_services.authentik.bootstrap_token`, and rerun `chimerai apply`.
 
 Run OpenClaw's first-time onboarding in the generated gateway container:
 
@@ -204,7 +210,8 @@ deployment.
 Before treating a host as alpha-ready:
 
 - run `chimerai apply` twice and confirm the second run has no material changes;
-- finish the generated Authentik setup checklist;
+- confirm the generated Authentik automation verification note matches the
+  protected apps you expect;
 - verify OpenClaw is reachable only through the Authentik-protected Traefik
   route;
 - run `chimerai backup` and confirm Restic can list the snapshot;

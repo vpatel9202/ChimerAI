@@ -77,6 +77,14 @@
     - chimerai_action == "apply"
     - not ansible_check_mode
 
+- name: Automate Authentik protected apps
+  ansible.builtin.include_tasks: automation.yml
+  when:
+    - chimerai_action == "apply"
+    - chimerai_authentik_automation_enabled | bool
+    - chimerai_authentik_managed_proxy_apps | length > 0
+    - not ansible_check_mode
+
 - name: Check whether Authentik Compose file exists
   ansible.builtin.stat:
     path: "{{ chimerai_authentik_app_dir }}/compose.yml"

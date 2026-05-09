@@ -91,6 +91,7 @@ client_secret: ENC[AES256_GCM,...]
 secret_key: ENC[AES256_GCM,...]
 bot_token: ENC[AES256_GCM,...]
 bootstrap_password: ENC[AES256_GCM,...]
+bootstrap_token: ENC[AES256_GCM,...]
 ```
 
 Non-secret structure remains readable:
@@ -134,6 +135,24 @@ production certificates.
 
 HTTP-01 requires public inbound access to ports `80` and `443`. If another
 service already owns those ports, Traefik will not start.
+
+## Authentik Automation Settings
+
+ChimerAI can automate Authentik proxy providers, applications, and embedded
+outpost membership for ChimerAI-managed apps that require ingress auth. Set a
+bootstrap token in the encrypted config before the first `chimerai apply`:
+
+```yaml
+chimerai_services:
+  authentik:
+    bootstrap_token: ENC[AES256_GCM,...]
+    automation_enabled: true
+```
+
+The token is rendered as `AUTHENTIK_BOOTSTRAP_TOKEN`, which Authentik uses to
+create a bootstrap API token. If an existing Authentik deployment was started
+without a bootstrap token, create an API token in Authentik, store it as
+`bootstrap_token`, and rerun `chimerai apply`.
 
 ## Backup Settings
 

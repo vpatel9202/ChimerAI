@@ -7,13 +7,14 @@ chimerai_authentik_redis_image: "{{ chimerai_services.authentik.redis_image | de
 chimerai_authentik_host: "{{ chimerai_services.authentik.host | default('auth.' + chimerai_domain) }}"
 chimerai_authentik_bootstrap_email: "{{ chimerai_services.authentik.bootstrap_email | default('admin@example.com') }}"
 chimerai_authentik_bootstrap_password: "{{ chimerai_services.authentik.bootstrap_password | default('replace-me') }}"
+chimerai_authentik_bootstrap_token: "{{ chimerai_services.authentik.bootstrap_token | default('') }}"
 chimerai_authentik_secret_key: "{{ chimerai_services.authentik.secret_key | default('replace-me') }}"
 chimerai_authentik_postgres_password: "{{ chimerai_services.authentik.postgres_password | default('replace-me') }}"
 chimerai_authentik_postgres_user: "{{ chimerai_services.authentik.postgres_user | default('authentik') }}"
 chimerai_authentik_postgres_db: "{{ chimerai_services.authentik.postgres_db | default('authentik') }}"
 chimerai_authentik_postgres_max_connections: "{{ chimerai_services.authentik.postgres_max_connections | default(300) }}"
-chimerai_authentik_postgres_uid: "{{ chimerai_services.authentik.postgres_uid | default(70) }}"
-chimerai_authentik_postgres_gid: "{{ chimerai_services.authentik.postgres_gid | default(0) }}"
+chimerai_authentik_postgres_uid: "{{ chimerai_services.authentik.postgres_uid | default('70') }}"
+chimerai_authentik_postgres_gid: "{{ chimerai_services.authentik.postgres_gid | default('0') }}"
 chimerai_authentik_web_workers: "{{ chimerai_services.authentik.web_workers | default(2) }}"
 chimerai_authentik_web_threads: "{{ chimerai_services.authentik.web_threads | default(2) }}"
 chimerai_authentik_worker_processes: "{{ chimerai_services.authentik.worker_processes | default(1) }}"
@@ -27,7 +28,55 @@ chimerai_authentik_redis_dir: "{{ chimerai_authentik_state_dir }}/redis"
 chimerai_authentik_media_dir: "{{ chimerai_authentik_state_dir }}/media"
 chimerai_authentik_templates_dir: "{{ chimerai_authentik_state_dir }}/custom-templates"
 chimerai_authentik_certs_dir: "{{ chimerai_authentik_state_dir }}/certs"
-chimerai_authentik_container_uid: "{{ chimerai_services.authentik.uid | default(1000) }}"
-chimerai_authentik_container_gid: "{{ chimerai_services.authentik.gid | default(1000) }}"
+chimerai_authentik_container_uid: "{{ chimerai_services.authentik.uid | default('1000') }}"
+chimerai_authentik_container_gid: "{{ chimerai_services.authentik.gid | default('1000') }}"
 chimerai_authentik_acme_resolver: "{{ chimerai_ingress.tls.resolver | default('letsencrypt') }}"
+chimerai_authentik_automation_enabled: "{{ chimerai_services.authentik.automation_enabled | default(true) }}"
+chimerai_authentik_api_url: "{{ chimerai_services.authentik.api_url | default('') }}"
+chimerai_authentik_authorization_flow_slug: "{{ chimerai_services.authentik.authorization_flow_slug | default('default-provider-authorization-implicit-consent') }}"
+chimerai_authentik_invalidation_flow_slug: "{{ chimerai_services.authentik.invalidation_flow_slug | default('default-provider-invalidation-flow') }}"
+chimerai_authentik_outpost_name: "{{ chimerai_services.authentik.outpost_name | default('authentik Embedded Outpost') }}"
+chimerai_authentik_managed_group: "{{ chimerai_services.authentik.managed_group | default('ChimerAI') }}"
+chimerai_authentik_extra_managed_proxy_apps: "{{ chimerai_services.authentik.managed_proxy_apps | default([]) }}"
+chimerai_authentik_builtin_proxy_apps: >-
+  {{
+    (
+      [
+        {
+          'name': 'OpenClaw',
+          'slug': 'openclaw',
+          'provider_name': 'ChimerAI OpenClaw',
+          'host': chimerai_services.openclaw.host | default('openclaw.' + chimerai_domain),
+          'external_url': 'https://' + (chimerai_services.openclaw.host | default('openclaw.' + chimerai_domain)),
+          'description': 'OpenClaw gateway managed by ChimerAI'
+        }
+      ]
+      if (
+        'openclaw' in chimerai_enabled_roles
+        and (chimerai_services.openclaw.enabled | default(true) | bool)
+        and (chimerai_services.openclaw.auth_required | default(chimerai_ingress.auth.protect_apps_by_default | default(true)) | bool)
+      )
+      else []
+    )
+    +
+    (
+      [
+        {
+          'name': 'Open WebUI',
+          'slug': 'open-webui',
+          'provider_name': 'ChimerAI Open WebUI',
+          'host': chimerai_services.open_webui.ingress.host | default('webui.' + chimerai_domain),
+          'external_url': 'https://' + (chimerai_services.open_webui.ingress.host | default('webui.' + chimerai_domain)),
+          'description': 'Open WebUI managed by ChimerAI'
+        }
+      ]
+      if (
+        'open_webui' in chimerai_enabled_roles
+        and (chimerai_services.open_webui.ingress.enabled | default(false) | bool)
+        and (chimerai_services.open_webui.ingress.auth_required | default(chimerai_ingress.auth.protect_apps_by_default | default(true)) | bool)
+      )
+      else []
+    )
+  }}
+chimerai_authentik_managed_proxy_apps: "{{ chimerai_authentik_builtin_proxy_apps + chimerai_authentik_extra_managed_proxy_apps }}"
 chimerai_authentik_remove_state: "{{ chimerai_services.authentik.remove_state | default(false) }}"

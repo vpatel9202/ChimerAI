@@ -63,8 +63,10 @@ all:
               host: auth.example.com
               bootstrap_email: admin@example.com
               bootstrap_password: replace-me
+              bootstrap_token: replace-me
               postgres_password: replace-me
               secret_key: replace-me
+              automation_enabled: true
 
             open_webui:
               image: ghcr.io/open-webui/open-webui:main
@@ -82,6 +84,7 @@ all:
               image: ghcr.io/openclaw/openclaw:latest
               host: openclaw.example.com
               auth_required: true
+              allow_unconfigured: true
               provider:
                 anthropic_api_key: replace-me
                 openai_api_key: replace-me

@@ -75,6 +75,8 @@ Implemented today:
   `backup`, `openclaw`, `diag`, and `open_webui`;
 - Traefik public ingress with Let's Encrypt HTTP-01 certificate management;
 - Authentik as the shared forward-auth layer for Traefik-routed apps;
+- Authentik app, proxy provider, and embedded outpost automation for managed
+  protected apps;
 - OpenClaw gateway deployment plus `chimerai openclaw onboard` helper;
 - Docker Compose output for Open WebUI in a predictable deployment directory;
 - app-local bind-mounted state under the configured state root;
@@ -85,7 +87,8 @@ Still rough or intentionally incomplete:
 
 - MCP server roles;
 - model provider abstraction or inherited API key configuration.
-- fully automated Authentik provider/application wiring.
+- automated users, groups, policies, and external identity providers in
+  Authentik.
 - fully automated update lifecycle; rerun `chimerai apply` after changing
   config or image tags during alpha.
 
@@ -321,13 +324,14 @@ The project is provider-neutral:
 - [x] Add the first agent/runtime role beyond Open WebUI
 - [ ] Add the first MCP server role
 - [x] Add backup and restore workflows
+- [x] Add Authentik provider/application/outpost automation
 - [ ] Document and test a complete fresh-server install
 
 ### Milestone 3: Public Alpha
 
 - [ ] Publish example inventories
-- [ ] Add issue templates
-- [ ] Add security policy
+- [x] Add issue templates
+- [x] Add security policy
 - [ ] Prove idempotent `apply` on a clean Ubuntu 24.04 host
 - [ ] Add comparison guide against existing self-hosted AI stacks
 

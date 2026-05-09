@@ -46,9 +46,9 @@ Named Docker volumes are not used for ChimerAI-managed persistence.
 This milestone does not add a global provider registry. Provider secrets stay
 app-local until multiple real roles need shared provider inheritance.
 
-Authentik provider/application/outpost automation is expected to evolve. Until
-the blueprint/API flow is fully stable, ChimerAI renders an operator checklist
-next to the Authentik Compose project.
+Authentik provider/application/outpost automation covers ChimerAI-managed apps
+that require ingress auth. User/group/policy setup remains an operator task
+until ChimerAI has a clearer authorization model.
 
 ## Acceptance Criteria
 
@@ -57,5 +57,7 @@ next to the Authentik Compose project.
   those roles are enabled.
 - Traefik requests Let's Encrypt certificates using HTTP-01.
 - OpenClaw is routed through Traefik and uses Authentik forward-auth middleware.
+- ChimerAI creates or updates the Authentik OpenClaw application, proxy
+  provider, and embedded outpost membership during `chimerai apply`.
 - All persistent service data lives under `chimerai_state_root`.
 - `chimerai openclaw onboard` runs the documented Docker onboarding flow.

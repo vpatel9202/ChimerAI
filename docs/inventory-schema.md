@@ -83,8 +83,10 @@ all:
               host: auth.example.com
               bootstrap_email: admin@example.com
               bootstrap_password: replace-me
+              bootstrap_token: replace-me
               secret_key: replace-me
               postgres_password: replace-me
+              automation_enabled: true
               postgres_max_connections: 300
               web_workers: 2
               web_threads: 2
@@ -206,7 +208,6 @@ leaving non-secret structure readable in diffs.
 
 The example inventory exists so Ansible can parse the playbook and roles have a
 starting contract. The current public stack configures first-pass ingress,
-shared auth, OpenClaw, and Restic-backed state backup, but it still expects
-manual Authentik provider and application setup after first deployment. A
-dedicated `update` action, MCP server roles, and provider-key inheritance are
-post-alpha work.
+shared auth, Authentik app/provider/outpost automation for managed apps,
+OpenClaw, and Restic-backed state backup. A dedicated `update` action, MCP
+server roles, and provider-key inheritance are post-alpha work.

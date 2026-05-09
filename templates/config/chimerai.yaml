@@ -59,8 +59,10 @@ chimerai_services:
     host: auth.example.com
     bootstrap_email: admin@example.com
     bootstrap_password: replace-me
+    bootstrap_token: replace-me
     postgres_password: replace-me
     secret_key: replace-me
+    automation_enabled: true
     postgres_max_connections: 300
     web_workers: 2
     web_threads: 2

@@ -27,7 +27,9 @@
     content: "{{ lookup('ansible.builtin.password', chimerai_open_webui_secret_file + ' length=64 chars=ascii_letters,digits') }}\n"
     mode: "0600"
   no_log: true
-  when: chimerai_action == "apply"
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
 
 - name: Render Open WebUI env file
   ansible.builtin.template:

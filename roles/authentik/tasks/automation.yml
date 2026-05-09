@@ -1,0 +1,270 @@
+---
+- name: Validate Authentik automation token
+  ansible.builtin.assert:
+    that:
+      - chimerai_authentik_bootstrap_token | length > 0
+    fail_msg: "Authentik automation is enabled; set chimerai_services.authentik.bootstrap_token in encrypted config."
+  no_log: true
+
+- name: Discover Authentik server container IP
+  ansible.builtin.command:
+    argv:
+      - docker
+      - inspect
+      - -f
+      - "{{ '{{' }} with index .NetworkSettings.Networks \"{{ chimerai_authentik_internal_network }}\" {{ '}}' }}{{ '{{' }} .IPAddress {{ '}}' }}{{ '{{' }} end {{ '}}' }}"
+      - "{{ chimerai_authentik_project_name }}-server"
+  register: chimerai_authentik_server_ip
+  changed_when: false
+  when: chimerai_authentik_api_url | length == 0
+
+- name: Resolve Authentik API URL
+  ansible.builtin.set_fact:
+    chimerai_authentik_resolved_api_url: >-
+      {{
+        chimerai_authentik_api_url
+        if chimerai_authentik_api_url | length > 0
+        else 'http://' + (chimerai_authentik_server_ip.stdout | trim) + ':9000'
+      }}
+
+- name: Wait for Authentik API
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/flows/instances/{{ chimerai_authentik_authorization_flow_slug }}/"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    return_content: true
+    status_code: 200
+  register: chimerai_authentik_authorization_flow
+  retries: 40
+  delay: 3
+  until: chimerai_authentik_authorization_flow.status == 200
+  changed_when: false
+  no_log: true
+
+- name: Read Authentik provider invalidation flow
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/flows/instances/{{ chimerai_authentik_invalidation_flow_slug }}/"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    return_content: true
+    status_code: 200
+  register: chimerai_authentik_invalidation_flow
+  changed_when: false
+  no_log: true
+
+- name: Look up Authentik proxy providers
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/providers/proxy/?name__iexact={{ item.provider_name | urlencode }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    return_content: true
+    status_code: 200
+  loop: "{{ chimerai_authentik_managed_proxy_apps }}"
+  register: chimerai_authentik_provider_lookup
+  changed_when: false
+  no_log: true
+
+- name: Create missing Authentik proxy providers
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/providers/proxy/"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    body_format: json
+    body:
+      name: "{{ item.item.provider_name }}"
+      authorization_flow: "{{ chimerai_authentik_authorization_flow.json.pk }}"
+      invalidation_flow: "{{ chimerai_authentik_invalidation_flow.json.pk }}"
+      property_mappings: []
+      external_host: "{{ item.item.external_url }}"
+      internal_host_ssl_validation: true
+      basic_auth_enabled: false
+      mode: forward_single
+      intercept_header_auth: false
+    return_content: true
+    status_code: 201
+  loop: "{{ chimerai_authentik_provider_lookup.results }}"
+  when: item.json.results | length == 0
+  register: chimerai_authentik_provider_create
+  no_log: true
+
+- name: Update existing Authentik proxy providers
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/providers/proxy/{{ item.json.results[0].pk }}/"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    body_format: json
+    body:
+      name: "{{ item.item.provider_name }}"
+      authorization_flow: "{{ chimerai_authentik_authorization_flow.json.pk }}"
+      invalidation_flow: "{{ chimerai_authentik_invalidation_flow.json.pk }}"
+      external_host: "{{ item.item.external_url }}"
+      internal_host_ssl_validation: true
+      basic_auth_enabled: false
+      mode: forward_single
+      intercept_header_auth: false
+    return_content: true
+    status_code: 200
+  loop: "{{ chimerai_authentik_provider_lookup.results }}"
+  when:
+    - item.json.results | length > 0
+    - item.json.results[0].external_host != item.item.external_url
+      or item.json.results[0].mode != 'forward_single'
+      or item.json.results[0].authorization_flow != chimerai_authentik_authorization_flow.json.pk
+      or item.json.results[0].invalidation_flow != chimerai_authentik_invalidation_flow.json.pk
+  no_log: true
+
+- name: Re-read Authentik proxy providers
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/providers/proxy/?name__iexact={{ item.provider_name | urlencode }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    return_content: true
+    status_code: 200
+  loop: "{{ chimerai_authentik_managed_proxy_apps }}"
+  register: chimerai_authentik_provider_final
+  changed_when: false
+  no_log: true
+
+- name: Build managed Authentik provider ID list
+  ansible.builtin.set_fact:
+    chimerai_authentik_managed_provider_ids: "{{ (chimerai_authentik_managed_provider_ids | default([])) + [item.json.results[0].pk | int] }}"
+  loop: "{{ chimerai_authentik_provider_final.results }}"
+  no_log: true
+
+- name: Look up Authentik applications
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/core/applications/{{ item.slug }}/"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    return_content: true
+    status_code:
+      - 200
+      - 404
+  loop: "{{ chimerai_authentik_managed_proxy_apps }}"
+  register: chimerai_authentik_application_lookup
+  changed_when: false
+  no_log: true
+
+- name: Create missing Authentik applications
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/core/applications/"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    body_format: json
+    body:
+      name: "{{ item.item.name }}"
+      slug: "{{ item.item.slug }}"
+      provider: "{{ chimerai_authentik_managed_provider_ids[chimerai_authentik_app_index] }}"
+      backchannel_providers: []
+      open_in_new_tab: true
+      meta_launch_url: "{{ item.item.external_url }}"
+      meta_description: "{{ item.item.description | default('Managed by ChimerAI') }}"
+      meta_publisher: ChimerAI
+      policy_engine_mode: any
+      group: "{{ chimerai_authentik_managed_group }}"
+    return_content: true
+    status_code: 201
+  loop: "{{ chimerai_authentik_application_lookup.results }}"
+  loop_control:
+    index_var: chimerai_authentik_app_index
+  when: item.status == 404
+  no_log: true
+
+- name: Update existing Authentik applications
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/core/applications/{{ item.item.slug }}/"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    body_format: json
+    body:
+      name: "{{ item.item.name }}"
+      provider: "{{ chimerai_authentik_managed_provider_ids[chimerai_authentik_app_index] }}"
+      backchannel_providers: []
+      open_in_new_tab: true
+      meta_launch_url: "{{ item.item.external_url }}"
+      meta_description: "{{ item.item.description | default('Managed by ChimerAI') }}"
+      meta_publisher: ChimerAI
+      policy_engine_mode: any
+      group: "{{ chimerai_authentik_managed_group }}"
+    return_content: true
+    status_code: 200
+  loop: "{{ chimerai_authentik_application_lookup.results }}"
+  loop_control:
+    index_var: chimerai_authentik_app_index
+  when:
+    - item.status == 200
+    - item.json.name != item.item.name
+      or item.json.provider != chimerai_authentik_managed_provider_ids[chimerai_authentik_app_index]
+      or item.json.meta_launch_url != item.item.external_url
+      or item.json.group != chimerai_authentik_managed_group
+  no_log: true
+
+- name: Look up Authentik proxy outpost
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/outposts/instances/?name__iexact={{ chimerai_authentik_outpost_name | urlencode }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    return_content: true
+    status_code: 200
+  register: chimerai_authentik_outpost_lookup
+  changed_when: false
+  no_log: true
+
+- name: Validate Authentik proxy outpost exists
+  ansible.builtin.assert:
+    that:
+      - chimerai_authentik_outpost_lookup.json.results | length > 0
+    fail_msg: "Authentik outpost '{{ chimerai_authentik_outpost_name }}' was not found."
+
+- name: Build Authentik outpost provider list
+  ansible.builtin.set_fact:
+    chimerai_authentik_outpost_provider_ids: "{{ (chimerai_authentik_outpost_lookup.json.results[0].providers + chimerai_authentik_managed_provider_ids) | unique | list }}"
+    chimerai_authentik_outpost_config: "{{ chimerai_authentik_outpost_lookup.json.results[0].config | combine({'authentik_host': 'https://' + chimerai_authentik_host}) }}"
+  no_log: true
+
+- name: Update Authentik proxy outpost
+  ansible.builtin.uri:
+    url: "{{ chimerai_authentik_resolved_api_url }}/api/v3/outposts/instances/{{ chimerai_authentik_outpost_lookup.json.results[0].pk }}/"
+    method: PUT
+    headers:
+      Authorization: "Bearer {{ chimerai_authentik_bootstrap_token }}"
+      Accept: application/json
+    body_format: json
+    body:
+      name: "{{ chimerai_authentik_outpost_lookup.json.results[0].name }}"
+      type: "{{ chimerai_authentik_outpost_lookup.json.results[0].type }}"
+      providers: "{{ chimerai_authentik_outpost_provider_ids }}"
+      service_connection: "{{ chimerai_authentik_outpost_lookup.json.results[0].service_connection }}"
+      config: "{{ chimerai_authentik_outpost_config }}"
+      managed: "{{ chimerai_authentik_outpost_lookup.json.results[0].managed }}"
+    return_content: true
+    status_code: 200
+  when:
+    - chimerai_authentik_outpost_lookup.json.results[0].providers | sort != chimerai_authentik_outpost_provider_ids | sort
+      or chimerai_authentik_outpost_lookup.json.results[0].config.authentik_host | default('') != 'https://' + chimerai_authentik_host
+  no_log: true
+
+- name: Report Authentik automation summary
+  ansible.builtin.debug:
+    msg: "Authentik automation reconciled {{ chimerai_authentik_managed_proxy_apps | length }} protected app(s)."
+  changed_when: false
