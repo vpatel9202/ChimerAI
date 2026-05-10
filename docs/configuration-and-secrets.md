@@ -110,6 +110,8 @@ chimerai_enabled_roles:
   - mcp_browser
   - mcp_firecrawl
   - mcp_gateway
+  - n8n
+  - langfuse
 ```
 
 When adding new secret fields, use explicit names such as `api_key`,
@@ -268,6 +270,28 @@ chimerai_services:
 
 Do not rotate `encryption_key` casually. Existing n8n credentials and workflow
 secrets depend on it.
+
+## Langfuse Settings
+
+Langfuse requires stable database, object storage, auth, and encryption
+secrets. Store them in the encrypted local config:
+
+```yaml
+chimerai_enabled_roles:
+  - langfuse
+chimerai_services:
+  langfuse:
+    postgres_password: ENC[AES256_GCM,...]
+    clickhouse_password: ENC[AES256_GCM,...]
+    redis_password: ENC[AES256_GCM,...]
+    minio_secret_key: ENC[AES256_GCM,...]
+    nextauth_secret: ENC[AES256_GCM,...]
+    salt: ENC[AES256_GCM,...]
+    encryption_key: ENC[AES256_GCM,...]
+```
+
+`encryption_key` must be 64 hexadecimal characters. Do not rotate it casually;
+stored Langfuse secrets and credentials depend on it.
 
 ## Backup Settings
 

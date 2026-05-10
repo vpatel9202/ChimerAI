@@ -1,0 +1,153 @@
+---
+services:
+  postgres:
+    image: "{{ chimerai_langfuse_postgres_image }}"
+    container_name: "{{ chimerai_langfuse_project_name }}-postgres"
+    restart: unless-stopped
+    env_file:
+      - postgres.env
+    volumes:
+      - "{{ chimerai_langfuse_postgres_dir }}:/var/lib/postgresql/data"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "pg_isready -U {{ chimerai_langfuse_db_user }} -d {{ chimerai_langfuse_db_name }}"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_langfuse_network }}"
+
+  clickhouse:
+    image: "{{ chimerai_langfuse_clickhouse_image }}"
+    container_name: "{{ chimerai_langfuse_project_name }}-clickhouse"
+    restart: unless-stopped
+    env_file:
+      - clickhouse.env
+    environment:
+      TZ: UTC
+    volumes:
+      - "{{ chimerai_langfuse_clickhouse_dir }}:/var/lib/clickhouse"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "clickhouse-client --user {{ chimerai_langfuse_clickhouse_user }} --password \"$${CLICKHOUSE_PASSWORD}\" --query 'SELECT 1'"
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks:
+      - "{{ chimerai_langfuse_network }}"
+
+  redis:
+    image: "{{ chimerai_langfuse_redis_image }}"
+    container_name: "{{ chimerai_langfuse_project_name }}-redis"
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --requirepass
+      - "{{ chimerai_langfuse_redis_password }}"
+      - --maxmemory-policy
+      - noeviction
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - -a
+        - "{{ chimerai_langfuse_redis_password }}"
+        - ping
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_langfuse_network }}"
+
+  minio:
+    image: "{{ chimerai_langfuse_minio_image }}"
+    container_name: "{{ chimerai_langfuse_project_name }}-minio"
+    restart: unless-stopped
+    env_file:
+      - minio.env
+    command:
+      - server
+      - /data
+      - --address
+      - ":9000"
+      - --console-address
+      - ":9001"
+    volumes:
+      - "{{ chimerai_langfuse_minio_dir }}:/data"
+    healthcheck:
+      test:
+        - CMD
+        - mc
+        - ready
+        - local
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_langfuse_network }}"
+
+  web:
+    image: "{{ chimerai_langfuse_web_image }}"
+    container_name: "{{ chimerai_langfuse_project_name }}-web"
+    restart: unless-stopped
+    env_file:
+      - langfuse.env
+    environment:
+      PORT: "{{ chimerai_langfuse_web_port }}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    ports:
+      - "{{ chimerai_langfuse_host }}:{{ chimerai_langfuse_host_port }}:{{ chimerai_langfuse_web_port }}"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:{{ chimerai_langfuse_web_port }}/api/public/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    networks:
+      - "{{ chimerai_langfuse_network }}"
+
+  worker:
+    image: "{{ chimerai_langfuse_worker_image }}"
+    container_name: "{{ chimerai_langfuse_project_name }}-worker"
+    restart: unless-stopped
+    env_file:
+      - langfuse.env
+    environment:
+      PORT: "{{ chimerai_langfuse_worker_port }}"
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:{{ chimerai_langfuse_worker_port }}/api/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    networks:
+      - "{{ chimerai_langfuse_network }}"
+
+networks:
+  {{ chimerai_langfuse_network }}:
+    external: true

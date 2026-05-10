@@ -38,6 +38,7 @@ all:
             - backup
             - qdrant
             - n8n
+            - langfuse
             - openclaw
             - mcp_todoist
             - mcp_filesystem
@@ -150,6 +151,26 @@ all:
               network: chimerai-internal
               postgres_password: replace-me
               encryption_key: replace-me
+            langfuse:
+              web_image: langfuse/langfuse:3
+              worker_image: langfuse/langfuse-worker:3
+              postgres_image: postgres:16-alpine
+              clickhouse_image: clickhouse/clickhouse-server:latest
+              redis_image: redis:7-alpine
+              minio_image: minio/minio:latest
+              minio_client_image: minio/mc:latest
+              host: 127.0.0.1
+              host_port: 13000
+              web_port: 3000
+              worker_port: 3030
+              network: chimerai-internal
+              postgres_password: replace-me
+              clickhouse_password: replace-me
+              redis_password: replace-me
+              minio_secret_key: replace-me
+              nextauth_secret: replace-me
+              salt: replace-me
+              encryption_key: 0000000000000000000000000000000000000000000000000000000000000000
             mcp_todoist:
               enabled: false
               image: node:22-alpine
@@ -228,7 +249,7 @@ all:
 | `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `n8n`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `n8n`, `langfuse`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File

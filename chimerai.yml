@@ -78,6 +78,11 @@
       tags:
         - n8n
         - automation
+    - role: langfuse
+      when: "'langfuse' in chimerai_enabled_roles"
+      tags:
+        - langfuse
+        - observability
     - role: mcp_todoist
       when: "'mcp_todoist' in chimerai_enabled_roles"
       tags:

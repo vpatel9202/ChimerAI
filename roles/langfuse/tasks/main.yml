@@ -1,0 +1,164 @@
+---
+- name: Validate Langfuse configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_langfuse_web_image | length > 0
+      - chimerai_langfuse_worker_image | length > 0
+      - chimerai_langfuse_host | length > 0
+      - chimerai_langfuse_host_port | int > 0
+      - chimerai_langfuse_network | length > 0
+    fail_msg: "Langfuse configuration is incomplete."
+
+- name: Validate Langfuse secrets before apply
+  ansible.builtin.assert:
+    that:
+      - chimerai_langfuse_postgres_password | length > 0
+      - chimerai_langfuse_clickhouse_password | length > 0
+      - chimerai_langfuse_redis_password | length > 0
+      - chimerai_langfuse_minio_secret_key | length > 0
+      - chimerai_langfuse_nextauth_secret | length > 0
+      - chimerai_langfuse_salt | length > 0
+      - chimerai_langfuse_encryption_key is match('^[0-9a-fA-F]{64}$')
+      - chimerai_langfuse_postgres_password != 'replace-me'
+      - chimerai_langfuse_clickhouse_password != 'replace-me'
+      - chimerai_langfuse_redis_password != 'replace-me'
+      - chimerai_langfuse_minio_secret_key != 'replace-me'
+      - chimerai_langfuse_nextauth_secret != 'replace-me'
+      - chimerai_langfuse_salt != 'replace-me'
+    fail_msg: "Langfuse apply requires postgres, ClickHouse, Redis, MinIO, NextAuth, salt, and 64-hex encryption secrets."
+  when: chimerai_action == "apply"
+  no_log: true
+
+- name: Create Langfuse directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "0755"
+  loop:
+    - path: "{{ chimerai_langfuse_app_dir }}"
+    - path: "{{ chimerai_langfuse_state_dir }}"
+    - path: "{{ chimerai_langfuse_postgres_dir }}"
+      owner: "{{ chimerai_langfuse_postgres_uid }}"
+      group: "{{ chimerai_langfuse_postgres_gid }}"
+    - path: "{{ chimerai_langfuse_clickhouse_dir }}"
+      owner: "{{ chimerai_langfuse_clickhouse_uid }}"
+      group: "{{ chimerai_langfuse_clickhouse_gid }}"
+    - path: "{{ chimerai_langfuse_minio_dir }}"
+      owner: "{{ chimerai_langfuse_minio_uid }}"
+      group: "{{ chimerai_langfuse_minio_gid }}"
+  when: chimerai_action == "apply"
+
+- name: Render Langfuse env files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ chimerai_langfuse_app_dir }}/{{ item.dest }}"
+    mode: "0600"
+  loop:
+    - src: langfuse.env.j2
+      dest: langfuse.env
+    - src: postgres.env.j2
+      dest: postgres.env
+    - src: clickhouse.env.j2
+      dest: clickhouse.env
+    - src: minio.env.j2
+      dest: minio.env
+  no_log: true
+  when: chimerai_action == "apply"
+
+- name: Render Langfuse Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_langfuse_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Langfuse
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_langfuse_app_dir }}"
+    project_name: "{{ chimerai_langfuse_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Ensure Langfuse MinIO buckets exist
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - --network
+      - "{{ chimerai_langfuse_network }}"
+      - --entrypoint
+      - /bin/sh
+      - "{{ chimerai_langfuse_minio_client_image }}"
+      - -c
+      - >-
+        mc alias set local http://minio:9000 "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY" &&
+        mc mb --ignore-existing local/{{ chimerai_langfuse_event_bucket }} &&
+        mc mb --ignore-existing local/{{ chimerai_langfuse_media_bucket }} &&
+        mc mb --ignore-existing local/{{ chimerai_langfuse_export_bucket }}
+  environment:
+    MINIO_ACCESS_KEY: "{{ chimerai_langfuse_minio_access_key }}"
+    MINIO_SECRET_KEY: "{{ chimerai_langfuse_minio_secret_key }}"
+  changed_when: false
+  no_log: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check Langfuse web health after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_langfuse_host }}:{{ chimerai_langfuse_host_port }}/api/public/health"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: chimerai_langfuse_health
+  until: chimerai_langfuse_health is succeeded
+  retries: 60
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether Langfuse Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_langfuse_app_dir }}/compose.yml"
+  register: chimerai_langfuse_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Langfuse
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_langfuse_app_dir }}"
+    project_name: "{{ chimerai_langfuse_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_langfuse_compose_file.stat.exists
+
+- name: Remove Langfuse generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_langfuse_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Langfuse state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/langfuse
+  when:
+    - chimerai_action == "remove"
+    - chimerai_langfuse_remove_state | bool
+  changed_when: true

@@ -71,10 +71,11 @@ and Firecrawl are higher-priority general-purpose tools.
 
 ## 2E: Automation And Observability
 
-Status: planned.
+Status: implemented.
 
 - Add n8n for workflow automation. Implemented.
 - Add Langfuse for LLM tracing, prompt visibility, and evaluation workflows.
+  Implemented.
 - Add Qdrant as the first vector storage role. Implemented.
 
 These roles make ChimerAI useful beyond a chat UI: workflows can run, agent
