@@ -121,6 +121,14 @@ all:
                 opencode:
                   enabled: true
 
+            ollama:
+              image: ollama/ollama:latest
+              host: 127.0.0.1
+              host_port: 11434
+              container_port: 11434
+              network: chimerai-internal
+              gpu: none
+
             mcp_todoist:
               enabled: false
               image: node:22-alpine

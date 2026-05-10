@@ -109,6 +109,13 @@ all:
                   enabled: true
                 opencode:
                   enabled: true
+            ollama:
+              image: ollama/ollama:latest
+              host: 127.0.0.1
+              host_port: 11434
+              container_port: 11434
+              network: chimerai-internal
+              gpu: none
             mcp_todoist:
               enabled: false
               image: node:22-alpine
@@ -158,7 +165,7 @@ all:
 | `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `mcp_todoist`, and `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `mcp_todoist`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File
@@ -249,7 +256,7 @@ leaving non-secret structure readable in diffs.
 The example inventory exists so Ansible can parse the playbook and roles have a
 starting contract. The current public stack configures first-pass ingress,
 shared auth, Authentik app/provider/outpost automation for managed apps,
-OpenClaw, optional host-installed and containerized agent CLI roles, the first
-Todoist MCP server role, and Restic-backed state backup. A dedicated `update`
-action, additional MCP server roles, and provider-key inheritance are
-post-alpha work.
+OpenClaw, optional host-installed and containerized agent CLI roles, Ollama as
+the first local model runtime, the first Todoist MCP server role, and
+Restic-backed state backup. A dedicated `update` action, additional MCP server
+roles, and provider-key inheritance are post-alpha work.

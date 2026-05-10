@@ -1,0 +1,12 @@
+---
+chimerai_ollama_name: ollama
+chimerai_ollama_project_name: chimerai-ollama
+chimerai_ollama_image: "{{ chimerai_services.ollama.image | default('ollama/ollama:latest') }}"
+chimerai_ollama_host: "{{ chimerai_services.ollama.host | default('127.0.0.1') }}"
+chimerai_ollama_host_port: "{{ chimerai_services.ollama.host_port | default(11434) }}"
+chimerai_ollama_container_port: "{{ chimerai_services.ollama.container_port | default(11434) }}"
+chimerai_ollama_network: "{{ chimerai_services.ollama.network | default('chimerai-internal') }}"
+chimerai_ollama_gpu: "{{ chimerai_services.ollama.gpu | default('none') }}"
+chimerai_ollama_app_dir: "{{ chimerai_deployment_root }}/ollama"
+chimerai_ollama_data_dir: "{{ chimerai_state_root }}/ollama/data"
+chimerai_ollama_remove_state: "{{ chimerai_services.ollama.remove_state | default(false) }}"

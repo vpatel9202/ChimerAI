@@ -1,0 +1,23 @@
+---
+services:
+  ollama:
+    image: "{{ chimerai_ollama_image }}"
+    container_name: "{{ chimerai_ollama_project_name }}"
+    restart: unless-stopped
+    ports:
+      - "{{ chimerai_ollama_host }}:{{ chimerai_ollama_host_port }}:{{ chimerai_ollama_container_port }}"
+    volumes:
+      - "{{ chimerai_ollama_data_dir }}:/root/.ollama"
+{% if chimerai_ollama_gpu == "nvidia" %}
+    gpus: all
+{% elif chimerai_ollama_gpu == "amd" %}
+    devices:
+      - /dev/kfd
+      - /dev/dri
+{% endif %}
+    networks:
+      - "{{ chimerai_ollama_network }}"
+
+networks:
+  {{ chimerai_ollama_network }}:
+    external: true

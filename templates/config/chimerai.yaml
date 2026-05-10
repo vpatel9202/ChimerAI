@@ -128,6 +128,15 @@ chimerai_services:
       opencode:
         enabled: true
 
+  # Optional local model runtime. Models are not pulled automatically.
+  ollama:
+    image: ollama/ollama:latest
+    host: 127.0.0.1
+    host_port: 11434
+    container_port: 11434
+    network: chimerai-internal
+    gpu: none
+
   # Optional first MCP server role. Add `mcp_todoist` to
   # `chimerai_enabled_roles` after setting a real encrypted API key.
   mcp_todoist:

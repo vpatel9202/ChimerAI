@@ -1,0 +1,92 @@
+---
+- name: Validate Ollama configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_ollama_image | length > 0
+      - chimerai_ollama_host | length > 0
+      - chimerai_ollama_host_port | int > 0
+      - chimerai_ollama_container_port | int > 0
+      - chimerai_ollama_network | length > 0
+      - chimerai_ollama_gpu in ["none", "nvidia", "amd"]
+    fail_msg: "Ollama configuration is incomplete."
+
+- name: Create Ollama directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ chimerai_ollama_app_dir }}"
+    - "{{ chimerai_ollama_data_dir }}"
+  when: chimerai_action == "apply"
+
+- name: Render Ollama Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_ollama_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Ollama
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_ollama_app_dir }}"
+    project_name: "{{ chimerai_ollama_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check Ollama HTTP API after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_ollama_host }}:{{ chimerai_ollama_host_port }}/api/version"
+    method: GET
+    status_code: 200
+    return_content: true
+  register: chimerai_ollama_version_check
+  changed_when: false
+  retries: 24
+  delay: 5
+  until: chimerai_ollama_version_check.status == 200
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether Ollama Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_ollama_app_dir }}/compose.yml"
+  register: chimerai_ollama_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Ollama
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_ollama_app_dir }}"
+    project_name: "{{ chimerai_ollama_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_ollama_compose_file.stat.exists
+
+- name: Remove Ollama generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_ollama_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Ollama state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/ollama
+  when:
+    - chimerai_action == "remove"
+    - chimerai_ollama_remove_state | bool
+  changed_when: true

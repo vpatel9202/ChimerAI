@@ -82,6 +82,8 @@ Available now:
   with user-scoped npm paths;
 - optional containerized runner for Codex, Claude Code, Gemini CLI, and
   OpenCode with an explicit workspace mount;
+- optional Ollama local model runtime with loopback API exposure and
+  bind-mounted model state;
 - optional Todoist MCP server role on a private MCP network with loopback host
   access for local agents;
 - automatic OpenClaw MCP registry wiring for the Todoist MCP server when both
@@ -179,6 +181,7 @@ The current shape is:
 │   ├── openclaw/
 │   ├── agent_cli/
 │   ├── runner/
+│   ├── ollama/
 │   ├── mcp_todoist/
 │   ├── diag/
 │   └── open_webui/
@@ -361,7 +364,7 @@ instead of one oversized role push.
 
 #### 2C: Model Layer
 
-- [ ] Add Ollama for local model runtime
+- [x] Add Ollama for local model runtime
 - [ ] Add LiteLLM for model gateway, routing, and provider abstraction
 - [ ] Document how Open WebUI and OpenClaw consume model endpoints
 
