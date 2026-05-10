@@ -150,6 +150,16 @@ chimerai_services:
     postgres_password: replace-me
     models: []
 
+  # Optional vector storage role for retrieval and agent memory use cases.
+  qdrant:
+    image: qdrant/qdrant:latest
+    host: 127.0.0.1
+    host_port: 16333
+    container_port: 6333
+    grpc_host_port: 16334
+    grpc_container_port: 6334
+    network: chimerai-internal
+
   # Optional first MCP server role. Add `mcp_todoist` to
   # `chimerai_enabled_roles` after setting a real encrypted API key.
   mcp_todoist:

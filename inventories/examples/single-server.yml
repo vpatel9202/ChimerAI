@@ -141,6 +141,15 @@ all:
               postgres_password: replace-me
               models: []
 
+            qdrant:
+              image: qdrant/qdrant:latest
+              host: 127.0.0.1
+              host_port: 16333
+              container_port: 6333
+              grpc_host_port: 16334
+              grpc_container_port: 6334
+              network: chimerai-internal
+
             mcp_todoist:
               enabled: false
               image: node:22-alpine

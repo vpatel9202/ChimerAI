@@ -1,0 +1,99 @@
+---
+- name: Validate Qdrant configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_qdrant_image | length > 0
+      - chimerai_qdrant_host | length > 0
+      - chimerai_qdrant_host_port | int > 0
+      - chimerai_qdrant_container_port | int > 0
+      - chimerai_qdrant_grpc_host_port | int > 0
+      - chimerai_qdrant_grpc_container_port | int > 0
+      - chimerai_qdrant_network | length > 0
+    fail_msg: "Qdrant configuration is incomplete."
+
+- name: Create Qdrant directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "0755"
+  loop:
+    - path: "{{ chimerai_qdrant_app_dir }}"
+    - path: "{{ chimerai_qdrant_storage_dir }}"
+      owner: "{{ chimerai_qdrant_uid }}"
+      group: "{{ chimerai_qdrant_gid }}"
+    - path: "{{ chimerai_qdrant_snapshots_dir }}"
+      owner: "{{ chimerai_qdrant_uid }}"
+      group: "{{ chimerai_qdrant_gid }}"
+  when: chimerai_action == "apply"
+
+- name: Render Qdrant Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_qdrant_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Qdrant
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_qdrant_app_dir }}"
+    project_name: "{{ chimerai_qdrant_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check Qdrant readiness after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_qdrant_host }}:{{ chimerai_qdrant_host_port }}/readyz"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: chimerai_qdrant_ready
+  until: chimerai_qdrant_ready is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether Qdrant Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_qdrant_app_dir }}/compose.yml"
+  register: chimerai_qdrant_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Qdrant
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_qdrant_app_dir }}"
+    project_name: "{{ chimerai_qdrant_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_qdrant_compose_file.stat.exists
+
+- name: Remove Qdrant generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_qdrant_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Qdrant state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/qdrant
+  when:
+    - chimerai_action == "remove"
+    - chimerai_qdrant_remove_state | bool
+  changed_when: true

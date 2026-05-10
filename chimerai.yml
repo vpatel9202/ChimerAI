@@ -67,6 +67,12 @@
       tags:
         - litellm
         - model
+    - role: qdrant
+      when: "'qdrant' in chimerai_enabled_roles"
+      tags:
+        - qdrant
+        - storage
+        - vector
     - role: mcp_todoist
       when: "'mcp_todoist' in chimerai_enabled_roles"
       tags:

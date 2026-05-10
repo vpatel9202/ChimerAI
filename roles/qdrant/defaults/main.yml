@@ -1,0 +1,17 @@
+---
+chimerai_qdrant_name: qdrant
+chimerai_qdrant_project_name: chimerai-qdrant
+chimerai_qdrant_image: "{{ chimerai_services.qdrant.image | default('qdrant/qdrant:latest') }}"
+chimerai_qdrant_host: "{{ chimerai_services.qdrant.host | default('127.0.0.1') }}"
+chimerai_qdrant_host_port: "{{ chimerai_services.qdrant.host_port | default(16333) }}"
+chimerai_qdrant_container_port: "{{ chimerai_services.qdrant.container_port | default(6333) }}"
+chimerai_qdrant_grpc_host_port: "{{ chimerai_services.qdrant.grpc_host_port | default(16334) }}"
+chimerai_qdrant_grpc_container_port: "{{ chimerai_services.qdrant.grpc_container_port | default(6334) }}"
+chimerai_qdrant_network: "{{ chimerai_services.qdrant.network | default('chimerai-internal') }}"
+chimerai_qdrant_app_dir: "{{ chimerai_deployment_root }}/qdrant"
+chimerai_qdrant_state_dir: "{{ chimerai_state_root }}/qdrant"
+chimerai_qdrant_storage_dir: "{{ chimerai_qdrant_state_dir }}/storage"
+chimerai_qdrant_snapshots_dir: "{{ chimerai_qdrant_state_dir }}/snapshots"
+chimerai_qdrant_uid: "{{ chimerai_services.qdrant.uid | default('1000') }}"
+chimerai_qdrant_gid: "{{ chimerai_services.qdrant.gid | default('1000') }}"
+chimerai_qdrant_remove_state: "{{ chimerai_services.qdrant.remove_state | default(false) }}"

@@ -75,7 +75,7 @@ Status: planned.
 
 - Add n8n for workflow automation.
 - Add Langfuse for LLM tracing, prompt visibility, and evaluation workflows.
-- Add Qdrant as the first vector storage role.
+- Add Qdrant as the first vector storage role. Implemented.
 
 These roles make ChimerAI useful beyond a chat UI: workflows can run, agent
 behavior can be inspected, and retrieval-backed apps have a storage primitive.

@@ -36,6 +36,7 @@ all:
             - traefik
             - authentik
             - backup
+            - qdrant
             - openclaw
             - mcp_todoist
             - mcp_filesystem
@@ -131,6 +132,14 @@ all:
               salt_key: replace-me
               postgres_password: replace-me
               models: []
+            qdrant:
+              image: qdrant/qdrant:latest
+              host: 127.0.0.1
+              host_port: 16333
+              container_port: 6333
+              grpc_host_port: 16334
+              grpc_container_port: 6334
+              network: chimerai-internal
             mcp_todoist:
               enabled: false
               image: node:22-alpine
@@ -209,7 +218,7 @@ all:
 | `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File
@@ -301,8 +310,8 @@ The example inventory exists so Ansible can parse the playbook and roles have a
 starting contract. The current public stack configures first-pass ingress,
 shared auth, Authentik app/provider/outpost automation for managed apps,
 OpenClaw, optional host-installed and containerized agent CLI roles, Ollama as
-the first local model runtime, LiteLLM as the model gateway, the first Todoist
-MCP server role, filesystem, browser, and Firecrawl MCP roles, a local MCP
-catalog for runtime wiring, and Restic-backed state backup. A dedicated
+the first local model runtime, LiteLLM as the model gateway, Qdrant as the first
+vector storage role, the first Todoist MCP server role, filesystem, browser, and
+Firecrawl MCP roles, a local MCP catalog for runtime wiring, and Restic-backed state backup. A dedicated
 `update` action, additional MCP server roles, and provider-key inheritance are
 post-alpha work.

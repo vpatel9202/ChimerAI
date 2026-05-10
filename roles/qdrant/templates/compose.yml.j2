@@ -1,0 +1,30 @@
+---
+services:
+  qdrant:
+    image: "{{ chimerai_qdrant_image }}"
+    container_name: "{{ chimerai_qdrant_project_name }}"
+    restart: unless-stopped
+    environment:
+      TZ: "{{ chimerai_timezone }}"
+    ports:
+      - "{{ chimerai_qdrant_host }}:{{ chimerai_qdrant_host_port }}:{{ chimerai_qdrant_container_port }}"
+      - "{{ chimerai_qdrant_host }}:{{ chimerai_qdrant_grpc_host_port }}:{{ chimerai_qdrant_grpc_container_port }}"
+    volumes:
+      - "{{ chimerai_qdrant_storage_dir }}:/qdrant/storage"
+      - "{{ chimerai_qdrant_snapshots_dir }}:/qdrant/snapshots"
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - "curl -fsS http://127.0.0.1:{{ chimerai_qdrant_container_port }}/readyz"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_qdrant_network }}"
+
+networks:
+  {{ chimerai_qdrant_network }}:
+    external: true
