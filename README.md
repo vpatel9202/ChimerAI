@@ -330,21 +330,56 @@ The project is provider-neutral:
 - [x] Add `bin/chimerai` wrapper for config init/edit/validate
 - [x] Add repo-local bootstrap installer
 
-### Milestone 2: First Real Stack
+### Milestone 2: Full Stack Foundation
 
-- [x] Choose the first real AI stack role set
-- [x] Add ingress profile
-- [x] Add authentication profile
-- [x] Add the first agent/runtime role beyond Open WebUI
-- [x] Add the first MCP server role
-- [x] Add backup and restore workflows
-- [x] Add Authentik provider/application/outpost automation
-- [x] Wire OpenClaw to the Todoist MCP role
+Milestone 2 is split into sub-milestones so the "full stack" grows in layers
+instead of one oversized role push.
+
+#### 2A: Core Ingress And Identity
+
+- [x] Add Traefik public ingress
+- [x] Add Authentik shared auth
+- [x] Add OpenClaw as the first agent runtime
+- [x] Add Open WebUI as the first chat UI
+- [x] Add backup, restore, and diagnostics foundations
+
+#### 2B: Operator Agent CLI Layer
+
+- [ ] Add `agent_cli` for Codex, Claude Code, Gemini CLI, and OpenCode
+- [ ] Install agent CLIs on the host by default with user-scoped paths
+- [ ] Document optional containerized runner mode for later sandbox use
+
+#### 2C: Model Layer
+
+- [ ] Add Ollama for local model runtime
+- [ ] Add LiteLLM for model gateway, routing, and provider abstraction
+- [ ] Document how Open WebUI and OpenClaw consume model endpoints
+
+#### 2D: MCP Core Layer
+
+- [ ] Add `mcp_gateway` for curated MCP profiles and runtime wiring
+- [ ] Add `mcp_filesystem` with explicit workspace/path allowlists
+- [ ] Add `mcp_browser` with Playwright-based browser automation
+- [ ] Add `mcp_search` for general web search
+- [ ] Add `mcp_firecrawl` for scraping, crawling, and extraction
+- [x] Keep `mcp_todoist` as a specialized proof and example role
+
+#### 2E: Automation And Observability
+
+- [ ] Add n8n for workflow automation
+- [ ] Add Langfuse for LLM traces, prompt visibility, and evaluations
+- [ ] Add Qdrant as the first vector storage role
+
+#### 2F: Safety And Operations Foundation
+
+- [ ] Define the secrets and credential boundary across roles
+- [ ] Add notifications for validation, backup, and agent workflow events
+- [ ] Add `runner` profiles for Docker, Incus, and future cloud sandboxes
 - [ ] Document and test a complete fresh-host install
 
 ### Milestone 3: Public Alpha
 
-- [ ] Complete clean Ubuntu 24.04 install validation in Incus or equivalent
+- [ ] Complete clean Ubuntu 24.04 install validation for the Milestone 2 stack
 - [ ] Prove idempotent `apply` for the enabled alpha role set
 - [ ] Prove backup and restore on generated bind-mounted state
 - [ ] Finish public install, security, and troubleshooting docs
@@ -353,12 +388,11 @@ The project is provider-neutral:
 
 ### Milestone 4: MCP And Agent Runtime Catalog
 
-- [ ] Add a repeatable pattern for additional MCP server roles
-- [ ] Add at least two more MCP integrations with private-by-default exposure
-- [ ] Define provider-key inheritance only after multiple roles need it
-- [ ] Document safe read-only and mutating validation prompts for agent runtimes
-- [ ] Keep OpenClaw as the first supported runtime while preserving room for
-  other agent runtimes
+- [ ] Expand beyond the Milestone 2 MCP core set
+- [ ] Add more specialized MCP integrations with private-by-default exposure
+- [ ] Add additional agent runtimes only after OpenClaw patterns are stable
+- [ ] Improve MCP discovery, profiles, and tool permission policy
+- [ ] Document safe read-only and mutating validation prompts per tool class
 
 ### Milestone 5: Operations Maturity
 
@@ -367,11 +401,11 @@ The project is provider-neutral:
 - [ ] Add restore drills and operator runbooks
 - [ ] Improve observability guidance for logs, health checks, and exposed ports
 - [ ] Define remote access profiles after ingress/auth behavior is stable
+- [ ] Mature notifications, audit, and runner/sandbox operations
 
 ### Later Milestones
 
 - app catalog and role selection UX;
-- local model and model gateway profiles;
 - memory and document-ingestion roles;
 - multi-host or split-controller deployments;
 - private deployment migration and dogfooding guides.

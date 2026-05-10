@@ -6,7 +6,7 @@ small and optimized for the current single-server roles: `common`, `docker`,
 `open_webui`, plus the first optional MCP role `mcp_todoist`.
 
 ChimerAI roles should make host state reproducible while keeping Docker Compose
-output visible and debuggable.
+output visible and debuggable where services are involved.
 
 ## Role Responsibilities
 
@@ -24,6 +24,8 @@ Every role should have one clear responsibility:
 - `mcp_todoist`: first MCP server role; private Todoist HTTP MCP service.
 - app roles: app-local state, rendered config, rendered Compose, lifecycle, and
   validation for one service or tightly related service group.
+- host tool roles: user-scoped CLI/tool installs, version checks, uninstall or
+  rollback guidance, and no long-running service assumptions.
 
 Do not create generic roles that hide app behavior behind excessive variable
 indirection. A role should make generated files easier to inspect, not harder.
@@ -61,7 +63,7 @@ Roles should use predictable tags so operators can run narrow tasks:
 Core roles may also use role-specific tags such as `common`, `docker`,
 `networks`, and `diag`.
 
-## State And Compose Expectations
+## State, Host Tools, And Compose Expectations
 
 Roles that manage services should:
 
@@ -72,6 +74,14 @@ Roles that manage services should:
 - keep generated Compose readable by a human operator;
 - create explicit Docker networks rather than relying on accidental defaults;
 - provide a validation path that can run without destructive side effects.
+
+Roles that manage host tools should:
+
+- install into user-scoped paths by default;
+- avoid global package-manager state when a supported user install exists;
+- expose version and path validation;
+- document what host access the tool receives;
+- keep secrets in encrypted config or tool-native auth stores, not in the repo.
 
 ## Lifecycle Interface
 
@@ -105,10 +115,11 @@ config, and rendered with `no_log: true` when secret values are involved.
 
 ## Current Boundary
 
-The current stack proves the contract with core roles, public ingress, shared
-auth, a first agent runtime, and a first optional MCP server. It still does not
-automate every app's inside-the-UI setup, provide a broader MCP catalog,
-implement a global model-provider registry, or provide a dedicated update
+The current stack proves the service-role contract with core roles, public
+ingress, shared auth, a first agent runtime, and a first optional MCP server.
+The expanded Milestone 2 roadmap adds host tool roles, model roles, broader MCP
+roles, automation, observability, notifications, and runner profiles. It still
+does not automate every app's inside-the-UI setup or provide a dedicated update
 lifecycle.
 
 The current installer bootstraps local control tooling only. It does not make

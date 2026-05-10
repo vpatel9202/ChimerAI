@@ -11,6 +11,7 @@ recovery, and operator confidence.
 - Add backup and restore drills for the alpha stack.
 - Document log inspection, port exposure review, and health-check workflows.
 - Decide which remote access profiles belong in the public project.
+- Mature notifications, audit trails, and runner/sandbox operations.
 
 ## Release Gates
 
@@ -19,6 +20,8 @@ recovery, and operator confidence.
 - Restore documentation has been tested against a clean recovery path.
 - Diagnostics explain what failed and what to inspect next.
 - Security guidance covers the operational lifecycle, not only first install.
+- Operators can review tool calls, notifications, and runner activity without
+  reading raw container logs first.
 
 ## Non-Goals
 
