@@ -108,6 +108,7 @@ chimerai_enabled_roles:
   - mcp_todoist
   - mcp_filesystem
   - mcp_browser
+  - mcp_firecrawl
   - mcp_gateway
 ```
 
@@ -233,6 +234,23 @@ chimerai_services:
 The role persists browser profile and output data under
 `/opt/chimerai/apps/mcp-browser/`. Treat browser state as sensitive when agents
 log into websites during validation or automation.
+
+## Firecrawl MCP Settings
+
+The Firecrawl MCP role provides web search, scraping, crawling, mapping, and
+structured extraction tools. It requires a Firecrawl API key:
+
+```yaml
+chimerai_enabled_roles:
+  - mcp_firecrawl
+  - mcp_gateway
+chimerai_services:
+  mcp_firecrawl:
+    api_key: ENC[AES256_GCM,...]
+```
+
+Firecrawl-backed tools can spend API credits. Keep validation prompts narrow,
+use small limits, and avoid broad crawls unless the operator intends that cost.
 
 ## Backup Settings
 

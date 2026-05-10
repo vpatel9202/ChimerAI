@@ -1,0 +1,18 @@
+---
+chimerai_mcp_firecrawl_name: mcp-firecrawl
+chimerai_mcp_firecrawl_project_name: chimerai-mcp-firecrawl
+chimerai_mcp_firecrawl_image: "{{ chimerai_services.mcp_firecrawl.image | default('node:22-alpine') }}"
+chimerai_mcp_firecrawl_server_version: "{{ chimerai_services.mcp_firecrawl.server_version | default('2.0.2') }}"
+chimerai_mcp_firecrawl_supergateway_version: "{{ chimerai_services.mcp_firecrawl.supergateway_version | default('3.4.3') }}"
+chimerai_mcp_firecrawl_host: "{{ chimerai_services.mcp_firecrawl.host | default('127.0.0.1') }}"
+chimerai_mcp_firecrawl_host_port: "{{ chimerai_services.mcp_firecrawl.host_port | default(13005) }}"
+chimerai_mcp_firecrawl_container_port: "{{ chimerai_services.mcp_firecrawl.container_port | default(3000) }}"
+chimerai_mcp_firecrawl_network: "{{ chimerai_services.mcp_firecrawl.network | default('chimerai-mcp') }}"
+chimerai_mcp_firecrawl_app_dir: "{{ chimerai_deployment_root }}/mcp-firecrawl"
+chimerai_mcp_firecrawl_state_dir: "{{ chimerai_state_root }}/mcp-firecrawl"
+chimerai_mcp_firecrawl_npm_cache_dir: "{{ chimerai_mcp_firecrawl_state_dir }}/npm-cache"
+chimerai_mcp_firecrawl_uid: "{{ chimerai_services.mcp_firecrawl.uid | default('1000') }}"
+chimerai_mcp_firecrawl_gid: "{{ chimerai_services.mcp_firecrawl.gid | default('1000') }}"
+chimerai_mcp_firecrawl_api_key: "{{ chimerai_services.mcp_firecrawl.api_key | default('') }}"
+chimerai_mcp_firecrawl_api_url: "{{ chimerai_services.mcp_firecrawl.api_url | default('') }}"
+chimerai_mcp_firecrawl_remove_state: "{{ chimerai_services.mcp_firecrawl.remove_state | default(false) }}"

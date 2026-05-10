@@ -1,0 +1,46 @@
+---
+services:
+  mcp-firecrawl:
+    image: "{{ chimerai_mcp_firecrawl_image }}"
+    container_name: "{{ chimerai_mcp_firecrawl_project_name }}"
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HOME: /home/node
+      NPM_CONFIG_CACHE: /home/node/.npm
+      TZ: "{{ chimerai_timezone }}"
+    working_dir: /home/node
+    user: "node"
+    command:
+      - sh
+      - -c
+      - >-
+        npx -y supergateway@{{ chimerai_mcp_firecrawl_supergateway_version }}
+        --stdio "npx -y firecrawl-mcp@{{ chimerai_mcp_firecrawl_server_version }}"
+        --outputTransport streamableHttp
+        --port {{ chimerai_mcp_firecrawl_container_port }}
+        --streamableHttpPath /mcp
+        --healthEndpoint /healthz
+        --stateful
+        --logLevel info
+    ports:
+      - "{{ chimerai_mcp_firecrawl_host }}:{{ chimerai_mcp_firecrawl_host_port }}:{{ chimerai_mcp_firecrawl_container_port }}"
+    volumes:
+      - "{{ chimerai_mcp_firecrawl_npm_cache_dir }}:/home/node/.npm"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:{{ chimerai_mcp_firecrawl_container_port }}/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_mcp_firecrawl_network }}"
+
+networks:
+  {{ chimerai_mcp_firecrawl_network }}:
+    external: true

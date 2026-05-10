@@ -1,0 +1,147 @@
+---
+- name: Validate Firecrawl MCP configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_mcp_firecrawl_image | length > 0
+      - chimerai_mcp_firecrawl_server_version | length > 0
+      - chimerai_mcp_firecrawl_supergateway_version | length > 0
+      - chimerai_mcp_firecrawl_host | length > 0
+      - chimerai_mcp_firecrawl_host_port | int > 0
+      - chimerai_mcp_firecrawl_container_port | int > 0
+      - chimerai_mcp_firecrawl_network | length > 0
+    fail_msg: "Firecrawl MCP configuration is incomplete."
+
+- name: Validate Firecrawl MCP secrets before apply
+  ansible.builtin.assert:
+    that:
+      - chimerai_mcp_firecrawl_api_key | length > 0
+      - chimerai_mcp_firecrawl_api_key != 'replace-me'
+    fail_msg: "Firecrawl MCP apply requires chimerai_services.mcp_firecrawl.api_key in the encrypted config."
+  when: chimerai_action == "apply"
+  no_log: true
+
+- name: Create Firecrawl MCP directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "0755"
+  loop:
+    - path: "{{ chimerai_mcp_firecrawl_app_dir }}"
+    - path: "{{ chimerai_mcp_firecrawl_npm_cache_dir }}"
+      owner: "{{ chimerai_mcp_firecrawl_uid }}"
+      group: "{{ chimerai_mcp_firecrawl_gid }}"
+  when: chimerai_action == "apply"
+
+- name: Render Firecrawl MCP env file
+  ansible.builtin.template:
+    src: mcp-firecrawl.env.j2
+    dest: "{{ chimerai_mcp_firecrawl_app_dir }}/.env"
+    mode: "0600"
+  no_log: true
+  when: chimerai_action == "apply"
+
+- name: Render Firecrawl MCP Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_mcp_firecrawl_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Firecrawl MCP
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_mcp_firecrawl_app_dir }}"
+    project_name: "{{ chimerai_mcp_firecrawl_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Register Firecrawl MCP server
+  ansible.builtin.set_fact:
+    chimerai_mcp_servers: >-
+      {{
+        (chimerai_mcp_servers | default([])) + [
+          {
+            'name': 'firecrawl',
+            'url': 'http://' ~ chimerai_mcp_firecrawl_project_name ~ ':' ~ (chimerai_mcp_firecrawl_container_port | string) ~ '/mcp',
+            'transport': 'streamable-http',
+            'category': 'web',
+            'mutating': false,
+            'health_url': 'http://' ~ chimerai_mcp_firecrawl_project_name ~ ':' ~ (chimerai_mcp_firecrawl_container_port | string) ~ '/healthz'
+          }
+        ]
+      }}
+  when: chimerai_action == "apply"
+
+- name: Check Firecrawl MCP health endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_mcp_firecrawl_host }}:{{ chimerai_mcp_firecrawl_host_port }}/healthz"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: chimerai_mcp_firecrawl_health
+  until: chimerai_mcp_firecrawl_health is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check Firecrawl MCP streamable HTTP endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_mcp_firecrawl_host }}:{{ chimerai_mcp_firecrawl_host_port }}/mcp"
+    method: GET
+    status_code:
+      - 400
+      - 405
+      - 406
+    timeout: 10
+  register: chimerai_mcp_firecrawl_endpoint
+  until: chimerai_mcp_firecrawl_endpoint is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether Firecrawl MCP Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_mcp_firecrawl_app_dir }}/compose.yml"
+  register: chimerai_mcp_firecrawl_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Firecrawl MCP
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_mcp_firecrawl_app_dir }}"
+    project_name: "{{ chimerai_mcp_firecrawl_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_mcp_firecrawl_compose_file.stat.exists
+
+- name: Remove Firecrawl MCP generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_mcp_firecrawl_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Firecrawl MCP state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/mcp-firecrawl
+  when:
+    - chimerai_action == "remove"
+    - chimerai_mcp_firecrawl_remove_state | bool
+  changed_when: true

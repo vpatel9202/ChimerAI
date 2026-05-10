@@ -61,8 +61,9 @@ The MCP core should prioritize broadly useful tools before niche integrations:
   registry source.
 - `mcp_filesystem`: implemented with explicit workspace/path allowlists.
 - `mcp_browser`: implemented with Playwright-based browser automation.
-- `mcp_search`: general web search.
-- `mcp_firecrawl`: scraping, crawling, and structured extraction.
+- `mcp_search`: implemented through Firecrawl's search-capable MCP tools.
+- `mcp_firecrawl`: implemented for scraping, crawling, and structured
+  extraction.
 - `mcp_todoist`: specialized proof and example role.
 
 Todoist remains valuable as a real MCP proof, but filesystem, browser/search,
