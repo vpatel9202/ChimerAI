@@ -59,6 +59,23 @@
     - chimerai_action == "apply"
     - not ansible_check_mode
 
+- name: Register Todoist MCP server
+  ansible.builtin.set_fact:
+    chimerai_mcp_servers: >-
+      {{
+        (chimerai_mcp_servers | default([])) + [
+          {
+            'name': 'todoist',
+            'url': 'http://' ~ chimerai_mcp_todoist_project_name ~ ':' ~ (chimerai_mcp_todoist_container_port | string) ~ '/mcp',
+            'transport': 'streamable-http',
+            'category': 'tasks',
+            'mutating': true,
+            'health_url': 'http://' ~ chimerai_mcp_todoist_project_name ~ ':' ~ (chimerai_mcp_todoist_container_port | string) ~ '/health'
+          }
+        ]
+      }}
+  when: chimerai_action == "apply"
+
 - name: Check whether Todoist MCP Compose file exists
   ansible.builtin.stat:
     path: "{{ chimerai_mcp_todoist_app_dir }}/compose.yml"

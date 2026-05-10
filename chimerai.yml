@@ -73,6 +73,11 @@
         - mcp_todoist
         - mcp
         - app
+    - role: mcp_gateway
+      when: "'mcp_gateway' in chimerai_enabled_roles"
+      tags:
+        - mcp_gateway
+        - mcp
     - role: openclaw
       when: "'openclaw' in chimerai_enabled_roles"
       tags:

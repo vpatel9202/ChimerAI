@@ -11,7 +11,7 @@ role.
 
 ## 2A: Core Ingress And Identity
 
-Status: partially implemented.
+Status: in progress.
 
 - Traefik is the public HTTPS entrypoint.
 - Let's Encrypt HTTP-01 is the default ACME flow.
@@ -57,8 +57,8 @@ Status: partially implemented.
 
 The MCP core should prioritize broadly useful tools before niche integrations:
 
-- `mcp_gateway`: curated MCP profiles, runtime wiring, and registry/catalog
-  integration.
+- `mcp_gateway`: implemented as a local catalog writer and shared OpenClaw MCP
+  registry source.
 - `mcp_filesystem`: workspace/path-scoped file access.
 - `mcp_browser`: Playwright-based browser automation.
 - `mcp_search`: general web search.

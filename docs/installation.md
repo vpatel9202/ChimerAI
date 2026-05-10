@@ -152,16 +152,16 @@ If Authentik was first started without `bootstrap_token`, create an API token
 manually in Authentik, add it to the encrypted config as
 `chimerai_services.authentik.bootstrap_token`, and rerun `chimerai apply`.
 
-To enable the optional Todoist MCP role, add `mcp_todoist` to
-`chimerai_enabled_roles` and store a real Todoist API key in the encrypted
+To enable the optional Todoist MCP role, add `mcp_todoist` and `mcp_gateway` to
+`chimerai_enabled_roles`, then store a real Todoist API key in the encrypted
 config. The service is private by default and exposes
 `http://127.0.0.1:13002/mcp` for host-based MCP clients.
 
-When `openclaw` is enabled with `mcp_todoist`, ChimerAI attaches OpenClaw to the
-private MCP network and registers Todoist at
-`http://chimerai-mcp-todoist:3000/mcp` in OpenClaw's MCP registry. To validate
-an LLM actually using Todoist, configure both a real Todoist API key and a real
-OpenClaw provider key, then run a read-only OpenClaw agent prompt.
+When `openclaw` is enabled with MCP service roles and `mcp_gateway`, ChimerAI
+attaches OpenClaw to the private MCP network and registers catalog entries such
+as Todoist at their Docker-internal MCP endpoints. To validate an LLM actually
+using Todoist, configure both a real Todoist API key and a real OpenClaw
+provider key, then run a read-only OpenClaw agent prompt.
 
 Run OpenClaw's first-time onboarding in the generated gateway container:
 

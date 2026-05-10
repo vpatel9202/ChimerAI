@@ -1,0 +1,5 @@
+---
+chimerai_mcp_gateway_name: mcp-gateway
+chimerai_mcp_gateway_app_dir: "{{ chimerai_deployment_root }}/mcp-gateway"
+chimerai_mcp_gateway_catalog_file: "{{ chimerai_mcp_gateway_app_dir }}/catalog.json"
+chimerai_mcp_gateway_servers: "{{ chimerai_mcp_servers | default([]) }}"

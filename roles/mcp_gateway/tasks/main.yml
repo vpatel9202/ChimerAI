@@ -1,0 +1,30 @@
+---
+- name: Validate MCP gateway catalog
+  ansible.builtin.assert:
+    that:
+      - chimerai_mcp_gateway_servers is sequence
+      - item.name | length > 0
+      - item.url | length > 0
+      - item.transport | length > 0
+    fail_msg: "MCP gateway catalog contains an incomplete server entry."
+  loop: "{{ chimerai_mcp_gateway_servers }}"
+
+- name: Create MCP gateway directory
+  ansible.builtin.file:
+    path: "{{ chimerai_mcp_gateway_app_dir }}"
+    state: directory
+    mode: "0755"
+  when: chimerai_action == "apply"
+
+- name: Render MCP gateway catalog
+  ansible.builtin.copy:
+    dest: "{{ chimerai_mcp_gateway_catalog_file }}"
+    content: "{{ {'servers': chimerai_mcp_gateway_servers} | to_nice_json }}\n"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Remove MCP gateway generated catalog
+  ansible.builtin.file:
+    path: "{{ chimerai_mcp_gateway_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"

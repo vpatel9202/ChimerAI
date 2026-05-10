@@ -106,6 +106,7 @@ chimerai_enabled_roles:
   - backup
   - openclaw
   - mcp_todoist
+  - mcp_gateway
 ```
 
 When adding new secret fields, use explicit names such as `api_key`,
@@ -172,14 +173,15 @@ The role exposes the MCP endpoint on loopback, normally
 `http://127.0.0.1:13002/mcp`, and joins the private `chimerai-mcp` Docker
 network for agent runtimes.
 
-When `openclaw` and `mcp_todoist` are both enabled, ChimerAI also attaches
-OpenClaw to the MCP network and registers Todoist in OpenClaw's MCP registry:
+When `mcp_gateway` is enabled after MCP service roles, ChimerAI writes a local
+MCP catalog. When `openclaw` is also enabled, ChimerAI attaches OpenClaw to the
+MCP network and registers catalog entries in OpenClaw's MCP registry:
 
 ```yaml
-chimerai_services:
-  openclaw:
-    mcp_network: chimerai-mcp
-    todoist_mcp_enabled: true
+chimerai_enabled_roles:
+  - mcp_todoist
+  - mcp_gateway
+  - openclaw
 ```
 
 Real OpenClaw LLM validation additionally requires a provider key under

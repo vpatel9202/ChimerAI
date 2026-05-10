@@ -99,7 +99,7 @@
     - not ansible_check_mode
     - "'mcp_todoist' in chimerai_enabled_roles"
 
-- name: Check OpenClaw Todoist MCP registry entry after apply
+- name: Check OpenClaw MCP registry entries after apply
   ansible.builtin.command:
     argv:
       - docker
@@ -109,15 +109,16 @@
       - dist/index.js
       - mcp
       - show
-      - "{{ chimerai_services.openclaw.todoist_mcp_name | default('todoist') }}"
+      - "{{ item.name }}"
       - --json
-  register: chimerai_diag_openclaw_todoist_mcp
+  loop: "{{ chimerai_mcp_servers | default([]) }}"
+  register: chimerai_diag_openclaw_mcp_entries
   changed_when: false
   when:
     - chimerai_action == "apply"
     - not ansible_check_mode
     - "'openclaw' in chimerai_enabled_roles"
-    - "'mcp_todoist' in chimerai_enabled_roles"
+    - chimerai_mcp_servers | default([]) | length > 0
 
 - name: Report validation summary
   ansible.builtin.debug:

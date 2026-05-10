@@ -372,7 +372,7 @@ instead of one oversized role push.
 
 #### 2D: MCP Core Layer
 
-- [ ] Add `mcp_gateway` for curated MCP profiles and runtime wiring
+- [x] Add `mcp_gateway` for curated MCP profiles and runtime wiring
 - [ ] Add `mcp_filesystem` with explicit workspace/path allowlists
 - [ ] Add `mcp_browser` with Playwright-based browser automation
 - [ ] Add `mcp_search` for general web search
