@@ -93,6 +93,17 @@ chimerai_services:
       anthropic_api_key: replace-me
       openai_api_key: replace-me
 
+  # Optional host-installed agent CLI layer. Add `agent_cli` to
+  # `chimerai_enabled_roles` to install enabled tools.
+  agent_cli:
+    install_method: npm
+    install_node: true
+    install_prefix: "{{ ansible_env.HOME }}/.local/share/chimerai/agent-cli/npm"
+    bin_dir: "{{ ansible_env.HOME }}/.local/bin"
+    tools:
+      codex:
+        enabled: true
+
   # Optional first MCP server role. Add `mcp_todoist` to
   # `chimerai_enabled_roles` after setting a real encrypted API key.
   mcp_todoist:

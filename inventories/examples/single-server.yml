@@ -90,6 +90,15 @@ all:
                 anthropic_api_key: replace-me
                 openai_api_key: replace-me
 
+            agent_cli:
+              install_method: npm
+              install_node: true
+              install_prefix: "{{ ansible_env.HOME }}/.local/share/chimerai/agent-cli/npm"
+              bin_dir: "{{ ansible_env.HOME }}/.local/bin"
+              tools:
+                codex:
+                  enabled: true
+
             mcp_todoist:
               enabled: false
               image: node:22-alpine

@@ -1,0 +1,152 @@
+---
+- name: Validate Agent CLI configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_agent_cli_install_method == "npm"
+      - chimerai_agent_cli_install_prefix | length > 0
+      - chimerai_agent_cli_bin_dir | length > 0
+      - chimerai_agent_cli_tools is mapping
+    fail_msg: "Agent CLI configuration is incomplete."
+
+- name: Build enabled Agent CLI tool list
+  ansible.builtin.set_fact:
+    chimerai_agent_cli_enabled_tools: >-
+      {{
+        chimerai_agent_cli_tools
+        | dict2items
+        | selectattr('value.enabled', 'defined')
+        | selectattr('value.enabled')
+        | map(attribute='key')
+        | list
+      }}
+
+- name: Validate enabled Agent CLI tools are known
+  ansible.builtin.assert:
+    that:
+      - item in chimerai_agent_cli_tool_catalog
+    fail_msg: "Unknown Agent CLI tool '{{ item }}'."
+  loop: "{{ chimerai_agent_cli_enabled_tools }}"
+
+- name: Install Node.js and npm for Agent CLI packages
+  ansible.builtin.package:
+    name: "{{ chimerai_agent_cli_node_packages }}"
+    state: present
+  when:
+    - chimerai_action == "apply"
+    - chimerai_agent_cli_install_node | bool
+    - chimerai_agent_cli_enabled_tools | length > 0
+
+- name: Check npm for Agent CLI installs
+  ansible.builtin.command:
+    argv:
+      - npm
+      - --version
+  register: chimerai_agent_cli_npm_version
+  changed_when: false
+  when: chimerai_agent_cli_enabled_tools | length > 0
+
+- name: Create Agent CLI install directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ chimerai_agent_cli_install_prefix }}"
+    - "{{ chimerai_agent_cli_bin_dir }}"
+  when: chimerai_action == "apply"
+
+- name: Check installed Agent CLI npm packages
+  ansible.builtin.command:
+    argv:
+      - npm
+      - list
+      - --global
+      - --prefix
+      - "{{ chimerai_agent_cli_install_prefix }}"
+      - "{{ chimerai_agent_cli_tool_catalog[item].package }}"
+      - --depth=0
+  loop: "{{ chimerai_agent_cli_enabled_tools }}"
+  register: chimerai_agent_cli_package_checks
+  changed_when: false
+  failed_when: false
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Install enabled Agent CLI npm packages
+  ansible.builtin.command:
+    argv:
+      - npm
+      - install
+      - --global
+      - --prefix
+      - "{{ chimerai_agent_cli_install_prefix }}"
+      - "{{ chimerai_agent_cli_tool_catalog[item].package }}{{ '@' + chimerai_agent_cli_tools[item].version if chimerai_agent_cli_tools[item].version is defined else '' }}"
+  loop: "{{ chimerai_agent_cli_enabled_tools }}"
+  loop_control:
+    index_var: chimerai_agent_cli_tool_index
+  register: chimerai_agent_cli_install
+  changed_when: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+    - >
+      chimerai_agent_cli_tools[item].version is defined or
+      chimerai_agent_cli_package_checks.results[chimerai_agent_cli_tool_index].rc != 0
+
+- name: Link enabled Agent CLI executables
+  ansible.builtin.file:
+    src: "{{ chimerai_agent_cli_install_prefix }}/bin/{{ chimerai_agent_cli_tool_catalog[item].executable }}"
+    dest: "{{ chimerai_agent_cli_bin_dir }}/{{ chimerai_agent_cli_tool_catalog[item].executable }}"
+    state: link
+    force: true
+  loop: "{{ chimerai_agent_cli_enabled_tools }}"
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check enabled Agent CLI executable paths
+  ansible.builtin.stat:
+    path: "{{ chimerai_agent_cli_bin_dir }}/{{ chimerai_agent_cli_tool_catalog[item].executable }}"
+  loop: "{{ chimerai_agent_cli_enabled_tools }}"
+  register: chimerai_agent_cli_executable_checks
+  when:
+    - chimerai_action in ["validate", "apply"]
+    - not ansible_check_mode
+
+- name: Validate enabled Agent CLI executables
+  ansible.builtin.command:
+    argv:
+      - "{{ chimerai_agent_cli_bin_dir }}/{{ chimerai_agent_cli_tool_catalog[item].executable }}"
+      - "{{ chimerai_agent_cli_tool_catalog[item].version_arg }}"
+  loop: "{{ chimerai_agent_cli_enabled_tools }}"
+  loop_control:
+    index_var: chimerai_agent_cli_tool_index
+  register: chimerai_agent_cli_version_checks
+  changed_when: false
+  when:
+    - chimerai_action in ["validate", "apply"]
+    - not ansible_check_mode
+    - chimerai_agent_cli_executable_checks.results[chimerai_agent_cli_tool_index].stat.exists
+
+- name: Remove Agent CLI executable links
+  ansible.builtin.file:
+    path: "{{ chimerai_agent_cli_bin_dir }}/{{ chimerai_agent_cli_tool_catalog[item].executable }}"
+    state: absent
+  loop: "{{ chimerai_agent_cli_enabled_tools }}"
+  when: chimerai_action == "remove"
+
+- name: Remove Agent CLI npm packages
+  ansible.builtin.command:
+    argv:
+      - npm
+      - uninstall
+      - --global
+      - --prefix
+      - "{{ chimerai_agent_cli_install_prefix }}"
+      - "{{ chimerai_agent_cli_tool_catalog[item].package }}"
+  loop: "{{ chimerai_agent_cli_enabled_tools }}"
+  changed_when: true
+  when:
+    - chimerai_action == "remove"
+    - not ansible_check_mode

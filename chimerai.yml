@@ -47,6 +47,11 @@
       tags:
         - open_webui
         - app
+    - role: agent_cli
+      when: "'agent_cli' in chimerai_enabled_roles"
+      tags:
+        - agent_cli
+        - host_tool
     - role: mcp_todoist
       when: "'mcp_todoist' in chimerai_enabled_roles"
       tags:
