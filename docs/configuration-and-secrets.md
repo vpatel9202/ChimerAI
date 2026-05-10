@@ -107,6 +107,7 @@ chimerai_enabled_roles:
   - openclaw
   - mcp_todoist
   - mcp_filesystem
+  - mcp_browser
   - mcp_gateway
 ```
 
@@ -212,6 +213,26 @@ chimerai_services:
 
 Do not allowlist broad host paths such as `/`, `/home`, or `/var` unless the
 deployment intentionally gives agents that scope.
+
+## Browser MCP Settings
+
+The browser MCP role runs Playwright MCP as a private service. Enable it with
+`mcp_gateway` when compatible agent runtimes should discover it automatically:
+
+```yaml
+chimerai_enabled_roles:
+  - mcp_browser
+  - mcp_gateway
+chimerai_services:
+  mcp_browser:
+    browser: chromium
+    headless: true
+    allowed_hosts: "*"
+```
+
+The role persists browser profile and output data under
+`/opt/chimerai/apps/mcp-browser/`. Treat browser state as sensitive when agents
+log into websites during validation or automation.
 
 ## Backup Settings
 

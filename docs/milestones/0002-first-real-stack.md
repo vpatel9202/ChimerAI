@@ -60,7 +60,7 @@ The MCP core should prioritize broadly useful tools before niche integrations:
 - `mcp_gateway`: implemented as a local catalog writer and shared OpenClaw MCP
   registry source.
 - `mcp_filesystem`: implemented with explicit workspace/path allowlists.
-- `mcp_browser`: Playwright-based browser automation.
+- `mcp_browser`: implemented with Playwright-based browser automation.
 - `mcp_search`: general web search.
 - `mcp_firecrawl`: scraping, crawling, and structured extraction.
 - `mcp_todoist`: specialized proof and example role.

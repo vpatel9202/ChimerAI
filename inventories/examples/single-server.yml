@@ -163,6 +163,15 @@ all:
                   path: /opt/chimerai/apps/mcp-filesystem/workspace
                   create: true
 
+            mcp_browser:
+              image: mcr.microsoft.com/playwright/mcp:latest
+              host: 127.0.0.1
+              host_port: 13004
+              container_port: 3000
+              browser: chromium
+              headless: true
+              allowed_hosts: "*"
+
           chimerai_backup:
             enabled: false
             engine: restic

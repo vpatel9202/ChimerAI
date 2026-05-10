@@ -1,0 +1,59 @@
+---
+services:
+  mcp-browser:
+    image: "{{ chimerai_mcp_browser_image }}"
+    container_name: "{{ chimerai_mcp_browser_project_name }}"
+    restart: unless-stopped
+    entrypoint:
+      - node
+    command:
+      - /app/cli.js
+{% if chimerai_mcp_browser_headless | bool %}
+      - --headless
+{% endif %}
+      - --browser
+      - "{{ chimerai_mcp_browser_browser }}"
+{% if chimerai_mcp_browser_no_sandbox | bool %}
+      - --no-sandbox
+{% endif %}
+      - --port
+      - "{{ chimerai_mcp_browser_container_port }}"
+      - --host
+      - "0.0.0.0"
+      - --allowed-hosts
+      - "{{ chimerai_mcp_browser_allowed_hosts }}"
+      - --user-data-dir
+      - /home/pwuser/profile
+      - --output-dir
+      - /home/pwuser/output
+      - --viewport-size
+      - "{{ chimerai_mcp_browser_viewport_size }}"
+{% if chimerai_mcp_browser_allowed_origins | length > 0 %}
+      - --allowed-origins
+      - "{{ chimerai_mcp_browser_allowed_origins }}"
+{% endif %}
+{% if chimerai_mcp_browser_blocked_origins | length > 0 %}
+      - --blocked-origins
+      - "{{ chimerai_mcp_browser_blocked_origins }}"
+{% endif %}
+    ports:
+      - "{{ chimerai_mcp_browser_host }}:{{ chimerai_mcp_browser_host_port }}:{{ chimerai_mcp_browser_container_port }}"
+    volumes:
+      - "{{ chimerai_mcp_browser_profile_dir }}:/home/pwuser/profile"
+      - "{{ chimerai_mcp_browser_output_dir }}:/home/pwuser/output"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:{{ chimerai_mcp_browser_container_port }}/mcp').then(()=>process.exit(0)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_mcp_browser_network }}"
+
+networks:
+  {{ chimerai_mcp_browser_network }}:
+    external: true

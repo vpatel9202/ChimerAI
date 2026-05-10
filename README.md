@@ -72,8 +72,8 @@ Available now:
 - SOPS + age encrypted private config at
   `inventories/local/chimerai.sops.yaml`;
 - Ansible roles for `common`, `docker`, `networks`, `traefik`, `authentik`,
-  `backup`, `openclaw`, `mcp_todoist`, `mcp_filesystem`, `mcp_gateway`, `diag`,
-  and `open_webui`;
+  `backup`, `openclaw`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`,
+  `mcp_gateway`, `diag`, and `open_webui`;
 - Traefik public ingress with Let's Encrypt HTTP-01 certificate management;
 - Authentik as the shared forward-auth layer for Traefik-routed apps;
 - Authentik app, proxy provider, and embedded outpost automation for managed
@@ -86,8 +86,8 @@ Available now:
 - optional Ollama local model runtime with loopback API exposure and
   bind-mounted model state;
 - optional LiteLLM model gateway with Postgres-backed proxy state;
-- optional Todoist and filesystem MCP server roles on a private MCP network
-  with loopback host access for local agents;
+- optional Todoist, filesystem, and browser MCP server roles on a private MCP
+  network with loopback host access for local agents;
 - local MCP catalog and automatic OpenClaw MCP registry wiring for enabled MCP
   service roles;
 - Docker Compose output for Open WebUI in a predictable deployment directory;
@@ -97,7 +97,7 @@ Available now:
 
 Still rough or intentionally incomplete:
 
-- additional MCP server roles beyond Todoist and filesystem;
+- additional MCP server roles beyond Todoist, filesystem, and browser;
 - containerized runner profile for agent CLI tools;
 - model provider abstraction or inherited API key configuration;
 - fully automated OpenClaw provider onboarding;
@@ -187,6 +187,7 @@ The current shape is:
 │   ├── litellm/
 │   ├── mcp_todoist/
 │   ├── mcp_filesystem/
+│   ├── mcp_browser/
 │   ├── mcp_gateway/
 │   ├── diag/
 │   └── open_webui/
@@ -377,7 +378,7 @@ instead of one oversized role push.
 
 - [x] Add `mcp_gateway` for curated MCP profiles and runtime wiring
 - [x] Add `mcp_filesystem` with explicit workspace/path allowlists
-- [ ] Add `mcp_browser` with Playwright-based browser automation
+- [x] Add `mcp_browser` with Playwright-based browser automation
 - [ ] Add `mcp_search` for general web search
 - [ ] Add `mcp_firecrawl` for scraping, crawling, and extraction
 - [x] Keep `mcp_todoist` as a specialized proof and example role

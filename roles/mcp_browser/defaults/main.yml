@@ -1,0 +1,22 @@
+---
+chimerai_mcp_browser_name: mcp-browser
+chimerai_mcp_browser_project_name: chimerai-mcp-browser
+chimerai_mcp_browser_image: "{{ chimerai_services.mcp_browser.image | default('mcr.microsoft.com/playwright/mcp:latest') }}"
+chimerai_mcp_browser_host: "{{ chimerai_services.mcp_browser.host | default('127.0.0.1') }}"
+chimerai_mcp_browser_host_port: "{{ chimerai_services.mcp_browser.host_port | default(13004) }}"
+chimerai_mcp_browser_container_port: "{{ chimerai_services.mcp_browser.container_port | default(3000) }}"
+chimerai_mcp_browser_network: "{{ chimerai_services.mcp_browser.network | default('chimerai-mcp') }}"
+chimerai_mcp_browser_app_dir: "{{ chimerai_deployment_root }}/mcp-browser"
+chimerai_mcp_browser_state_dir: "{{ chimerai_state_root }}/mcp-browser"
+chimerai_mcp_browser_profile_dir: "{{ chimerai_mcp_browser_state_dir }}/profile"
+chimerai_mcp_browser_output_dir: "{{ chimerai_mcp_browser_state_dir }}/output"
+chimerai_mcp_browser_uid: "{{ chimerai_services.mcp_browser.uid | default('1000') }}"
+chimerai_mcp_browser_gid: "{{ chimerai_services.mcp_browser.gid | default('1000') }}"
+chimerai_mcp_browser_browser: "{{ chimerai_services.mcp_browser.browser | default('chromium') }}"
+chimerai_mcp_browser_headless: "{{ chimerai_services.mcp_browser.headless | default(true) }}"
+chimerai_mcp_browser_no_sandbox: "{{ chimerai_services.mcp_browser.no_sandbox | default(true) }}"
+chimerai_mcp_browser_allowed_hosts: "{{ chimerai_services.mcp_browser.allowed_hosts | default('*') }}"
+chimerai_mcp_browser_allowed_origins: "{{ chimerai_services.mcp_browser.allowed_origins | default('') }}"
+chimerai_mcp_browser_blocked_origins: "{{ chimerai_services.mcp_browser.blocked_origins | default('') }}"
+chimerai_mcp_browser_viewport_size: "{{ chimerai_services.mcp_browser.viewport_size | default('1280,720') }}"
+chimerai_mcp_browser_remove_state: "{{ chimerai_services.mcp_browser.remove_state | default(false) }}"

@@ -79,6 +79,12 @@
         - mcp_filesystem
         - mcp
         - app
+    - role: mcp_browser
+      when: "'mcp_browser' in chimerai_enabled_roles"
+      tags:
+        - mcp_browser
+        - mcp
+        - app
     - role: mcp_gateway
       when: "'mcp_gateway' in chimerai_enabled_roles"
       tags:
