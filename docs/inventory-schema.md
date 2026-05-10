@@ -96,6 +96,19 @@ all:
                   enabled: false
                 opencode:
                   enabled: false
+            runner:
+              image: node:22-bookworm
+              network: chimerai-internal
+              workspace_dir: /opt/chimerai/apps/runner/workspace
+              tools:
+                codex:
+                  enabled: true
+                claude:
+                  enabled: true
+                gemini:
+                  enabled: true
+                opencode:
+                  enabled: true
             mcp_todoist:
               enabled: false
               image: node:22-alpine
@@ -145,7 +158,7 @@ all:
 | `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `mcp_todoist`, and `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `mcp_todoist`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File
@@ -236,6 +249,7 @@ leaving non-secret structure readable in diffs.
 The example inventory exists so Ansible can parse the playbook and roles have a
 starting contract. The current public stack configures first-pass ingress,
 shared auth, Authentik app/provider/outpost automation for managed apps,
-OpenClaw, an optional host-installed Codex CLI role, the first Todoist MCP
-server role, and Restic-backed state backup. A dedicated `update` action,
-additional MCP server roles, and provider-key inheritance are post-alpha work.
+OpenClaw, optional host-installed and containerized agent CLI roles, the first
+Todoist MCP server role, and Restic-backed state backup. A dedicated `update`
+action, additional MCP server roles, and provider-key inheritance are
+post-alpha work.

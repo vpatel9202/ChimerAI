@@ -80,6 +80,8 @@ Available now:
 - OpenClaw gateway deployment plus `chimerai openclaw onboard` helper;
 - optional host-installed Codex, Claude Code, Gemini CLI, and OpenCode role
   with user-scoped npm paths;
+- optional containerized runner for Codex, Claude Code, Gemini CLI, and
+  OpenCode with an explicit workspace mount;
 - optional Todoist MCP server role on a private MCP network with loopback host
   access for local agents;
 - automatic OpenClaw MCP registry wiring for the Todoist MCP server when both
@@ -176,6 +178,7 @@ The current shape is:
 │   ├── backup/
 │   ├── openclaw/
 │   ├── agent_cli/
+│   ├── runner/
 │   ├── mcp_todoist/
 │   ├── diag/
 │   └── open_webui/
@@ -354,7 +357,7 @@ instead of one oversized role push.
 - [x] Install Claude Code on the host with user-scoped npm paths
 - [x] Install Gemini CLI on the host with user-scoped npm paths
 - [x] Install OpenCode on the host with user-scoped npm paths
-- [ ] Document optional containerized runner mode for later sandbox use
+- [x] Add optional containerized runner mode for agent CLIs
 
 #### 2C: Model Layer
 

@@ -1,0 +1,30 @@
+---
+chimerai_runner_name: runner
+chimerai_runner_project_name: chimerai-runner
+chimerai_runner_image: "{{ chimerai_services.runner.image | default('node:22-bookworm') }}"
+chimerai_runner_network: "{{ chimerai_services.runner.network | default('chimerai-internal') }}"
+chimerai_runner_uid: "{{ chimerai_services.runner.uid | default('1000') }}"
+chimerai_runner_gid: "{{ chimerai_services.runner.gid | default('1000') }}"
+chimerai_runner_app_dir: "{{ chimerai_deployment_root }}/runner"
+chimerai_runner_workspace_dir: "{{ chimerai_services.runner.workspace_dir | default(chimerai_state_root + '/runner/workspace') }}"
+chimerai_runner_npm_prefix_dir: "{{ chimerai_state_root }}/runner/npm-global"
+chimerai_runner_npm_cache_dir: "{{ chimerai_state_root }}/runner/npm-cache"
+chimerai_runner_remove_state: "{{ chimerai_services.runner.remove_state | default(false) }}"
+chimerai_runner_tools: "{{ chimerai_services.runner.tools | default({ 'codex': { 'enabled': true }, 'claude': { 'enabled': true }, 'gemini': { 'enabled': true }, 'opencode': { 'enabled': true } }) }}"
+chimerai_runner_tool_catalog:
+  codex:
+    package: "@openai/codex"
+    executable: codex
+    version_arg: "--version"
+  claude:
+    package: "@anthropic-ai/claude-code"
+    executable: claude
+    version_arg: "--version"
+  gemini:
+    package: "@google/gemini-cli"
+    executable: gemini
+    version_arg: "--version"
+  opencode:
+    package: "opencode-ai"
+    executable: opencode
+    version_arg: "--version"

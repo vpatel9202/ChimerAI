@@ -1,0 +1,31 @@
+---
+services:
+  runner:
+    image: "{{ chimerai_runner_image }}"
+    container_name: "{{ chimerai_runner_project_name }}"
+    restart: unless-stopped
+    user: "{{ chimerai_runner_uid }}:{{ chimerai_runner_gid }}"
+    working_dir: /workspace
+    environment:
+      NPM_CONFIG_PREFIX: /home/node/.npm-global
+      NPM_CONFIG_CACHE: /home/node/.npm-cache
+      PATH: /home/node/.npm-global/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    command:
+      - sh
+      - -lc
+      - >-
+        npm install --global
+        {% for tool in chimerai_runner_enabled_tools -%}
+        {{ chimerai_runner_tool_catalog[tool].package }}{{ '@' + chimerai_runner_tools[tool].version if chimerai_runner_tools[tool].version is defined else '' }}
+        {% endfor -%}
+        && tail -f /dev/null
+    volumes:
+      - "{{ chimerai_runner_workspace_dir }}:/workspace"
+      - "{{ chimerai_runner_npm_prefix_dir }}:/home/node/.npm-global"
+      - "{{ chimerai_runner_npm_cache_dir }}:/home/node/.npm-cache"
+    networks:
+      - "{{ chimerai_runner_network }}"
+
+networks:
+  {{ chimerai_runner_network }}:
+    external: true

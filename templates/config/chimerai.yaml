@@ -112,6 +112,22 @@ chimerai_services:
       opencode:
         enabled: false
 
+  # Optional containerized agent CLI runner. Mount only the workspace paths
+  # the runner should be able to access.
+  runner:
+    image: node:22-bookworm
+    network: chimerai-internal
+    workspace_dir: /opt/chimerai/apps/runner/workspace
+    tools:
+      codex:
+        enabled: true
+      claude:
+        enabled: true
+      gemini:
+        enabled: true
+      opencode:
+        enabled: true
+
   # Optional first MCP server role. Add `mcp_todoist` to
   # `chimerai_enabled_roles` after setting a real encrypted API key.
   mcp_todoist:

@@ -52,6 +52,11 @@
       tags:
         - agent_cli
         - host_tool
+    - role: runner
+      when: "'runner' in chimerai_enabled_roles"
+      tags:
+        - runner
+        - sandbox
     - role: mcp_todoist
       when: "'mcp_todoist' in chimerai_enabled_roles"
       tags:

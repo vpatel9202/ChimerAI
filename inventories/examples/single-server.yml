@@ -107,6 +107,20 @@ all:
                 opencode:
                   enabled: false
 
+            runner:
+              image: node:22-bookworm
+              network: chimerai-internal
+              workspace_dir: /opt/chimerai/apps/runner/workspace
+              tools:
+                codex:
+                  enabled: true
+                claude:
+                  enabled: true
+                gemini:
+                  enabled: true
+                opencode:
+                  enabled: true
+
             mcp_todoist:
               enabled: false
               image: node:22-alpine
