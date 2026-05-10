@@ -87,6 +87,8 @@ all:
               host: openclaw.example.com
               auth_required: true
               mcp_network: chimerai-mcp
+              mcp_registry_enabled: true
+              mcp_cli_timeout: 20
               allow_unconfigured: true
             agent_cli:
               install_method: npm

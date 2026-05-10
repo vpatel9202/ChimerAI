@@ -11,6 +11,8 @@ chimerai_openclaw_allow_unconfigured: "{{ chimerai_services.openclaw.allow_uncon
 chimerai_openclaw_public_network: "{{ chimerai_services.openclaw.public_network | default('chimerai-public') }}"
 chimerai_openclaw_mcp_network: "{{ chimerai_services.openclaw.mcp_network | default('chimerai-mcp') }}"
 chimerai_openclaw_mcp_servers: "{{ chimerai_services.openclaw.mcp_servers | default(chimerai_mcp_servers | default([])) }}"
+chimerai_openclaw_mcp_registry_enabled: "{{ chimerai_services.openclaw.mcp_registry_enabled | default(true) }}"
+chimerai_openclaw_mcp_cli_timeout: "{{ chimerai_services.openclaw.mcp_cli_timeout | default(20) }}"
 chimerai_openclaw_app_dir: "{{ chimerai_deployment_root }}/openclaw"
 chimerai_openclaw_state_dir: "{{ chimerai_state_root }}/openclaw"
 chimerai_openclaw_config_dir: "{{ chimerai_openclaw_state_dir }}/config"

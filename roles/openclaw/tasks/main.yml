@@ -9,6 +9,7 @@
       - chimerai_openclaw_public_network | length > 0
       - chimerai_openclaw_mcp_servers is sequence
       - chimerai_openclaw_mcp_network | length > 0
+      - chimerai_openclaw_mcp_cli_timeout | int > 0
     fail_msg: "OpenClaw configuration is incomplete."
 
 - name: Create OpenClaw directories
@@ -59,11 +60,15 @@
   ansible.builtin.set_fact:
     chimerai_openclaw_mcp_configs: "{{ chimerai_openclaw_mcp_configs | default({}) | combine({item.name: {'url': item.url, 'transport': item.transport}}) }}"
   loop: "{{ chimerai_openclaw_mcp_servers }}"
-  when: chimerai_action == "apply"
+  when:
+    - chimerai_action == "apply"
+    - chimerai_openclaw_mcp_registry_enabled | bool
 
 - name: Read OpenClaw MCP registry entries
   ansible.builtin.command:
     argv:
+      - timeout
+      - "{{ chimerai_openclaw_mcp_cli_timeout | string }}s"
       - docker
       - exec
       - "{{ chimerai_openclaw_project_name }}-gateway"
@@ -79,8 +84,24 @@
   failed_when: false
   when:
     - chimerai_action == "apply"
+    - chimerai_openclaw_mcp_registry_enabled | bool
     - chimerai_openclaw_mcp_servers | length > 0
     - not ansible_check_mode
+
+- name: Fail when OpenClaw MCP registry read times out
+  ansible.builtin.fail:
+    msg: >-
+      OpenClaw MCP registry command timed out after {{ chimerai_openclaw_mcp_cli_timeout }}s while reading
+      '{{ item.item.name }}'. This indicates the OpenClaw MCP CLI is hanging before ChimerAI can reconcile
+      registry entries. Set chimerai_services.openclaw.mcp_registry_enabled=false to skip OpenClaw registry
+      reconciliation while keeping the MCP gateway catalog and network wiring.
+  loop: "{{ chimerai_openclaw_mcp_show.results | default([]) }}"
+  when:
+    - chimerai_action == "apply"
+    - chimerai_openclaw_mcp_registry_enabled | bool
+    - chimerai_openclaw_mcp_servers | length > 0
+    - not ansible_check_mode
+    - item.rc == 124
 
 - name: Store current OpenClaw MCP registry entries
   ansible.builtin.set_fact:
@@ -88,6 +109,7 @@
   loop: "{{ chimerai_openclaw_mcp_show.results | default([]) }}"
   when:
     - chimerai_action == "apply"
+    - chimerai_openclaw_mcp_registry_enabled | bool
     - chimerai_openclaw_mcp_servers | length > 0
     - not ansible_check_mode
     - item.rc == 0
@@ -95,6 +117,8 @@
 - name: Reconcile OpenClaw MCP registry entries
   ansible.builtin.command:
     argv:
+      - timeout
+      - "{{ chimerai_openclaw_mcp_cli_timeout | string }}s"
       - docker
       - exec
       - "{{ chimerai_openclaw_project_name }}-gateway"
@@ -105,13 +129,31 @@
       - "{{ item.name }}"
       - "{{ chimerai_openclaw_mcp_configs[item.name] | to_json }}"
   loop: "{{ chimerai_openclaw_mcp_servers }}"
+  register: chimerai_openclaw_mcp_set
   changed_when: true
+  failed_when: false
   when:
     - chimerai_action == "apply"
+    - chimerai_openclaw_mcp_registry_enabled | bool
     - chimerai_openclaw_mcp_servers | length > 0
     - not ansible_check_mode
     - >-
       (chimerai_openclaw_mcp_current | default({})).get(item.name, {}) != chimerai_openclaw_mcp_configs[item.name]
+
+- name: Fail when OpenClaw MCP registry write fails
+  ansible.builtin.fail:
+    msg: >-
+      OpenClaw MCP registry command failed for '{{ item.item.name }}' with rc={{ item.rc }} after at most
+      {{ chimerai_openclaw_mcp_cli_timeout }}s. Set chimerai_services.openclaw.mcp_registry_enabled=false
+      to skip OpenClaw registry reconciliation while keeping the MCP gateway catalog and network wiring.
+  loop: "{{ chimerai_openclaw_mcp_set.results | default([]) }}"
+  when:
+    - chimerai_action == "apply"
+    - chimerai_openclaw_mcp_registry_enabled | bool
+    - chimerai_openclaw_mcp_servers | length > 0
+    - not ansible_check_mode
+    - item.rc is defined
+    - item.rc != 0
 
 - name: Check whether OpenClaw Compose file exists
   ansible.builtin.stat:

@@ -163,6 +163,12 @@ as Todoist at their Docker-internal MCP endpoints. To validate an LLM actually
 using Todoist, configure both a real Todoist API key and a real OpenClaw
 provider key, then run a read-only OpenClaw agent prompt.
 
+If OpenClaw's `mcp` CLI hangs on a specific image version, set
+`chimerai_services.openclaw.mcp_registry_enabled: false` to keep the MCP
+gateway catalog and private network wiring while skipping OpenClaw registry
+reconciliation. The registry command is timeout-bound by
+`chimerai_services.openclaw.mcp_cli_timeout`, default `20` seconds.
+
 Run OpenClaw's first-time onboarding in the generated gateway container:
 
 ```bash
@@ -226,8 +232,9 @@ Before treating a host as alpha-ready:
 - verify OpenClaw is reachable only through the Authentik-protected Traefik
   route;
 - if Todoist MCP is enabled, verify OpenClaw's MCP registry contains the
-  Todoist server and run a read-only OpenClaw agent prompt with a real provider
-  key;
+  Todoist server, or confirm the registry step was intentionally disabled with
+  `openclaw.mcp_registry_enabled: false`, and run a read-only OpenClaw agent
+  prompt with a real provider key;
 - run `chimerai backup` and confirm Restic can list the snapshot;
 - keep Let's Encrypt staging enabled until DNS, firewall, and routing are
   confirmed, then switch to production certificates.

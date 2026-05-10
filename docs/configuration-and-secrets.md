@@ -193,6 +193,18 @@ chimerai_enabled_roles:
 Real OpenClaw LLM validation additionally requires a provider key under
 `chimerai_services.openclaw.provider`.
 
+OpenClaw registry reconciliation is timeout-bound so a wedged OpenClaw CLI does
+not hang `chimerai apply` indefinitely. If OpenClaw's `mcp` command hangs on a
+specific image version, temporarily keep the MCP catalog and network wiring but
+skip the OpenClaw registry step:
+
+```yaml
+chimerai_services:
+  openclaw:
+    mcp_registry_enabled: false
+    mcp_cli_timeout: 20
+```
+
 ## Filesystem MCP Settings
 
 The filesystem MCP role is optional and private by default. It exposes only the
