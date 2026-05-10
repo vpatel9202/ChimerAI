@@ -73,6 +73,11 @@
         - qdrant
         - storage
         - vector
+    - role: n8n
+      when: "'n8n' in chimerai_enabled_roles"
+      tags:
+        - n8n
+        - automation
     - role: mcp_todoist
       when: "'mcp_todoist' in chimerai_enabled_roles"
       tags:

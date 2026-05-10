@@ -1,0 +1,53 @@
+---
+services:
+  postgres:
+    image: "{{ chimerai_n8n_postgres_image }}"
+    container_name: "{{ chimerai_n8n_project_name }}-postgres"
+    restart: unless-stopped
+    env_file:
+      - postgres.env
+    volumes:
+      - "{{ chimerai_n8n_postgres_dir }}:/var/lib/postgresql/data"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "pg_isready -U {{ chimerai_n8n_db_user }} -d {{ chimerai_n8n_db_name }}"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_n8n_network }}"
+
+  n8n:
+    image: "{{ chimerai_n8n_image }}"
+    container_name: "{{ chimerai_n8n_project_name }}"
+    restart: unless-stopped
+    env_file:
+      - n8n.env
+    environment:
+      TZ: "{{ chimerai_timezone }}"
+      GENERIC_TIMEZONE: "{{ chimerai_timezone }}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "{{ chimerai_n8n_host }}:{{ chimerai_n8n_host_port }}:{{ chimerai_n8n_container_port }}"
+    volumes:
+      - "{{ chimerai_n8n_data_dir }}:/home/node/.n8n"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:{{ chimerai_n8n_container_port }}/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - "{{ chimerai_n8n_network }}"
+
+networks:
+  {{ chimerai_n8n_network }}:
+    external: true

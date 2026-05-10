@@ -72,7 +72,7 @@ Available now:
 - SOPS + age encrypted private config at
   `inventories/local/chimerai.sops.yaml`;
 - Ansible roles for `common`, `docker`, `networks`, `traefik`, `authentik`,
-  `backup`, `openclaw`, `qdrant`, `mcp_todoist`, `mcp_filesystem`,
+  `backup`, `openclaw`, `qdrant`, `n8n`, `mcp_todoist`, `mcp_filesystem`,
   `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, `diag`, and `open_webui`;
 - Traefik public ingress with Let's Encrypt HTTP-01 certificate management;
 - Authentik as the shared forward-auth layer for Traefik-routed apps;
@@ -87,6 +87,7 @@ Available now:
   bind-mounted model state;
 - optional LiteLLM model gateway with Postgres-backed proxy state;
 - optional Qdrant vector storage with loopback HTTP and gRPC exposure;
+- optional n8n workflow automation with Postgres-backed state;
 - optional Todoist, filesystem, browser, and Firecrawl MCP server roles on a
   private MCP network with loopback host access for local agents;
 - local MCP catalog and automatic OpenClaw MCP registry wiring for enabled MCP
@@ -188,6 +189,7 @@ The current shape is:
 │   ├── ollama/
 │   ├── litellm/
 │   ├── qdrant/
+│   ├── n8n/
 │   ├── mcp_todoist/
 │   ├── mcp_filesystem/
 │   ├── mcp_browser/
@@ -389,7 +391,7 @@ instead of one oversized role push.
 
 #### 2E: Automation And Observability
 
-- [ ] Add n8n for workflow automation
+- [x] Add n8n for workflow automation
 - [ ] Add Langfuse for LLM traces, prompt visibility, and evaluations
 - [x] Add Qdrant as the first vector storage role
 

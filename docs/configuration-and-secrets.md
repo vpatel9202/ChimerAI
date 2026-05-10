@@ -252,6 +252,23 @@ chimerai_services:
 Firecrawl-backed tools can spend API credits. Keep validation prompts narrow,
 use small limits, and avoid broad crawls unless the operator intends that cost.
 
+## n8n Settings
+
+n8n requires stable encryption and database secrets. Store both in the encrypted
+local config:
+
+```yaml
+chimerai_enabled_roles:
+  - n8n
+chimerai_services:
+  n8n:
+    postgres_password: ENC[AES256_GCM,...]
+    encryption_key: ENC[AES256_GCM,...]
+```
+
+Do not rotate `encryption_key` casually. Existing n8n credentials and workflow
+secrets depend on it.
+
 ## Backup Settings
 
 The alpha backup workflow uses Restic. Keep the repository password in the

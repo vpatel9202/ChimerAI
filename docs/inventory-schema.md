@@ -37,6 +37,7 @@ all:
             - authentik
             - backup
             - qdrant
+            - n8n
             - openclaw
             - mcp_todoist
             - mcp_filesystem
@@ -140,6 +141,15 @@ all:
               grpc_host_port: 16334
               grpc_container_port: 6334
               network: chimerai-internal
+            n8n:
+              image: n8nio/n8n:latest
+              postgres_image: postgres:16-alpine
+              host: 127.0.0.1
+              host_port: 15678
+              container_port: 5678
+              network: chimerai-internal
+              postgres_password: replace-me
+              encryption_key: replace-me
             mcp_todoist:
               enabled: false
               image: node:22-alpine
@@ -218,7 +228,7 @@ all:
 | `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `n8n`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File
@@ -311,7 +321,8 @@ starting contract. The current public stack configures first-pass ingress,
 shared auth, Authentik app/provider/outpost automation for managed apps,
 OpenClaw, optional host-installed and containerized agent CLI roles, Ollama as
 the first local model runtime, LiteLLM as the model gateway, Qdrant as the first
-vector storage role, the first Todoist MCP server role, filesystem, browser, and
-Firecrawl MCP roles, a local MCP catalog for runtime wiring, and Restic-backed state backup. A dedicated
+vector storage role, n8n as the first workflow automation role, the first
+Todoist MCP server role, filesystem, browser, and Firecrawl MCP roles, a local
+MCP catalog for runtime wiring, and Restic-backed state backup. A dedicated
 `update` action, additional MCP server roles, and provider-key inheritance are
 post-alpha work.

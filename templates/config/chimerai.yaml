@@ -160,6 +160,17 @@ chimerai_services:
     grpc_container_port: 6334
     network: chimerai-internal
 
+  # Optional workflow automation role. Keep both values encrypted.
+  n8n:
+    image: n8nio/n8n:latest
+    postgres_image: postgres:16-alpine
+    host: 127.0.0.1
+    host_port: 15678
+    container_port: 5678
+    network: chimerai-internal
+    postgres_password: replace-me
+    encryption_key: replace-me
+
   # Optional first MCP server role. Add `mcp_todoist` to
   # `chimerai_enabled_roles` after setting a real encrypted API key.
   mcp_todoist:

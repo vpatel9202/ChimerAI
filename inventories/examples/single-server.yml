@@ -150,6 +150,16 @@ all:
               grpc_container_port: 6334
               network: chimerai-internal
 
+            n8n:
+              image: n8nio/n8n:latest
+              postgres_image: postgres:16-alpine
+              host: 127.0.0.1
+              host_port: 15678
+              container_port: 5678
+              network: chimerai-internal
+              postgres_password: replace-me
+              encryption_key: replace-me
+
             mcp_todoist:
               enabled: false
               image: node:22-alpine

@@ -1,0 +1,124 @@
+---
+- name: Validate n8n configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_n8n_image | length > 0
+      - chimerai_n8n_postgres_image | length > 0
+      - chimerai_n8n_host | length > 0
+      - chimerai_n8n_host_port | int > 0
+      - chimerai_n8n_container_port | int > 0
+      - chimerai_n8n_network | length > 0
+      - chimerai_n8n_db_name | length > 0
+      - chimerai_n8n_db_user | length > 0
+    fail_msg: "n8n configuration is incomplete."
+
+- name: Validate n8n secrets before apply
+  ansible.builtin.assert:
+    that:
+      - chimerai_n8n_postgres_password | length > 0
+      - chimerai_n8n_postgres_password != 'replace-me'
+      - chimerai_n8n_encryption_key | length > 0
+      - chimerai_n8n_encryption_key != 'replace-me'
+    fail_msg: "n8n apply requires postgres_password and encryption_key in the encrypted config."
+  when: chimerai_action == "apply"
+  no_log: true
+
+- name: Create n8n directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "0755"
+  loop:
+    - path: "{{ chimerai_n8n_app_dir }}"
+    - path: "{{ chimerai_n8n_data_dir }}"
+      owner: "{{ chimerai_n8n_uid }}"
+      group: "{{ chimerai_n8n_gid }}"
+    - path: "{{ chimerai_n8n_postgres_dir }}"
+      owner: "{{ chimerai_n8n_postgres_uid }}"
+      group: "{{ chimerai_n8n_postgres_gid }}"
+  when: chimerai_action == "apply"
+
+- name: Render n8n env files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ chimerai_n8n_app_dir }}/{{ item.dest }}"
+    mode: "0600"
+  loop:
+    - src: n8n.env.j2
+      dest: n8n.env
+    - src: postgres.env.j2
+      dest: postgres.env
+  no_log: true
+  when: chimerai_action == "apply"
+
+- name: Render n8n Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_n8n_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start n8n
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_n8n_app_dir }}"
+    project_name: "{{ chimerai_n8n_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check n8n readiness after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_n8n_host }}:{{ chimerai_n8n_host_port }}/healthz"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: chimerai_n8n_ready
+  until: chimerai_n8n_ready is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether n8n Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_n8n_app_dir }}/compose.yml"
+  register: chimerai_n8n_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove n8n
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_n8n_app_dir }}"
+    project_name: "{{ chimerai_n8n_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_n8n_compose_file.stat.exists
+
+- name: Remove n8n generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_n8n_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove n8n state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/n8n
+  when:
+    - chimerai_action == "remove"
+    - chimerai_n8n_remove_state | bool
+  changed_when: true

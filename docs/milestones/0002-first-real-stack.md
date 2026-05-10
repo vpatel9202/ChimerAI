@@ -73,7 +73,7 @@ and Firecrawl are higher-priority general-purpose tools.
 
 Status: planned.
 
-- Add n8n for workflow automation.
+- Add n8n for workflow automation. Implemented.
 - Add Langfuse for LLM tracing, prompt visibility, and evaluation workflows.
 - Add Qdrant as the first vector storage role. Implemented.
 
