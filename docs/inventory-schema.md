@@ -43,6 +43,7 @@ all:
             - mcp_todoist
             - mcp_filesystem
             - mcp_browser
+            - mcp_chrome_devtools
             - mcp_firecrawl
             - mcp_gateway
             - diag
@@ -199,6 +200,15 @@ all:
               browser: chromium
               headless: true
               allowed_hosts: "*"
+            mcp_chrome_devtools:
+              image: mcr.microsoft.com/playwright:v1.56.1-noble
+              server_version: "0.2.7"
+              supergateway_version: "3.4.3"
+              host: 127.0.0.1
+              host_port: 13006
+              container_port: 3000
+              headless: true
+              isolated: true
             mcp_firecrawl:
               image: node:22-alpine
               server_version: "2.0.2"
@@ -249,7 +259,7 @@ all:
 | `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `n8n`, `langfuse`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `n8n`, `langfuse`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_chrome_devtools`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File
@@ -343,7 +353,7 @@ shared auth, Authentik app/provider/outpost automation for managed apps,
 OpenClaw, optional host-installed and containerized agent CLI roles, Ollama as
 the first local model runtime, LiteLLM as the model gateway, Qdrant as the first
 vector storage role, n8n as the first workflow automation role, the first
-Todoist MCP server role, filesystem, browser, and Firecrawl MCP roles, a local
-MCP catalog for runtime wiring, and Restic-backed state backup. A dedicated
-`update` action, additional MCP server roles, and provider-key inheritance are
-post-alpha work.
+Todoist MCP server role, filesystem, browser, Chrome DevTools, and Firecrawl
+MCP roles, a local MCP catalog for runtime wiring, and Restic-backed state
+backup. A dedicated `update` action, additional MCP server roles, and
+provider-key inheritance are post-alpha work.

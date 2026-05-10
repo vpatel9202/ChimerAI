@@ -1,0 +1,135 @@
+---
+- name: Validate Chrome DevTools MCP configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_mcp_chrome_devtools_image | length > 0
+      - chimerai_mcp_chrome_devtools_server_version | length > 0
+      - chimerai_mcp_chrome_devtools_supergateway_version | length > 0
+      - chimerai_mcp_chrome_devtools_host | length > 0
+      - chimerai_mcp_chrome_devtools_host_port | int > 0
+      - chimerai_mcp_chrome_devtools_container_port | int > 0
+      - chimerai_mcp_chrome_devtools_debug_port | int > 0
+      - chimerai_mcp_chrome_devtools_network | length > 0
+    fail_msg: "Chrome DevTools MCP configuration is incomplete."
+
+- name: Create Chrome DevTools MCP directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(chimerai_mcp_chrome_devtools_uid) }}"
+    group: "{{ item.group | default(chimerai_mcp_chrome_devtools_gid) }}"
+    mode: "{{ item.mode | default('0755') }}"
+    recurse: "{{ item.recurse | default(false) }}"
+  loop:
+    - path: "{{ chimerai_mcp_chrome_devtools_app_dir }}"
+      owner: "{{ ansible_user_uid | default(omit) }}"
+      group: "{{ ansible_user_gid | default(omit) }}"
+    - path: "{{ chimerai_mcp_chrome_devtools_npm_cache_dir }}"
+      recurse: true
+    - path: "{{ chimerai_mcp_chrome_devtools_profile_dir }}"
+      recurse: true
+  when: chimerai_action == "apply"
+
+- name: Render Chrome DevTools MCP Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_mcp_chrome_devtools_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Chrome DevTools MCP
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_mcp_chrome_devtools_app_dir }}"
+    project_name: "{{ chimerai_mcp_chrome_devtools_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Register Chrome DevTools MCP server
+  ansible.builtin.set_fact:
+    chimerai_mcp_servers: >-
+      {{
+        (chimerai_mcp_servers | default([])) + [
+          {
+            'name': 'chrome-devtools',
+            'url': 'http://' ~ chimerai_mcp_chrome_devtools_project_name ~ ':' ~ (chimerai_mcp_chrome_devtools_container_port | string) ~ '/mcp',
+            'transport': 'streamable-http',
+            'category': 'browser-debugging',
+            'mutating': true,
+            'health_url': 'http://' ~ chimerai_mcp_chrome_devtools_project_name ~ ':' ~ (chimerai_mcp_chrome_devtools_container_port | string) ~ '/healthz'
+          }
+        ]
+      }}
+  when: chimerai_action == "apply"
+
+- name: Check Chrome DevTools MCP health endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_mcp_chrome_devtools_host }}:{{ chimerai_mcp_chrome_devtools_host_port }}/healthz"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: chimerai_mcp_chrome_devtools_health
+  until: chimerai_mcp_chrome_devtools_health is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check Chrome DevTools MCP streamable HTTP endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_mcp_chrome_devtools_host }}:{{ chimerai_mcp_chrome_devtools_host_port }}/mcp"
+    method: GET
+    status_code:
+      - 400
+      - 405
+      - 406
+    timeout: 10
+  register: chimerai_mcp_chrome_devtools_endpoint
+  until: chimerai_mcp_chrome_devtools_endpoint is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether Chrome DevTools MCP Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_mcp_chrome_devtools_app_dir }}/compose.yml"
+  register: chimerai_mcp_chrome_devtools_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Chrome DevTools MCP
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_mcp_chrome_devtools_app_dir }}"
+    project_name: "{{ chimerai_mcp_chrome_devtools_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_mcp_chrome_devtools_compose_file.stat.exists
+
+- name: Remove Chrome DevTools MCP generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_mcp_chrome_devtools_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Chrome DevTools MCP state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/mcp-chrome-devtools
+  when:
+    - chimerai_action == "remove"
+    - chimerai_mcp_chrome_devtools_remove_state | bool
+  changed_when: true

@@ -61,13 +61,15 @@ The MCP core should prioritize broadly useful tools before niche integrations:
   registry source.
 - `mcp_filesystem`: implemented with explicit workspace/path allowlists.
 - `mcp_browser`: implemented with Playwright-based browser automation.
+- `mcp_chrome_devtools`: implemented with Chrome DevTools debugging,
+  inspection, screenshots, and performance tracing.
 - `mcp_search`: implemented through Firecrawl's search-capable MCP tools.
 - `mcp_firecrawl`: implemented for scraping, crawling, and structured
   extraction.
 - `mcp_todoist`: specialized proof and example role.
 
 Todoist remains valuable as a real MCP proof, but filesystem, browser/search,
-and Firecrawl are higher-priority general-purpose tools.
+Chrome DevTools, and Firecrawl are higher-priority general-purpose tools.
 
 ## 2E: Automation And Observability
 
@@ -138,7 +140,7 @@ Named Docker volumes are not used for ChimerAI-managed persistence.
 - OpenClaw can receive managed MCP entries for enabled MCP roles.
 - Agent CLIs install in user-scoped host paths and report versions.
 - Model endpoints are documented and consumable by Open WebUI and OpenClaw.
-- MCP filesystem, browser, search, and Firecrawl roles have explicit safety
-  boundaries.
+- MCP filesystem, browser, Chrome DevTools, search, and Firecrawl roles have
+  explicit safety boundaries.
 - Backup, diagnostics, notifications, and runner documentation cover the
   expanded stack.

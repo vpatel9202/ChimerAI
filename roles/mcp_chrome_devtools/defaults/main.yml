@@ -1,0 +1,20 @@
+---
+chimerai_mcp_chrome_devtools_name: mcp-chrome-devtools
+chimerai_mcp_chrome_devtools_project_name: chimerai-mcp-chrome-devtools
+chimerai_mcp_chrome_devtools_image: "{{ chimerai_services.mcp_chrome_devtools.image | default('mcr.microsoft.com/playwright:v1.56.1-noble') }}"
+chimerai_mcp_chrome_devtools_server_version: "{{ chimerai_services.mcp_chrome_devtools.server_version | default('0.2.7') }}"
+chimerai_mcp_chrome_devtools_supergateway_version: "{{ chimerai_services.mcp_chrome_devtools.supergateway_version | default('3.4.3') }}"
+chimerai_mcp_chrome_devtools_host: "{{ chimerai_services.mcp_chrome_devtools.host | default('127.0.0.1') }}"
+chimerai_mcp_chrome_devtools_host_port: "{{ chimerai_services.mcp_chrome_devtools.host_port | default(13006) }}"
+chimerai_mcp_chrome_devtools_container_port: "{{ chimerai_services.mcp_chrome_devtools.container_port | default(3000) }}"
+chimerai_mcp_chrome_devtools_debug_port: "{{ chimerai_services.mcp_chrome_devtools.debug_port | default(9222) }}"
+chimerai_mcp_chrome_devtools_network: "{{ chimerai_services.mcp_chrome_devtools.network | default('chimerai-mcp') }}"
+chimerai_mcp_chrome_devtools_app_dir: "{{ chimerai_deployment_root }}/mcp-chrome-devtools"
+chimerai_mcp_chrome_devtools_state_dir: "{{ chimerai_state_root }}/mcp-chrome-devtools"
+chimerai_mcp_chrome_devtools_profile_dir: "{{ chimerai_mcp_chrome_devtools_state_dir }}/profile"
+chimerai_mcp_chrome_devtools_npm_cache_dir: "{{ chimerai_mcp_chrome_devtools_state_dir }}/npm-cache"
+chimerai_mcp_chrome_devtools_uid: "{{ chimerai_services.mcp_chrome_devtools.uid | default('1001') }}"
+chimerai_mcp_chrome_devtools_gid: "{{ chimerai_services.mcp_chrome_devtools.gid | default('1001') }}"
+chimerai_mcp_chrome_devtools_headless: "{{ chimerai_services.mcp_chrome_devtools.headless | default(true) }}"
+chimerai_mcp_chrome_devtools_isolated: "{{ chimerai_services.mcp_chrome_devtools.isolated | default(true) }}"
+chimerai_mcp_chrome_devtools_remove_state: "{{ chimerai_services.mcp_chrome_devtools.remove_state | default(false) }}"

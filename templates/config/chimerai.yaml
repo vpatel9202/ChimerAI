@@ -229,6 +229,18 @@ chimerai_services:
     headless: true
     allowed_hosts: "*"
 
+  # Optional Chrome DevTools MCP role for debugging, network/console
+  # inspection, screenshots, and performance tracing.
+  mcp_chrome_devtools:
+    image: mcr.microsoft.com/playwright:v1.56.1-noble
+    server_version: "0.2.7"
+    supergateway_version: "3.4.3"
+    host: 127.0.0.1
+    host_port: 13006
+    container_port: 3000
+    headless: true
+    isolated: true
+
   # Optional Firecrawl MCP role for web search, scraping, crawling, and
   # extraction. Keep the API key encrypted.
   mcp_firecrawl:

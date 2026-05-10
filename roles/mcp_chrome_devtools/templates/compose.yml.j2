@@ -1,0 +1,55 @@
+---
+services:
+  mcp-chrome-devtools:
+    image: "{{ chimerai_mcp_chrome_devtools_image }}"
+    container_name: "{{ chimerai_mcp_chrome_devtools_project_name }}"
+    restart: unless-stopped
+    environment:
+      HOME: /home/pwuser
+      NPM_CONFIG_CACHE: /home/pwuser/.npm
+      TZ: "{{ chimerai_timezone }}"
+    working_dir: /home/pwuser
+    user: "pwuser"
+    command:
+      - sh
+      - -c
+      - >-
+        CHROME_PATH="$$(find /ms-playwright -path '*/chrome-linux/chrome' -type f | head -n 1)" &&
+        test -x "$$CHROME_PATH" &&
+        "$$CHROME_PATH"
+        {% if chimerai_mcp_chrome_devtools_headless | bool %}--headless=new{% endif %}
+        --no-sandbox
+        --disable-dev-shm-usage
+        --remote-debugging-address=127.0.0.1
+        --remote-debugging-port={{ chimerai_mcp_chrome_devtools_debug_port }}
+        --user-data-dir=/home/pwuser/profile
+        about:blank >/tmp/chimerai-chrome-devtools.log 2>&1 &
+        exec npx -y supergateway@{{ chimerai_mcp_chrome_devtools_supergateway_version }}
+        --stdio "npx -y chrome-devtools-mcp@{{ chimerai_mcp_chrome_devtools_server_version }} --browserUrl=http://127.0.0.1:{{ chimerai_mcp_chrome_devtools_debug_port }}{% if chimerai_mcp_chrome_devtools_isolated | bool %} --isolated=true{% endif %}"
+        --outputTransport streamableHttp
+        --port {{ chimerai_mcp_chrome_devtools_container_port }}
+        --streamableHttpPath /mcp
+        --healthEndpoint /healthz
+        --stateful
+        --logLevel info
+    ports:
+      - "{{ chimerai_mcp_chrome_devtools_host }}:{{ chimerai_mcp_chrome_devtools_host_port }}:{{ chimerai_mcp_chrome_devtools_container_port }}"
+    volumes:
+      - "{{ chimerai_mcp_chrome_devtools_npm_cache_dir }}:/home/pwuser/.npm"
+      - "{{ chimerai_mcp_chrome_devtools_profile_dir }}:/home/pwuser/profile"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:{{ chimerai_mcp_chrome_devtools_container_port }}/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_mcp_chrome_devtools_network }}"
+
+networks:
+  {{ chimerai_mcp_chrome_devtools_network }}:
+    external: true

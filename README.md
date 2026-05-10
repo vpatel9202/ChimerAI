@@ -73,7 +73,8 @@ Available now:
   `inventories/local/chimerai.sops.yaml`;
 - Ansible roles for `common`, `docker`, `networks`, `traefik`, `authentik`,
   `backup`, `openclaw`, `qdrant`, `n8n`, `langfuse`, `mcp_todoist`, `mcp_filesystem`,
-  `mcp_browser`, `mcp_firecrawl`, `mcp_gateway`, `diag`, and `open_webui`;
+  `mcp_browser`, `mcp_chrome_devtools`, `mcp_firecrawl`, `mcp_gateway`,
+  `diag`, and `open_webui`;
 - Traefik public ingress with Let's Encrypt HTTP-01 certificate management;
 - Authentik as the shared forward-auth layer for Traefik-routed apps;
 - Authentik app, proxy provider, and embedded outpost automation for managed
@@ -90,8 +91,9 @@ Available now:
 - optional n8n workflow automation with Postgres-backed state;
 - optional Langfuse LLM observability stack with Postgres, ClickHouse, Redis,
   and MinIO-backed state;
-- optional Todoist, filesystem, browser, and Firecrawl MCP server roles on a
-  private MCP network with loopback host access for local agents;
+- optional Todoist, filesystem, browser, Chrome DevTools, and Firecrawl MCP
+  server roles on a private MCP network with loopback host access for local
+  agents;
 - local MCP catalog and automatic OpenClaw MCP registry wiring for enabled MCP
   service roles;
 - Docker Compose output for Open WebUI in a predictable deployment directory;
@@ -101,8 +103,8 @@ Available now:
 
 Still rough or intentionally incomplete:
 
-- additional MCP server roles beyond Todoist, filesystem, browser, and
-  Firecrawl;
+- additional MCP server roles beyond Todoist, filesystem, browser, Chrome
+  DevTools, and Firecrawl;
 - containerized runner profile for agent CLI tools;
 - model provider abstraction or inherited API key configuration;
 - fully automated OpenClaw provider onboarding;
@@ -196,6 +198,7 @@ The current shape is:
 │   ├── mcp_todoist/
 │   ├── mcp_filesystem/
 │   ├── mcp_browser/
+│   ├── mcp_chrome_devtools/
 │   ├── mcp_firecrawl/
 │   ├── mcp_gateway/
 │   ├── diag/
@@ -388,6 +391,7 @@ instead of one oversized role push.
 - [x] Add `mcp_gateway` for curated MCP profiles and runtime wiring
 - [x] Add `mcp_filesystem` with explicit workspace/path allowlists
 - [x] Add `mcp_browser` with Playwright-based browser automation
+- [x] Add `mcp_chrome_devtools` with Chrome DevTools debugging and tracing
 - [x] Add `mcp_search` for general web search through Firecrawl
 - [x] Add `mcp_firecrawl` for scraping, crawling, and extraction
 - [x] Keep `mcp_todoist` as a specialized proof and example role

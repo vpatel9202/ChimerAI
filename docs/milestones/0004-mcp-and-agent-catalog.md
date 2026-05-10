@@ -5,8 +5,8 @@ runtime into a broader catalog of MCP servers and agent runtimes.
 
 ## Goals
 
-- Add specialized MCP roles beyond filesystem, browser, search, Firecrawl, and
-  Todoist.
+- Add specialized MCP roles beyond filesystem, browser, Chrome DevTools,
+  search, Firecrawl, and Todoist.
 - Keep MCP endpoints available to host agents and containerized agent runtimes.
 - Improve MCP discovery, profiles, permissions, and registry/catalog behavior.
 - Add more agent runtimes only after OpenClaw patterns are stable.

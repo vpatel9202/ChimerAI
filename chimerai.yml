@@ -101,6 +101,12 @@
         - mcp_browser
         - mcp
         - app
+    - role: mcp_chrome_devtools
+      when: "'mcp_chrome_devtools' in chimerai_enabled_roles"
+      tags:
+        - mcp_chrome_devtools
+        - mcp
+        - app
     - role: mcp_firecrawl
       when: "'mcp_firecrawl' in chimerai_enabled_roles"
       tags:

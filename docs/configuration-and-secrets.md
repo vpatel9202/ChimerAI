@@ -108,6 +108,7 @@ chimerai_enabled_roles:
   - mcp_todoist
   - mcp_filesystem
   - mcp_browser
+  - mcp_chrome_devtools
   - mcp_firecrawl
   - mcp_gateway
   - n8n
@@ -236,6 +237,27 @@ chimerai_services:
 The role persists browser profile and output data under
 `/opt/chimerai/apps/mcp-browser/`. Treat browser state as sensitive when agents
 log into websites during validation or automation.
+
+## Chrome DevTools MCP Settings
+
+The Chrome DevTools MCP role runs Chrome DevTools MCP as a private service for
+debugging, screenshots, console and network inspection, and performance
+tracing:
+
+```yaml
+chimerai_enabled_roles:
+  - mcp_chrome_devtools
+  - mcp_gateway
+chimerai_services:
+  mcp_chrome_devtools:
+    headless: true
+    isolated: true
+```
+
+The role starts a managed Chromium instance inside the container. Treat it as a
+mutating browser-debugging tool: agents can navigate pages, inspect page
+content, run scripts, and read console or network data from the managed
+browser.
 
 ## Firecrawl MCP Settings
 
