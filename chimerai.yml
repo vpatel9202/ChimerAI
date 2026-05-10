@@ -62,6 +62,11 @@
       tags:
         - ollama
         - model
+    - role: litellm
+      when: "'litellm' in chimerai_enabled_roles"
+      tags:
+        - litellm
+        - model
     - role: mcp_todoist
       when: "'mcp_todoist' in chimerai_enabled_roles"
       tags:

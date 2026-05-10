@@ -1,0 +1,18 @@
+---
+chimerai_litellm_name: litellm
+chimerai_litellm_project_name: chimerai-litellm
+chimerai_litellm_image: "{{ chimerai_services.litellm.image | default('ghcr.io/berriai/litellm:main-latest') }}"
+chimerai_litellm_postgres_image: "{{ chimerai_services.litellm.postgres_image | default('postgres:16-alpine') }}"
+chimerai_litellm_host: "{{ chimerai_services.litellm.host | default('127.0.0.1') }}"
+chimerai_litellm_host_port: "{{ chimerai_services.litellm.host_port | default(14000) }}"
+chimerai_litellm_container_port: "{{ chimerai_services.litellm.container_port | default(4000) }}"
+chimerai_litellm_network: "{{ chimerai_services.litellm.network | default('chimerai-internal') }}"
+chimerai_litellm_app_dir: "{{ chimerai_deployment_root }}/litellm"
+chimerai_litellm_data_dir: "{{ chimerai_state_root }}/litellm/postgres"
+chimerai_litellm_remove_state: "{{ chimerai_services.litellm.remove_state | default(false) }}"
+chimerai_litellm_master_key: "{{ chimerai_services.litellm.master_key | default('replace-me') }}"
+chimerai_litellm_salt_key: "{{ chimerai_services.litellm.salt_key | default('replace-me') }}"
+chimerai_litellm_postgres_password: "{{ chimerai_services.litellm.postgres_password | default('replace-me') }}"
+chimerai_litellm_postgres_user: "{{ chimerai_services.litellm.postgres_user | default('litellm') }}"
+chimerai_litellm_postgres_db: "{{ chimerai_services.litellm.postgres_db | default('litellm') }}"
+chimerai_litellm_models: "{{ chimerai_services.litellm.models | default([]) }}"

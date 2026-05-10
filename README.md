@@ -84,6 +84,7 @@ Available now:
   OpenCode with an explicit workspace mount;
 - optional Ollama local model runtime with loopback API exposure and
   bind-mounted model state;
+- optional LiteLLM model gateway with Postgres-backed proxy state;
 - optional Todoist MCP server role on a private MCP network with loopback host
   access for local agents;
 - automatic OpenClaw MCP registry wiring for the Todoist MCP server when both
@@ -182,6 +183,7 @@ The current shape is:
 │   ├── agent_cli/
 │   ├── runner/
 │   ├── ollama/
+│   ├── litellm/
 │   ├── mcp_todoist/
 │   ├── diag/
 │   └── open_webui/
@@ -365,8 +367,8 @@ instead of one oversized role push.
 #### 2C: Model Layer
 
 - [x] Add Ollama for local model runtime
-- [ ] Add LiteLLM for model gateway, routing, and provider abstraction
-- [ ] Document how Open WebUI and OpenClaw consume model endpoints
+- [x] Add LiteLLM for model gateway, routing, and provider abstraction
+- [x] Document basic model endpoint handoff in role docs
 
 #### 2D: MCP Core Layer
 

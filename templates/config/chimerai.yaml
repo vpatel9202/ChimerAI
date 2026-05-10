@@ -137,6 +137,19 @@ chimerai_services:
     network: chimerai-internal
     gpu: none
 
+  # Optional model gateway. Keep keys in the encrypted config.
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    postgres_image: postgres:16-alpine
+    host: 127.0.0.1
+    host_port: 14000
+    container_port: 4000
+    network: chimerai-internal
+    master_key: replace-me
+    salt_key: replace-me
+    postgres_password: replace-me
+    models: []
+
   # Optional first MCP server role. Add `mcp_todoist` to
   # `chimerai_enabled_roles` after setting a real encrypted API key.
   mcp_todoist:

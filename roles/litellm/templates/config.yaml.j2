@@ -1,0 +1,15 @@
+---
+{% if chimerai_litellm_models | length > 0 %}
+model_list:
+{{ chimerai_litellm_models | to_nice_yaml(indent=2) | indent(2, true) }}
+{% else %}
+model_list: []
+{% endif %}
+
+general_settings:
+  master_key: "{{ chimerai_litellm_master_key }}"
+  database_url: "postgresql://{{ chimerai_litellm_postgres_user }}:{{ chimerai_litellm_postgres_password }}@postgres:5432/{{ chimerai_litellm_postgres_db }}"
+
+litellm_settings:
+  set_verbose: false
+  json_logs: true

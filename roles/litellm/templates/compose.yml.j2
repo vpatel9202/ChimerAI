@@ -1,0 +1,44 @@
+---
+services:
+  litellm:
+    image: "{{ chimerai_litellm_image }}"
+    container_name: "{{ chimerai_litellm_project_name }}"
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - --config
+      - /app/config.yaml
+      - --port
+      - "{{ chimerai_litellm_container_port }}"
+    ports:
+      - "{{ chimerai_litellm_host }}:{{ chimerai_litellm_host_port }}:{{ chimerai_litellm_container_port }}"
+    volumes:
+      - "{{ chimerai_litellm_app_dir }}/config.yaml:/app/config.yaml:ro"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - "{{ chimerai_litellm_network }}"
+
+  postgres:
+    image: "{{ chimerai_litellm_postgres_image }}"
+    container_name: "{{ chimerai_litellm_project_name }}-postgres"
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "{{ chimerai_litellm_postgres_user }}"
+      POSTGRES_PASSWORD: "{{ chimerai_litellm_postgres_password }}"
+      POSTGRES_DB: "{{ chimerai_litellm_postgres_db }}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ chimerai_litellm_postgres_user }} -d {{ chimerai_litellm_postgres_db }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - "{{ chimerai_litellm_data_dir }}:/var/lib/postgresql/data"
+    networks:
+      - "{{ chimerai_litellm_network }}"
+
+networks:
+  {{ chimerai_litellm_network }}:
+    external: true
