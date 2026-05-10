@@ -2,7 +2,11 @@
 chimerai_agent_cli_name: agent-cli
 chimerai_agent_cli_install_method: "{{ chimerai_services.agent_cli.install_method | default('npm') }}"
 chimerai_agent_cli_install_node: "{{ chimerai_services.agent_cli.install_node | default(true) }}"
-chimerai_agent_cli_node_packages: "{{ chimerai_services.agent_cli.node_packages | default(['nodejs', 'npm']) }}"
+chimerai_agent_cli_node_repository_enabled: "{{ chimerai_services.agent_cli.node_repository_enabled | default(true) }}"
+chimerai_agent_cli_node_major: "{{ chimerai_services.agent_cli.node_major | default(22) }}"
+chimerai_agent_cli_node_packages: "{{ chimerai_services.agent_cli.node_packages | default(['nodejs']) }}"
+chimerai_agent_cli_nodesource_key_url: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
+chimerai_agent_cli_nodesource_keyring: "/etc/apt/keyrings/nodesource.asc"
 chimerai_agent_cli_install_prefix: "{{ chimerai_services.agent_cli.install_prefix | default(ansible_env.HOME + '/.local/share/chimerai/agent-cli/npm') }}"
 chimerai_agent_cli_bin_dir: "{{ chimerai_services.agent_cli.bin_dir | default(ansible_env.HOME + '/.local/bin') }}"
 chimerai_agent_cli_tools: "{{ chimerai_services.agent_cli.tools | default({ 'codex': { 'enabled': true } }) }}"
@@ -14,4 +18,8 @@ chimerai_agent_cli_tool_catalog:
   claude:
     package: "@anthropic-ai/claude-code"
     executable: claude
+    version_arg: "--version"
+  gemini:
+    package: "@google/gemini-cli"
+    executable: gemini
     version_arg: "--version"

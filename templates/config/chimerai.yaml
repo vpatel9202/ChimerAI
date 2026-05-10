@@ -98,12 +98,16 @@ chimerai_services:
   agent_cli:
     install_method: npm
     install_node: true
+    node_repository_enabled: true
+    node_major: 22
     install_prefix: "{{ ansible_env.HOME }}/.local/share/chimerai/agent-cli/npm"
     bin_dir: "{{ ansible_env.HOME }}/.local/bin"
     tools:
       codex:
         enabled: true
       claude:
+        enabled: false
+      gemini:
         enabled: false
 
   # Optional first MCP server role. Add `mcp_todoist` to

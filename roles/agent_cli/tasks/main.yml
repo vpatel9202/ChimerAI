@@ -27,10 +27,61 @@
     fail_msg: "Unknown Agent CLI tool '{{ item }}'."
   loop: "{{ chimerai_agent_cli_enabled_tools }}"
 
+- name: Install NodeSource repository prerequisites
+  ansible.builtin.package:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+  when:
+    - chimerai_action == "apply"
+    - chimerai_agent_cli_install_node | bool
+    - chimerai_agent_cli_node_repository_enabled | bool
+    - ansible_os_family == "Debian"
+    - chimerai_agent_cli_enabled_tools | length > 0
+
+- name: Create apt keyring directory for NodeSource
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  when:
+    - chimerai_action == "apply"
+    - chimerai_agent_cli_install_node | bool
+    - chimerai_agent_cli_node_repository_enabled | bool
+    - ansible_os_family == "Debian"
+    - chimerai_agent_cli_enabled_tools | length > 0
+
+- name: Install NodeSource signing key
+  ansible.builtin.get_url:
+    url: "{{ chimerai_agent_cli_nodesource_key_url }}"
+    dest: "{{ chimerai_agent_cli_nodesource_keyring }}"
+    mode: "0644"
+  when:
+    - chimerai_action == "apply"
+    - chimerai_agent_cli_install_node | bool
+    - chimerai_agent_cli_node_repository_enabled | bool
+    - ansible_os_family == "Debian"
+    - chimerai_agent_cli_enabled_tools | length > 0
+
+- name: Configure NodeSource apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ chimerai_agent_cli_nodesource_keyring }}] https://deb.nodesource.com/node_{{ chimerai_agent_cli_node_major }}.x nodistro main"
+    filename: nodesource
+    state: present
+    update_cache: true
+  when:
+    - chimerai_action == "apply"
+    - chimerai_agent_cli_install_node | bool
+    - chimerai_agent_cli_node_repository_enabled | bool
+    - ansible_os_family == "Debian"
+    - chimerai_agent_cli_enabled_tools | length > 0
+
 - name: Install Node.js and npm for Agent CLI packages
   ansible.builtin.package:
     name: "{{ chimerai_agent_cli_node_packages }}"
-    state: present
+    state: "{{ 'latest' if chimerai_agent_cli_node_repository_enabled | bool else 'present' }}"
   when:
     - chimerai_action == "apply"
     - chimerai_agent_cli_install_node | bool
