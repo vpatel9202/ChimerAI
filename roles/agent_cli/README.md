@@ -30,6 +30,8 @@ chimerai_services:
     tools:
       codex:
         enabled: true
+      claude:
+        enabled: false
 ```
 
 Real authentication remains tool-native and local to the operator. Do not store

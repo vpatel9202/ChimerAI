@@ -88,6 +88,8 @@ all:
               tools:
                 codex:
                   enabled: true
+                claude:
+                  enabled: false
             mcp_todoist:
               enabled: false
               image: node:22-alpine

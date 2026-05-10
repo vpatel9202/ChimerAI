@@ -78,7 +78,8 @@ Available now:
 - Authentik app, proxy provider, and embedded outpost automation for managed
   protected apps;
 - OpenClaw gateway deployment plus `chimerai openclaw onboard` helper;
-- optional host-installed Codex CLI role with user-scoped npm paths;
+- optional host-installed Codex and Claude Code CLI role with user-scoped npm
+  paths;
 - optional Todoist MCP server role on a private MCP network with loopback host
   access for local agents;
 - automatic OpenClaw MCP registry wiring for the Todoist MCP server when both
@@ -91,7 +92,7 @@ Available now:
 Still rough or intentionally incomplete:
 
 - additional MCP server roles beyond Todoist;
-- remaining agent CLI tools beyond Codex;
+- remaining agent CLI tools beyond Codex and Claude Code;
 - model provider abstraction or inherited API key configuration;
 - fully automated OpenClaw provider onboarding;
 - automated users, groups, policies, and external identity providers in
@@ -350,6 +351,7 @@ instead of one oversized role push.
 
 - [ ] Add `agent_cli` for Codex, Claude Code, Gemini CLI, and OpenCode
 - [x] Install Codex on the host with user-scoped npm paths
+- [x] Install Claude Code on the host with user-scoped npm paths
 - [ ] Document optional containerized runner mode for later sandbox use
 
 #### 2C: Model Layer
