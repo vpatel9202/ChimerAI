@@ -73,6 +73,12 @@
         - mcp_todoist
         - mcp
         - app
+    - role: mcp_filesystem
+      when: "'mcp_filesystem' in chimerai_enabled_roles"
+      tags:
+        - mcp_filesystem
+        - mcp
+        - app
     - role: mcp_gateway
       when: "'mcp_gateway' in chimerai_enabled_roles"
       tags:

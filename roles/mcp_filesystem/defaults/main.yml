@@ -1,0 +1,29 @@
+---
+chimerai_mcp_filesystem_name: mcp-filesystem
+chimerai_mcp_filesystem_project_name: chimerai-mcp-filesystem
+chimerai_mcp_filesystem_image: "{{ chimerai_services.mcp_filesystem.image | default('node:22-alpine') }}"
+chimerai_mcp_filesystem_server_version: "{{ chimerai_services.mcp_filesystem.server_version | default('2025.8.21') }}"
+chimerai_mcp_filesystem_supergateway_version: "{{ chimerai_services.mcp_filesystem.supergateway_version | default('3.4.3') }}"
+chimerai_mcp_filesystem_host: "{{ chimerai_services.mcp_filesystem.host | default('127.0.0.1') }}"
+chimerai_mcp_filesystem_host_port: "{{ chimerai_services.mcp_filesystem.host_port | default(13003) }}"
+chimerai_mcp_filesystem_container_port: "{{ chimerai_services.mcp_filesystem.container_port | default(3000) }}"
+chimerai_mcp_filesystem_network: "{{ chimerai_services.mcp_filesystem.network | default('chimerai-mcp') }}"
+chimerai_mcp_filesystem_app_dir: "{{ chimerai_deployment_root }}/mcp-filesystem"
+chimerai_mcp_filesystem_state_dir: "{{ chimerai_state_root }}/mcp-filesystem"
+chimerai_mcp_filesystem_workspace_dir: "{{ chimerai_mcp_filesystem_state_dir }}/workspace"
+chimerai_mcp_filesystem_npm_cache_dir: "{{ chimerai_mcp_filesystem_state_dir }}/npm-cache"
+chimerai_mcp_filesystem_container_root: "{{ chimerai_services.mcp_filesystem.container_root | default('/projects') }}"
+chimerai_mcp_filesystem_uid: "{{ chimerai_services.mcp_filesystem.uid | default('1000') }}"
+chimerai_mcp_filesystem_gid: "{{ chimerai_services.mcp_filesystem.gid | default('1000') }}"
+chimerai_mcp_filesystem_remove_state: "{{ chimerai_services.mcp_filesystem.remove_state | default(false) }}"
+chimerai_mcp_filesystem_allowed_paths: >-
+  {{
+    chimerai_services.mcp_filesystem.allowed_paths | default([
+      {
+        'name': 'workspace',
+        'path': chimerai_mcp_filesystem_workspace_dir,
+        'read_only': false,
+        'create': true
+      }
+    ])
+  }}

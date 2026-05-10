@@ -38,6 +38,7 @@ all:
             - backup
             - openclaw
             - mcp_todoist
+            - mcp_filesystem
             - mcp_gateway
             - diag
             - open_webui
@@ -137,6 +138,17 @@ all:
               container_port: 3000
               session_timeout_ms: 1800000
               todoist_api_key: replace-me
+            mcp_filesystem:
+              image: node:22-alpine
+              server_version: "2025.8.21"
+              supergateway_version: "3.4.3"
+              host: 127.0.0.1
+              host_port: 13003
+              container_port: 3000
+              allowed_paths:
+                - name: workspace
+                  path: /opt/chimerai/apps/mcp-filesystem/workspace
+                  create: true
             mcp_gateway:
               catalog_file: /opt/chimerai/mcp-gateway/catalog.json
             authentik:
@@ -179,7 +191,7 @@ all:
 | `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
-| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `mcp_todoist`, `mcp_gateway`, and `open_webui`. |
+| `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `mcp_todoist`, `mcp_filesystem`, `mcp_gateway`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
 
 ## Preferred Private Config File
@@ -272,6 +284,6 @@ starting contract. The current public stack configures first-pass ingress,
 shared auth, Authentik app/provider/outpost automation for managed apps,
 OpenClaw, optional host-installed and containerized agent CLI roles, Ollama as
 the first local model runtime, LiteLLM as the model gateway, the first Todoist
-MCP server role, a local MCP catalog for runtime wiring, and Restic-backed
-state backup. A dedicated `update` action, additional MCP server roles, and
-provider-key inheritance are post-alpha work.
+MCP server role, filesystem MCP role, a local MCP catalog for runtime wiring,
+and Restic-backed state backup. A dedicated `update` action, additional MCP
+server roles, and provider-key inheritance are post-alpha work.

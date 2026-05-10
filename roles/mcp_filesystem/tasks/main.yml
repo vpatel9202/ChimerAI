@@ -1,0 +1,154 @@
+---
+- name: Validate Filesystem MCP configuration
+  ansible.builtin.assert:
+    that:
+      - chimerai_mcp_filesystem_image | length > 0
+      - chimerai_mcp_filesystem_server_version | length > 0
+      - chimerai_mcp_filesystem_supergateway_version | length > 0
+      - chimerai_mcp_filesystem_host | length > 0
+      - chimerai_mcp_filesystem_host_port | int > 0
+      - chimerai_mcp_filesystem_container_port | int > 0
+      - chimerai_mcp_filesystem_network | length > 0
+      - chimerai_mcp_filesystem_allowed_paths is sequence
+      - chimerai_mcp_filesystem_allowed_paths | length > 0
+    fail_msg: "Filesystem MCP configuration is incomplete."
+
+- name: Validate Filesystem MCP allowlist entries
+  ansible.builtin.assert:
+    that:
+      - item.name is match('^[A-Za-z0-9_.-]+$')
+      - item.path | length > 0
+      - item.path is match('^/')
+    fail_msg: "Filesystem MCP allowed paths require an absolute path and a simple name."
+  loop: "{{ chimerai_mcp_filesystem_allowed_paths }}"
+
+- name: Create Filesystem MCP directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(chimerai_mcp_filesystem_uid) }}"
+    group: "{{ item.group | default(chimerai_mcp_filesystem_gid) }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop:
+    - path: "{{ chimerai_mcp_filesystem_app_dir }}"
+      owner: "{{ ansible_user_uid | default(omit) }}"
+      group: "{{ ansible_user_gid | default(omit) }}"
+    - path: "{{ chimerai_mcp_filesystem_npm_cache_dir }}"
+    - path: "{{ chimerai_mcp_filesystem_workspace_dir }}"
+  when: chimerai_action == "apply"
+
+- name: Create configured Filesystem MCP allowed paths
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(chimerai_mcp_filesystem_uid) }}"
+    group: "{{ item.group | default(chimerai_mcp_filesystem_gid) }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop: "{{ chimerai_mcp_filesystem_allowed_paths }}"
+  when:
+    - chimerai_action == "apply"
+    - item.create | default(false) | bool
+
+- name: Render Filesystem MCP Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ chimerai_mcp_filesystem_app_dir }}/compose.yml"
+    mode: "0644"
+  when: chimerai_action == "apply"
+
+- name: Start Filesystem MCP
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_mcp_filesystem_app_dir }}"
+    project_name: "{{ chimerai_mcp_filesystem_project_name }}"
+    state: present
+    remove_orphans: true
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Register Filesystem MCP server
+  ansible.builtin.set_fact:
+    chimerai_mcp_servers: >-
+      {{
+        (chimerai_mcp_servers | default([])) + [
+          {
+            'name': 'filesystem',
+            'url': 'http://' ~ chimerai_mcp_filesystem_project_name ~ ':' ~ (chimerai_mcp_filesystem_container_port | string) ~ '/mcp',
+            'transport': 'streamable-http',
+            'category': 'filesystem',
+            'mutating': true,
+            'health_url': 'http://' ~ chimerai_mcp_filesystem_project_name ~ ':' ~ (chimerai_mcp_filesystem_container_port | string) ~ '/healthz'
+          }
+        ]
+      }}
+  when: chimerai_action == "apply"
+
+- name: Check Filesystem MCP health endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_mcp_filesystem_host }}:{{ chimerai_mcp_filesystem_host_port }}/healthz"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: chimerai_mcp_filesystem_health
+  until: chimerai_mcp_filesystem_health is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check Filesystem MCP streamable HTTP endpoint after apply
+  ansible.builtin.uri:
+    url: "http://{{ chimerai_mcp_filesystem_host }}:{{ chimerai_mcp_filesystem_host_port }}/mcp"
+    method: GET
+    status_code:
+      - 400
+      - 405
+      - 406
+    timeout: 10
+  register: chimerai_mcp_filesystem_endpoint
+  until: chimerai_mcp_filesystem_endpoint is succeeded
+  retries: 30
+  delay: 5
+  when:
+    - chimerai_action == "apply"
+    - not ansible_check_mode
+
+- name: Check whether Filesystem MCP Compose file exists
+  ansible.builtin.stat:
+    path: "{{ chimerai_mcp_filesystem_app_dir }}/compose.yml"
+  register: chimerai_mcp_filesystem_compose_file
+  when: chimerai_action == "remove"
+
+- name: Stop and remove Filesystem MCP
+  community.docker.docker_compose_v2:
+    project_src: "{{ chimerai_mcp_filesystem_app_dir }}"
+    project_name: "{{ chimerai_mcp_filesystem_project_name }}"
+    state: absent
+    remove_orphans: true
+  when:
+    - chimerai_action == "remove"
+    - chimerai_mcp_filesystem_compose_file.stat.exists
+
+- name: Remove Filesystem MCP generated config
+  ansible.builtin.file:
+    path: "{{ chimerai_mcp_filesystem_app_dir }}"
+    state: absent
+  when: chimerai_action == "remove"
+
+- name: Remove Filesystem MCP state when explicitly allowed
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -v
+      - "{{ chimerai_state_root }}:/chimerai-state"
+      - alpine:3.20
+      - sh
+      - -c
+      - rm -rf /chimerai-state/mcp-filesystem
+  when:
+    - chimerai_action == "remove"
+    - chimerai_mcp_filesystem_remove_state | bool
+  changed_when: true

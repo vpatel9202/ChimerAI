@@ -1,0 +1,47 @@
+---
+services:
+  mcp-filesystem:
+    image: "{{ chimerai_mcp_filesystem_image }}"
+    container_name: "{{ chimerai_mcp_filesystem_project_name }}"
+    restart: unless-stopped
+    environment:
+      HOME: /home/node
+      NPM_CONFIG_CACHE: /home/node/.npm
+      TZ: "{{ chimerai_timezone }}"
+    working_dir: /home/node
+    user: "node"
+    command:
+      - sh
+      - -c
+      - >-
+        npx -y supergateway@{{ chimerai_mcp_filesystem_supergateway_version }}
+        --stdio "npx -y @modelcontextprotocol/server-filesystem@{{ chimerai_mcp_filesystem_server_version }}{% for allowed_path in chimerai_mcp_filesystem_allowed_paths %} {{ chimerai_mcp_filesystem_container_root }}/{{ allowed_path.name }}{% endfor %}"
+        --outputTransport streamableHttp
+        --port {{ chimerai_mcp_filesystem_container_port }}
+        --streamableHttpPath /mcp
+        --healthEndpoint /healthz
+        --stateful
+        --logLevel info
+    ports:
+      - "{{ chimerai_mcp_filesystem_host }}:{{ chimerai_mcp_filesystem_host_port }}:{{ chimerai_mcp_filesystem_container_port }}"
+    volumes:
+      - "{{ chimerai_mcp_filesystem_npm_cache_dir }}:/home/node/.npm"
+{% for allowed_path in chimerai_mcp_filesystem_allowed_paths %}
+      - "{{ allowed_path.path }}:{{ chimerai_mcp_filesystem_container_root }}/{{ allowed_path.name }}{% if allowed_path.read_only | default(false) | bool %}:ro{% endif %}"
+{% endfor %}
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:{{ chimerai_mcp_filesystem_container_port }}/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - "{{ chimerai_mcp_filesystem_network }}"
+
+networks:
+  {{ chimerai_mcp_filesystem_network }}:
+    external: true

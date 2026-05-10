@@ -106,6 +106,7 @@ chimerai_enabled_roles:
   - backup
   - openclaw
   - mcp_todoist
+  - mcp_filesystem
   - mcp_gateway
 ```
 
@@ -186,6 +187,31 @@ chimerai_enabled_roles:
 
 Real OpenClaw LLM validation additionally requires a provider key under
 `chimerai_services.openclaw.provider`.
+
+## Filesystem MCP Settings
+
+The filesystem MCP role is optional and private by default. It exposes only the
+directories listed in `allowed_paths`. The default path is a ChimerAI-managed
+workspace under `chimerai_state_root`.
+
+```yaml
+chimerai_enabled_roles:
+  - mcp_filesystem
+  - mcp_gateway
+chimerai_services:
+  mcp_filesystem:
+    allowed_paths:
+      - name: workspace
+        path: /opt/chimerai/apps/mcp-filesystem/workspace
+        create: true
+      - name: repo-readonly
+        path: /srv/chimerai/repo
+        read_only: true
+        create: false
+```
+
+Do not allowlist broad host paths such as `/`, `/home`, or `/var` unless the
+deployment intentionally gives agents that scope.
 
 ## Backup Settings
 
