@@ -94,6 +94,8 @@ all:
                   enabled: false
                 gemini:
                   enabled: false
+                opencode:
+                  enabled: false
             mcp_todoist:
               enabled: false
               image: node:22-alpine

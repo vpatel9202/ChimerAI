@@ -109,6 +109,8 @@ chimerai_services:
         enabled: false
       gemini:
         enabled: false
+      opencode:
+        enabled: false
 
   # Optional first MCP server role. Add `mcp_todoist` to
   # `chimerai_enabled_roles` after setting a real encrypted API key.

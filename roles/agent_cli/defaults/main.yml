@@ -23,3 +23,7 @@ chimerai_agent_cli_tool_catalog:
     package: "@google/gemini-cli"
     executable: gemini
     version_arg: "--version"
+  opencode:
+    package: "opencode-ai"
+    executable: opencode
+    version_arg: "--version"

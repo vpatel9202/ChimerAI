@@ -36,6 +36,8 @@ chimerai_services:
         enabled: false
       gemini:
         enabled: false
+      opencode:
+        enabled: false
 ```
 
 Real authentication remains tool-native and local to the operator. Do not store
