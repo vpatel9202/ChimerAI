@@ -1,31 +1,49 @@
-# Milestone 3: Public Alpha
+# Milestone 3: Public Alpha Foundation
 
-Milestone 3 turns the expanded Milestone 2 stack into a documented public alpha
-that a careful operator can evaluate on a clean Linux server in the current
-validation environment. Current validation records use Ubuntu Server 24.04; see
-the [platform support matrix](../platform-support.md).
+Milestone 3 defines the proof required before tagging a public alpha. The alpha
+is foundation-first: a careful operator should be able to start from a fresh
+Linux server, apply the stack, prove repeatability, recover generated state, and
+understand the limitations.
 
 ## Goals
 
-- Prove a fresh-host install from clone through `chimerai apply`.
-- Confirm a second `chimerai apply` has no material changes.
-- Validate the enabled Milestone 2 layers together: ingress, auth, agent CLI,
-  model runtime/gateway, MCP core, automation, observability, diagnostics, and
-  backup.
-- Document known limitations clearly enough that users can decide whether to
-  test the project.
+- Prove the fresh-clone path on the current alpha platform target.
+- Prove wrapper-backed validation, first apply, and second apply idempotency.
+- Prove backup and restore against generated service state without exposing
+  secrets.
+- Make diagnostics, release evidence, and known limitations explicit.
+- Keep the alpha boundary narrow enough for public users to evaluate honestly.
 
 ## Release Gates
 
-- The public alpha checklist passes.
-- Generated service config and bind-mounted state locations are documented.
-- Authentik automation boundaries are clear.
-- Backup and restore have been tested against generated state.
-- Security guidance covers secrets, ingress, exposed ports, and key rotation.
+Use the [Public Alpha Evidence Checklist](../public-alpha-checklist.md) for gate
+definitions, record release-candidate evidence in the
+[Public Alpha Validation Record](../public-alpha-validation-record.md), and keep
+platform claims aligned with [Platform Support](../platform-support.md).
+
+- **Fresh clone setup**: a new checkout can install local tooling, initialize
+  placeholder-safe config, and reach the documented validation commands.
+- **Validation**: `chimerai validate` and the documented syntax/check commands
+  complete with sanitized evidence.
+- **First apply**: `chimerai apply` can converge the single-server alpha stack
+  on the Linux server validation target.
+- **Second apply idempotency**: a second `chimerai apply` has no material
+  changes as defined in the public alpha checklist.
+- **Backup**: `chimerai backup` creates a Restic snapshot and the snapshot can
+  be listed without printing secrets.
+- **Restore drill**: generated state can be restored into a documented restore
+  target without exposing credentials or private inventory content.
+- **Diagnostics**: documented diagnostics identify common validation, apply,
+  service, backup, and restore failures with next inspection steps.
+- **Known limitations**: alpha limitations are documented before release, with
+  catalog breadth, multi-server deployment, and long-term operations maturity
+  kept out of the alpha blocker list.
 
 ## Non-Goals
 
-- Broad MCP catalog beyond the core Milestone 2 MCP set.
-- Global model-provider registry beyond the first LiteLLM/provider boundary.
-- Dedicated update lifecycle action.
+- Broad MCP or app catalog coverage. Catalog expansion belongs to Milestone 4.
+- Additional agent runtimes beyond the first validated runtime path.
+- Multi-server deployment support.
+- Full update lifecycle, service-specific observability, or operations maturity;
+  those belong to Milestone 5.
 - Full Authentik user, group, policy, or identity-provider automation.

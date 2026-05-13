@@ -54,20 +54,23 @@ ChimerAI gives operators a repo-local way to:
 
 ## Current Alpha Status
 
-Current state: ChimerAI can bootstrap local control tooling, create an
-encrypted private config file, validate the host, deploy/remove an early
-single-server stack, and run a first Restic-backed backup/restore flow for
-bind-mounted state.
+Current state: ChimerAI includes local control tooling, encrypted private config
+setup, host validation, deploy/remove paths for an early single-server stack, and
+Restic-backed backup/restore commands for configured bind-mounted state.
 
 The current alpha is best treated as an inspectable foundation for careful
 operators, not a turnkey production platform.
 
+ChimerAI is not public-alpha-ready until the
+[public alpha validation record](docs/public-alpha-validation-record.md) is
+filled with sanitized release-candidate evidence and passes.
+
 ## Platform Support
 
 The first full ChimerAI path is a single Linux server deployment. Ubuntu Server
-24.04 is the current fresh-host validation environment, but ChimerAI is not an
-Ubuntu-only project. Other Linux server distributions, multi-server
-deployments, and non-Linux controller paths remain unvalidated.
+24.04 is the current fresh-host validation target, but ChimerAI is not an
+Ubuntu-only project. Other Linux server distributions, multi-server deployments,
+and non-Linux controller paths remain unvalidated.
 
 See [Platform Support](docs/platform-support.md) for the canonical support
 matrix.
@@ -118,7 +121,7 @@ See [Installation](docs/installation.md) for details and troubleshooting.
 
 ## Current Foundation Capabilities
 
-Available now:
+Implemented foundation pieces include:
 
 - repo-local bootstrap with [install.sh](install.sh);
 - `chimerai` CLI wrapper for config initialization, editing, validation,
@@ -132,7 +135,8 @@ Available now:
 - Authentik app, proxy provider, and embedded outpost automation for managed
   protected apps;
 - predictable app-local bind mounts for ChimerAI-managed service state;
-- Restic-backed backup and restore actions for configured state;
+- Restic-backed backup and restore actions for configured state, pending public
+  alpha validation evidence;
 - diagnostics role and validation paths for the current stack.
 
 ## Optional And Reference Integrations
@@ -214,6 +218,8 @@ Core reference docs:
 - [Role Contract](docs/role-contract.md): expectations for future roles.
 - [Public Alpha Checklist](docs/public-alpha-checklist.md): release gates and
   trust criteria for a public alpha tag.
+- [Public Alpha Validation Record](docs/public-alpha-validation-record.md):
+  sanitized evidence template for alpha release proof.
 - [Architecture Decisions](docs/adr/): why major choices were made.
 - [Agent Context](docs/agents/): instructions for AI coding agents.
 

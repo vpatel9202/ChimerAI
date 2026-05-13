@@ -231,12 +231,16 @@ chimerai restore
 ```
 
 Restore uses the configured repository and restores the latest snapshot to `/`
-by default. Stop affected services first if you are restoring over a live
-deployment.
+by default. For public alpha drills, do not restore over `/` on a live host
+unless that risk is deliberately accepted. Prefer a disposable host, temporary
+restore directory, or controlled generated-state path, and record the restore
+target in the validation record.
 
 ## Alpha Operational Gates
 
-Before treating a host as alpha-ready:
+Before treating a host as alpha-ready, and before tagging a public alpha release,
+complete these gates and record sanitized results in the
+[public alpha validation record](public-alpha-validation-record.md):
 
 - run `chimerai apply` twice and confirm the second run has no material changes;
 - confirm the generated Authentik automation verification note matches the
@@ -248,6 +252,11 @@ Before treating a host as alpha-ready:
   `openclaw.mcp_registry_enabled: false`, and run a read-only OpenClaw agent
   prompt with a real provider key;
 - run `chimerai backup` and confirm Restic can list the snapshot;
+- run a restore drill against a disposable host, temporary restore directory, or
+  controlled generated-state path;
+- capture diagnostics proof for validation, apply, service, backup, and restore
+  failure inspection paths;
+- review and record known public alpha limitations without private host details;
 - keep Let's Encrypt staging enabled until DNS, firewall, and routing are
   confirmed, then switch to production certificates.
 
