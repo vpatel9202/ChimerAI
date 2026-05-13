@@ -1,17 +1,17 @@
 # Milestone 2: Full Stack Foundation
 
-Milestone 2 is the first ChimerAI "full stack" milestone. It starts with the
-implemented Traefik, Authentik, OpenClaw, Open WebUI, Todoist MCP, backup, and
-diagnostics work, then expands into the core layers needed for an AI homelab
-stack.
+Milestone 2 is the first ChimerAI foundation milestone. It starts with the
+implemented control plane, Traefik, Authentik, backup, and diagnostics work,
+then expands into the core layers needed for an AI operations platform.
 
 The milestone is split into sub-milestones so each layer can be designed,
 validated, and documented without hiding too much behavior behind one generic
-role.
+role. App roles such as OpenClaw, Open WebUI, model services, automation
+services, and MCP services are reference integrations on top of the foundation.
 
 ## 2A: Core Ingress And Identity
 
-Status: in progress.
+Status: available now.
 
 - Traefik is the public HTTPS entrypoint.
 - Let's Encrypt HTTP-01 is the default ACME flow.
@@ -25,9 +25,9 @@ Status: in progress.
 
 ## 2B: Operator Agent CLI Layer
 
-Status: planned.
+Status: available now.
 
-Add an `agent_cli` role for operator-facing coding agents:
+The `agent_cli` role installs operator-facing coding agents:
 
 - Codex
 - Claude Code
@@ -43,17 +43,17 @@ interactive path.
 
 ## 2C: Model Layer
 
-Status: planned.
+Status: available now.
 
-- Add Ollama as the first local model runtime.
-- Add LiteLLM as the first model gateway for provider routing and OpenAI-style
-  compatibility.
-- Document how Open WebUI, OpenClaw, and future roles consume local and remote
-  model endpoints.
+- Ollama is implemented as the first local model runtime.
+- LiteLLM is implemented as the first model gateway for provider routing and
+  OpenAI-style compatibility.
+- Model endpoint consumption remains a shared integration boundary for Open
+  WebUI, OpenClaw, and future roles.
 
 ## 2D: MCP Core Layer
 
-Status: partially implemented.
+Status: available now.
 
 The MCP core should prioritize broadly useful tools before niche integrations:
 
@@ -63,36 +63,36 @@ The MCP core should prioritize broadly useful tools before niche integrations:
 - `mcp_browser`: implemented with Playwright-based browser automation.
 - `mcp_chrome_devtools`: implemented with Chrome DevTools debugging,
   inspection, screenshots, and performance tracing.
-- `mcp_search`: implemented through Firecrawl's search-capable MCP tools.
 - `mcp_firecrawl`: implemented for scraping, crawling, and structured
-  extraction.
+  extraction, including the current Firecrawl-backed search capability.
 - `mcp_todoist`: specialized proof and example role.
 
-Todoist remains valuable as a real MCP proof, but filesystem, browser/search,
-Chrome DevTools, and Firecrawl are higher-priority general-purpose tools.
+There is no separate `mcp_search` role in the current implementation. Todoist
+remains valuable as a real MCP proof, but filesystem, browser, Chrome DevTools,
+and Firecrawl are higher-priority general-purpose tools.
 
 ## 2E: Automation And Observability
 
-Status: implemented.
+Status: available now.
 
-- Add n8n for workflow automation. Implemented.
-- Add Langfuse for LLM tracing, prompt visibility, and evaluation workflows.
-  Implemented.
-- Add Qdrant as the first vector storage role. Implemented.
+- n8n is implemented for workflow automation.
+- Langfuse is implemented for LLM tracing, prompt visibility, and evaluation
+  workflows.
+- Qdrant is implemented as the first vector storage role.
 
 These roles make ChimerAI useful beyond a chat UI: workflows can run, agent
 behavior can be inspected, and retrieval-backed apps have a storage primitive.
 
 ## 2F: Safety And Operations Foundation
 
-Status: planned.
+Status: in progress.
 
 - Define a secrets and credential boundary so roles receive only the keys they
   need.
-- Add notifications for failed validation, backup failures, restore drills, and
-  completed agent workflows.
-- Add `runner` profiles for controlled execution in Docker, Incus, and future
-  cloud sandboxes.
+- Notification wiring is planned for failed validation, backup failures, restore
+  drills, and completed agent workflows.
+- `runner` profiles are in progress for controlled execution in Docker, Incus,
+  and future cloud sandboxes.
 - Complete fresh-host validation for the expanded Milestone 2 stack.
 
 ## State Layout
@@ -132,6 +132,8 @@ Named Docker volumes are not used for ChimerAI-managed persistence.
   allowlists, and secrets.
 - Provider secrets stay app-local until multiple real roles need shared
   provider inheritance.
+- App roles are optional/reference integrations on top of the foundation, not
+  the product identity by themselves.
 
 ## Acceptance Criteria
 
@@ -140,7 +142,7 @@ Named Docker volumes are not used for ChimerAI-managed persistence.
 - OpenClaw can receive managed MCP entries for enabled MCP roles.
 - Agent CLIs install in user-scoped host paths and report versions.
 - Model endpoints are documented and consumable by Open WebUI and OpenClaw.
-- MCP filesystem, browser, Chrome DevTools, search, and Firecrawl roles have
+- MCP filesystem, browser, Chrome DevTools, and Firecrawl capabilities have
   explicit safety boundaries.
 - Backup, diagnostics, notifications, and runner documentation cover the
   expanded stack.

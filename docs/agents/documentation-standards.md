@@ -14,19 +14,23 @@ operate safely, and make changes without rediscovering project decisions.
 - Keep public docs provider-neutral unless documenting compatibility.
 - Avoid "production ready" unless the repo has a defined support and release
   policy for that claim.
+- App-role docs must distinguish foundation capability from optional or
+  reference integrations. Do not make ChimerAI read like a generic app bundle
+  when the role is demonstrating ingress, auth, secrets, state, backup, or
+  diagnostics behavior.
 
 ## README
 
 The README should be a landing page:
 
 - what ChimerAI is
-- how to get started
-- what is available now
-- why it exists
-- who it is for
+- what it gives operators
 - current status
-- planned architecture
-- roadmap
+- how to get started
+- current foundation capabilities
+- optional/reference integrations
+- architecture summary
+- roadmap pointers
 - contribution path
 
 Put the current quickstart near the top. Many homelab users will skim, so do
