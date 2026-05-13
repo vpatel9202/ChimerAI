@@ -1,258 +1,96 @@
 # ChimerAI
 
-> Self-hosted AI operations foundation for agents, MCP tools, automation, and secure operations.
+> Ansible-first, Compose-visible homelab foundation for AI services, agents,
+> MCP tools, automation, and secure operations.
 
-[![Project status: prototype alpha](https://img.shields.io/badge/status-prototype%20alpha-orange)](#current-alpha-status)
-[![Ansible first](https://img.shields.io/badge/Ansible-first-ee0000?logo=ansible&logoColor=white)](#architecture-summary)
-[![Docker Compose runtime](https://img.shields.io/badge/runtime-Docker%20Compose-2496ed?logo=docker&logoColor=white)](#architecture-summary)
-[![Target: Linux server alpha](https://img.shields.io/badge/target-Linux%20server%20alpha-2ea44f)](docs/platform-support.md)
+[![Project status: prototype alpha](https://img.shields.io/badge/status-prototype%20alpha-orange)](docs/milestones/README.md)
+[![Ansible first](https://img.shields.io/badge/Ansible-first-ee0000?logo=ansible&logoColor=white)](docs/architecture-map.md)
+[![Docker Compose runtime](https://img.shields.io/badge/runtime-Docker%20Compose-2496ed?logo=docker&logoColor=white)](docs/architecture-map.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
-ChimerAI is a self-hosted AI operations foundation: the repeatable control
-plane, runtime layout, and operator workflow for running AI services on your
-own infrastructure.
+ChimerAI is for operators who want a reviewable, self-hosted control plane for
+AI-adjacent infrastructure instead of a black-box appliance. It uses Ansible for
+provisioning and lifecycle, keeps Docker Compose output inspectable, and treats
+ingress, authentication, secrets, backup, restore, and diagnostics as foundation
+work.
 
-It focuses first on the parts every serious self-hosted AI stack needs:
+Status: prototype alpha. Use it only if you are comfortable reviewing Ansible,
+Compose files, generated config, and host changes before applying them.
 
-- auth and protected app access;
-- public ingress and TLS;
-- encrypted secrets and reproducible config;
-- lifecycle commands for validate, apply, remove, backup, and restore;
-- predictable app-local state;
-- diagnostics and health checks;
-- backup and restore boundaries;
-- visible Docker Compose output instead of opaque orchestration.
+## First 60 Seconds
 
-Status: ChimerAI is prototype/alpha software. It is useful for careful
-operators who are comfortable reviewing Ansible, Docker Compose, generated
-config, and host changes. It is not production-ready.
+| If you want to... | Start here |
+| --- | --- |
+| See what ChimerAI is | [Architecture map](docs/architecture-map.md) |
+| Install the local tooling | [Quick start](#quick-start) |
+| Understand current status | [Roadmap and milestones](docs/milestones/README.md) |
+| Compare it with nearby projects | [Comparison guide](docs/comparison.md) |
+| See planned demo evidence | [Demo and sample output](docs/demo-and-sample-output.md) |
+| Contribute safely | [Contributing](CONTRIBUTING.md) and [agent context](docs/agents/) |
 
-## What ChimerAI Is
+## What It Does Now
 
-ChimerAI is not a generic app bundle. Roles are governed examples of the
-operator model: core roles build the foundation, while reference and
-experimental roles prove selected patterns without turning the catalog into the
-product.
+- Bootstraps repo-local tooling with `./install.sh`.
+- Provides a `chimerai` CLI wrapper for validation and lifecycle tasks.
+- Defines an Ansible-first foundation with visible Docker Compose runtime
+  output.
+- Documents current contracts for config, secrets, ingress, auth, role support,
+  operations, and public alpha evidence.
 
-The project is inspired by mature homelab stacks, but it targets the AI-era
-operational problem: agents, MCP servers, model providers, workflow automation,
-memory, ingress, auth, backups, diagnostics, and secret handling under one
-inspectable control plane.
+## What It Is Not Yet
 
-## What It Gives Operators
-
-ChimerAI gives operators a repo-local way to:
-
-- initialize encrypted local config with SOPS and age;
-- validate host and config assumptions before deployment;
-- generate and run Docker Compose through Ansible roles;
-- expose multiple AI services through one Traefik ingress and Authentik
-  forward-auth layer;
-- keep service state under predictable app-local paths;
-- run backup and restore actions for configured state;
-- keep AI-coding-agent instructions provider-neutral;
-- separate public project defaults from private deployment context.
-
-## Current Alpha Status
-
-Current state: ChimerAI includes local control tooling, encrypted private config
-setup, host validation, deploy/remove paths for an early single-server stack, and
-Restic-backed backup/restore commands for configured bind-mounted state.
-
-The current alpha is best treated as an inspectable foundation for careful
-operators, not a turnkey production platform.
-
-ChimerAI is not public-alpha-ready until the
-[public alpha validation record](docs/public-alpha-validation-record.md) is
-filled with sanitized release-candidate evidence and passes.
-
-## Platform Support
-
-The first full ChimerAI path is a single Linux server deployment. Ubuntu Server
-24.04 is the current fresh-host validation target, but ChimerAI is not an
-Ubuntu-only project. Other Linux server distributions, multi-server deployments,
-and non-Linux controller paths remain unvalidated.
-
-See [Platform Support](docs/platform-support.md) for the canonical support
-matrix.
-
-Public ingress requires a real domain pointed at the host, with ports `80` and
-`443` reachable for Traefik and Let's Encrypt.
+- Not production-ready.
+- Not a broad app store.
+- Not a GUI homelab OS.
+- Not a managed cloud platform.
+- Not a promise that every planned role or workflow is implemented.
 
 ## Quick Start
 
+From a fresh checkout:
+
 ```bash
-git clone https://github.com/vpatel9202/ChimerAI.git
-cd ChimerAI
 ./install.sh
-chimerai config init
 chimerai validate
 ```
 
-When you are ready to deploy the configured proof of concept:
+`./install.sh` bootstraps local development tools and links the repo-local
+`chimerai` command. It does not deploy services, create encrypted config, or
+edit shell startup files.
 
-```bash
-chimerai apply
-```
+Before applying anything to a host, read:
 
-The default public-ingress template expects a real domain pointed at the host,
-ports `80` and `443` reachable from the internet, and `chimerai_acme_email`
-set for Let's Encrypt. The template starts with Let's Encrypt staging enabled
-so first runs do not burn certificate rate limits.
+- [Installation](docs/installation.md)
+- [Configuration and secrets](docs/configuration-and-secrets.md)
+- [Auth and ingress](docs/auth-and-ingress.md)
+- [Platform support](docs/platform-support.md)
 
-To remove ChimerAI-managed services:
+## System Shape
 
-```bash
-chimerai remove
-```
+ChimerAI separates four concerns:
 
-To back up or restore configured state after you have enabled
-`chimerai_backup` in the encrypted config:
+- Host provisioning and prerequisites.
+- Service deployment through generated, inspectable Docker Compose.
+- Integration wiring for ingress, authentication, secrets, state, and backup.
+- Diagnostics and validation paths for operators and contributors.
 
-```bash
-chimerai backup
-chimerai restore
-```
-
-The installer does not deploy services. It prepares local tooling, links the
-`chimerai` command into `~/.local/bin`, installs Python/Ansible dependencies,
-and installs `sops`/`age` if they are missing.
-
-See [Installation](docs/installation.md) for details and troubleshooting.
-
-## Current Foundation Capabilities
-
-Implemented foundation pieces include:
-
-- repo-local bootstrap with [install.sh](install.sh);
-- `chimerai` CLI wrapper for config initialization, editing, validation,
-  apply, remove, backup, and restore;
-- SOPS + age encrypted private config at
-  `inventories/local/chimerai.sops.yaml`;
-- Ansible-driven lifecycle through `chimerai.yml`;
-- Docker Compose as the visible service runtime;
-- shared [Traefik and Authentik auth/ingress](docs/auth-and-ingress.md) for
-  protected app routing;
-- Traefik public ingress with HTTP-to-HTTPS redirect and Let's Encrypt HTTP-01
-  certificate management;
-- Authentik as one shared forward-auth layer for multiple protected apps;
-- Authentik app, proxy provider, and embedded outpost automation for managed
-  protected apps;
-- predictable app-local bind mounts for ChimerAI-managed service state;
-- Restic-backed backup and restore actions for configured state, pending public
-  alpha validation evidence;
-- diagnostics role and validation paths for the current stack.
-
-## Role Catalog
-
-ChimerAI tracks roles by tier and support status so operators can tell the
-foundation from examples and experiments. Core roles carry the strongest
-maintenance expectation. Reference roles demonstrate app, model, automation, and
-agent-runtime patterns without promising equal support for every integration.
-Experimental roles are explicitly unstable.
-
-See the [role catalog](docs/role-catalog.md) and
-[role governance](docs/role-governance.md) docs before proposing new roles.
-
-## Architecture Summary
-
-ChimerAI is Ansible-first and Compose-visible.
-
-The foundation layers are:
-
-- **Control plane:** repo-local `chimerai` wrapper plus Ansible playbooks and
-  roles.
-- **Ingress and auth:** Traefik for public routing and TLS, plus Authentik
-  forward-auth for multiple managed apps.
-- **Secrets and config:** SOPS + age encrypted local config and explicit
-  inventory variables.
-- **Service runtime:** generated Docker Compose projects that remain readable
-  and debuggable.
-- **State and backup:** predictable app-local state directories and Restic
-  backup/restore actions.
-- **Diagnostics:** validation, health checks, and role-specific diagnostics as
-  first-class workflow.
-
-Key project choices:
-
-- **Ansible instead of a custom orchestrator:** Ansible is inspectable and
-  already good at host state.
-- **Docker Compose instead of Kubernetes:** Compose fits the current
-  single-server homelab target and is easy to debug.
-- **SOPS + age for secrets:** users get one private YAML config file while
-  sensitive values stay encrypted at rest.
-- **App-local state instead of opaque Docker volumes:** runtime files should
-  be easy to find, inspect, back up, and migrate.
-- **Provider-neutral agent instructions:** Codex, Claude, Gemini, local
-  models, and other coding agents should all read the same project policy.
-
-See [Architecture Decision Records](docs/adr/) for durable rationale.
+See [Architecture map](docs/architecture-map.md) for the compact system view.
 
 ## Roadmap
 
-The detailed roadmap lives in [docs/milestones/](docs/milestones/).
+The public roadmap source of truth is [docs/milestones/README.md](docs/milestones/README.md).
+The README intentionally does not duplicate that list.
 
-Current roadmap pointers:
+## Project Docs
 
-- [Milestone 2 Stack Plan](docs/milestones/0002-first-real-stack.md): current
-  foundation stack and reference integrations.
-- [Public Alpha Plan](docs/milestones/0003-public-alpha.md): release-readiness
-  gates before a first public alpha tag.
-- [Authentik and Traefik Plan](docs/milestones/0004-authentik-and-traefik.md):
-  shared auth and ingress differentiation.
-- [Role Catalog Governance Plan](docs/milestones/0005-role-catalog-governance.md):
-  tiers, support status, contribution gates, and deprecation policy.
-- [Operator Experience Plan](docs/milestones/0006-operations-maturity.md):
-  diagnostics, backup/restore, update lifecycle, and common failure modes.
-
-Core reference docs:
-
-- [Installation](docs/installation.md): bootstrap a fresh local checkout.
-- [Operator Operations](docs/operations/README.md): diagnostics,
-  backup/restore, updates, and common failure recovery.
-- [Configuration and Secrets](docs/configuration-and-secrets.md): encrypted
-  config, SOPS, age, and editing secrets.
-- [Auth and Ingress](docs/auth-and-ingress.md): shared Traefik and Authentik
-  contract for protected apps.
-- [Inventory Schema](docs/inventory-schema.md): current variable shape.
-- [Role Contract](docs/role-contract.md): expectations for future roles.
-- [Role Catalog](docs/role-catalog.md): current roles by tier and support
-  status.
-- [Role Governance](docs/role-governance.md): role inclusion and deprecation
-  policy.
-- [Public Alpha Checklist](docs/public-alpha-checklist.md): release gates and
-  trust criteria for a public alpha tag.
-- [Public Alpha Validation Record](docs/public-alpha-validation-record.md):
-  sanitized evidence template for alpha release proof.
-- [Architecture Decisions](docs/adr/): why major choices were made.
-- [Agent Context](docs/agents/): instructions for AI coding agents.
-
-## Contributing
-
-ChimerAI is early. Good contributions are small, reviewable, and honest about
-what is implemented versus planned.
-
-Useful first contributions:
-
-- improve docs;
-- add validation around existing roles;
-- propose narrowly scoped roles;
-- test the install flow on a clean Linux server in the current validation
-  environment;
-- write ADRs for major design changes before implementing them.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before
-opening a pull request.
-
-Agent-facing project policy is provider-neutral: [AGENTS.md](AGENTS.md) is the
-source of truth, and [CLAUDE.md](CLAUDE.md) plus [GEMINI.md](GEMINI.md) are thin
-import shims.
+- [Architecture map](docs/architecture-map.md)
+- [Comparison guide](docs/comparison.md)
+- [Demo and sample output](docs/demo-and-sample-output.md)
+- [Operations](docs/operations/README.md)
+- [Role catalog](docs/role-catalog.md)
+- [Architecture decisions](docs/adr/)
+- [Agent context](docs/agents/)
 
 ## License
 
-ChimerAI is licensed under the [Apache License 2.0](LICENSE).
-
-## Name
-
-The name ChimerAI combines "chimera" with AI: a modular system made from many
-specialized parts that should behave as one coherent operator stack.
+Apache License 2.0. See [LICENSE](LICENSE).

@@ -1,26 +1,24 @@
 # Milestones
 
-This directory records ChimerAI roadmap milestones. It is the detailed roadmap
-source of truth; the README should only summarize and link here.
+This directory is the public roadmap source of truth for ChimerAI.
 
-Milestone documents are planning and explanation artifacts. They should clearly
-separate available behavior from planned behavior, and they should not replace
-the task-oriented install and configuration guides.
+The root README links here instead of maintaining a second roadmap list. Update
+this file when adding, renaming, or retiring milestone documents.
 
-## Current Documents
+## Roadmap
 
-- [`0002-first-real-stack.md`](0002-first-real-stack.md): current implemented
-  stack across ingress/auth, secrets/config, service runtime, state/backup,
-  diagnostics, agent CLIs, model runtime, MCP, automation, and observability,
-  plus remaining in-progress safety and operations work and the platform
-  support matrix outcome.
-- [`0003-public-alpha.md`](0003-public-alpha.md): release-readiness gates for a
-  first public alpha after the expanded Milestone 2 stack is validated in the
-  current validation environment, not across every target platform family.
-- [`0004-authentik-and-traefik.md`](0004-authentik-and-traefik.md): shared
-  Traefik ingress and Authentik forward-auth differentiation for multiple
-  managed apps.
-- [`0005-role-catalog-governance.md`](0005-role-catalog-governance.md): role
-  catalog tiers, support status, contribution gates, and deprecation policy.
-- [`0006-operations-maturity.md`](0006-operations-maturity.md): operator
-  diagnostics, backup/restore, update lifecycle, and common failure modes.
+| Milestone | Focus | Status |
+| --- | --- | --- |
+| [0002: First Real Stack](0002-first-real-stack.md) | Foundation stack across ingress/auth, secrets/config, service runtime, state/backup, diagnostics, agent CLIs, model runtime, MCP, automation, observability, and platform support. | Current foundation |
+| [0003: Public Alpha](0003-public-alpha.md) | Release-readiness gates for the first public alpha tag. | Planned gate set |
+| [0004: Authentik and Traefik](0004-authentik-and-traefik.md) | Shared Traefik ingress and Authentik forward-auth differentiation for multiple managed apps. | Planned |
+| [0005: Role Catalog Governance](0005-role-catalog-governance.md) | Role tiers, support status, contribution gates, and deprecation policy. | Planned |
+| [0006: Operator Experience](0006-operations-maturity.md) | Diagnostics, backup/restore, update lifecycle, and common failure modes. | Planned |
+| [0007: Documentation and Discoverability](0007-documentation-and-discoverability.md) | README routing, architecture map, comparison guide, demo evidence plan, and agent context map. | In progress |
+
+## Maintenance Rules
+
+- Keep this file short and link to detail pages.
+- Do not duplicate the roadmap in the root README or scattered docs.
+- Mark planned work as planned until implementation and validation exist.
+- Prefer durable milestone names over date-based promises.

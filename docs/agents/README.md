@@ -31,6 +31,13 @@ read only when relevant to the task.
 
 Project-level references:
 
+- [`../architecture-map.md`](../architecture-map.md) gives the compact public
+  system map and should be read before changing high-level positioning or
+  architecture summaries.
+- [`../comparison.md`](../comparison.md) explains how ChimerAI compares with
+  nearby self-hosting projects and must stay sourced to official/project docs.
+- [`../demo-and-sample-output.md`](../demo-and-sample-output.md) records the
+  public demo and evidence plan without inventing unvalidated artifacts.
 - [`../installation.md`](../installation.md) defines the repo-local bootstrap
   flow.
 - [`../role-contract.md`](../role-contract.md) defines the initial role
@@ -45,7 +52,7 @@ Project-level references:
   the SOPS + age encrypted config workflow.
 - [`../adr/`](../adr/) records durable architecture decisions.
 - [`../milestones/`](../milestones/) records current and planned roadmap
-  milestones.
+  milestones. Treat this as the public roadmap source of truth.
 
 ## Loading Model
 
