@@ -16,6 +16,8 @@ work.
 
 Status: prototype alpha. Use it only if you are comfortable reviewing Ansible,
 Compose files, generated config, and host changes before applying them.
+The first public alpha is not ready to tag until the release-readiness evidence
+is complete.
 
 ## First 60 Seconds
 
@@ -26,6 +28,7 @@ Compose files, generated config, and host changes before applying them.
 | Understand current status | [Roadmap and milestones](docs/milestones/README.md) |
 | Compare it with nearby projects | [Comparison guide](docs/comparison.md) |
 | See planned demo evidence | [Demo and sample output](docs/demo-and-sample-output.md) |
+| Check public-alpha readiness | [Alpha checklist](docs/public-alpha-checklist.md), [validation record](docs/public-alpha-validation-record.md), and [release notes draft](docs/releases/v0.1.0-alpha.md) |
 | Contribute safely | [Contributing](CONTRIBUTING.md) and [agent context](docs/agents/) |
 | Understand community scope | [Community readiness](docs/community-readiness.md) |
 
@@ -82,11 +85,18 @@ See [Architecture map](docs/architecture-map.md) for the compact system view.
 The public roadmap source of truth is [docs/milestones/README.md](docs/milestones/README.md).
 The README intentionally does not duplicate that list.
 
+Release-readiness docs:
+
+- [Public alpha evidence checklist](docs/public-alpha-checklist.md)
+- [Public alpha validation record](docs/public-alpha-validation-record.md)
+- [v0.1.0-alpha release notes draft](docs/releases/v0.1.0-alpha.md)
+
 ## Project Docs
 
 - [Architecture map](docs/architecture-map.md)
 - [Comparison guide](docs/comparison.md)
 - [Demo and sample output](docs/demo-and-sample-output.md)
+- [Public alpha evidence checklist](docs/public-alpha-checklist.md)
 - [Operations](docs/operations/README.md)
 - [Role catalog](docs/role-catalog.md)
 - [Community readiness](docs/community-readiness.md)

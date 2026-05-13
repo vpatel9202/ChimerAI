@@ -1,6 +1,8 @@
 # Contributing
 
 ChimerAI is still in design/prototype stage.
+The `v0.1.0-alpha` release is unstable and not ready until the public validation
+record is complete.
 
 At this point, the most useful contributions are design feedback, issue reports,
 small documentation improvements, and focused improvements to the initial
@@ -10,6 +12,11 @@ ChimerAI is not ready for broad support requests, app-store requests, or large
 feature pull requests without prior agreement. Please keep issues and pull
 requests narrow enough for maintainers to review against the current prototype
 contracts.
+
+During the public-alpha release era, supported contribution scope is limited to
+release evidence, docs honesty, reproducible validation issues, small contract
+fixes, and approved implementation changes. Production support and private
+deployment debugging are out of scope.
 
 Use the available issue templates:
 
@@ -59,6 +66,10 @@ uv run ansible-playbook chimerai.yml --check
 
 If you have initialized local encrypted config, `chimerai validate` is the
 preferred end-to-end validation wrapper.
+
+Before opening a pull request, also confirm that public docs do not overclaim
+release readiness, validation evidence is either recorded or explicitly marked
+incomplete, secrets are scrubbed, and no `.local/` content is included.
 
 Before opening large implementation pull requests, please start with an issue or
 discussion so the design can be agreed on first.

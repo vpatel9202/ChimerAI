@@ -5,6 +5,11 @@ ChimerAI is preparing for public alpha, not broad community support.
 This page defines the surfaces that should exist before larger community use and
 the limits that protect maintainer time while the project is still a prototype.
 
+Release-era boundary: during `v0.1.0-alpha` preparation, community support is
+limited to release evidence, docs honesty, reproducible validation issues, and
+small contract fixes. The project is unstable and not ready for production
+support.
+
 ## Current Scope
 
 Accepted contribution paths:
@@ -18,6 +23,7 @@ Out of scope for now:
 
 - general homelab support;
 - private deployment debugging that depends on unpublished local state;
+- production deployment support for `v0.1.0-alpha`;
 - broad app-role requests without an owner and validation plan;
 - large implementation pull requests without prior design agreement.
 

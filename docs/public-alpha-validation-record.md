@@ -3,9 +3,10 @@
 This is the public release-candidate evidence record and reusable template for
 tagging a public alpha release. It is not proof by itself.
 
-Blank fields, `TBD` entries, or placeholder values mean the public alpha is not
-ready. Do not tag a public alpha release until every required field is filled
-with sanitized evidence and the reviewer sign-off says the release is ready.
+Blank fields, `TBD` entries, `Not recorded yet`, or placeholder values mean the
+public alpha is not ready. Do not tag `v0.1.0-alpha` or any public alpha release
+until every required field is filled with sanitized evidence and the reviewer
+sign-off says the release is ready.
 
 Keep only sanitized placeholders and sanitized results here. Do not include real
 domains, credentials, private inventory values, age identities, Restic passwords,
@@ -14,22 +15,23 @@ not fill expected or assumed results as evidence.
 
 ## Release Candidate
 
-- **Release candidate**:
-- **Date**:
-- **Reviewer**:
-- **Commit or tag**:
+- **Release candidate**: Not recorded yet.
+- **Date**: Not recorded yet.
+- **Reviewer**: Not recorded yet.
+- **Commit or tag**: Not recorded yet.
 - **Validation target**: single Linux server, currently Ubuntu Server 24.04.
 - **Inventory class**: sanitized example, such as `single-server`.
+- **Current readiness**: Not ready - validation evidence incomplete.
 
 ## Environment
 
-- **OS**:
-- **CPU/RAM class**:
-- **Disk class**:
-- **Network shape**:
+- **OS**: Not recorded yet.
+- **CPU/RAM class**: Not recorded yet.
+- **Disk class**: Not recorded yet.
+- **Network shape**: Not recorded yet.
 - **Execution context**: local shell, SSH session, CI dry run, or disposable
-  proof environment.
-- **Notes**:
+  proof environment. Not recorded yet.
+- **Notes**: Not recorded yet.
 
 ## Evidence Summary
 
@@ -53,66 +55,81 @@ Use the operator docs for repeatable evidence:
 
 ### Fresh Clone Setup
 
-- **Command run**:
-- **Environment**:
-- **Sanitized result**:
-- **Status**:
-- **Known limitation**:
+- **Command run**: Not recorded yet.
+- **Evidence location**: Not recorded yet.
+- **Environment**: Not recorded yet.
+- **Sanitized result**: Not recorded yet.
+- **Status**: Blocked until recorded.
+- **Known limitation**: Not recorded yet.
 
 ### Validate
 
-- **Command run**:
-- **Environment**:
-- **Sanitized result**:
-- **Status**:
-- **Known limitation**:
+- **Command run**: Not recorded yet.
+- **Evidence location**: Not recorded yet.
+- **Environment**: Not recorded yet.
+- **Sanitized result**: Not recorded yet.
+- **Status**: Blocked until recorded.
+- **Known limitation**: Not recorded yet.
 
 ### First Apply
 
-- **Command run**:
-- **Environment**:
-- **Sanitized result**:
-- **Status**:
-- **Known limitation**:
+- **Command run**: Not recorded yet.
+- **Evidence location**: Not recorded yet.
+- **Environment**: Not recorded yet.
+- **Sanitized result**: Not recorded yet.
+- **Status**: Blocked until recorded.
+- **Known limitation**: Not recorded yet.
 
 ### Second Apply Idempotency
 
-- **Command run**:
-- **Environment**:
-- **Sanitized result**:
-- **Material change review**:
-- **Status**:
-- **Known limitation**:
+- **Command run**: Not recorded yet.
+- **Evidence location**: Not recorded yet.
+- **Environment**: Not recorded yet.
+- **Sanitized result**: Not recorded yet.
+- **Material change review**: Not recorded yet.
+- **Status**: Blocked until recorded.
+- **Known limitation**: Not recorded yet.
 
 ### Backup
 
-- **Command run**:
-- **Environment**:
-- **Sanitized result**:
-- **Restic snapshot listed**:
-- **Generated state included**:
-- **No secret output printed**:
-- **Status**:
-- **Known limitation**:
+- **Command run**: Not recorded yet.
+- **Evidence location**: Not recorded yet.
+- **Environment**: Not recorded yet.
+- **Sanitized result**: Not recorded yet.
+- **Restic snapshot listed**: Not recorded yet.
+- **Generated state included**: Not recorded yet.
+- **No secret output printed**: Not recorded yet.
+- **Status**: Blocked until recorded.
+- **Known limitation**: Not recorded yet.
 
 ### Restore Drill
 
-- **Restore target**:
-- **Command run**:
-- **Environment**:
-- **Generated state restored**:
-- **Verification**:
-- **No secret output printed**:
-- **Status**:
-- **Known limitation**:
+- **Restore target**: Not recorded yet.
+- **Command run**: Not recorded yet.
+- **Evidence location**: Not recorded yet.
+- **Environment**: Not recorded yet.
+- **Generated state restored**: Not recorded yet.
+- **Verification**: Not recorded yet.
+- **No secret output printed**: Not recorded yet.
+- **Status**: Blocked until recorded.
+- **Known limitation**: Not recorded yet.
 
 ### Diagnostics
 
-- **Command run**:
-- **Environment**:
-- **Sanitized result**:
-- **Status**:
-- **Known limitation**:
+- **Command run**: Not recorded yet.
+- **Evidence location**: Not recorded yet.
+- **Environment**: Not recorded yet.
+- **Sanitized result**: Not recorded yet.
+- **Status**: Blocked until recorded.
+- **Known limitation**: Not recorded yet.
+
+### GitHub Repository Polish
+
+- **Description reviewed**: Not recorded yet.
+- **Topics reviewed**: Not recorded yet.
+- **Default branch and CI visibility reviewed**: Not recorded yet.
+- **Evidence location**: Not recorded yet.
+- **Status**: Blocked until recorded.
 
 ### Known Limitations
 

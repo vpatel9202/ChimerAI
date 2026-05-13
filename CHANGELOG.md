@@ -6,6 +6,11 @@ The project has not published a release yet.
 
 ## Unreleased
 
+### v0.1.0-alpha
+
+Unreleased and not ready to tag. Validation evidence is incomplete, and the
+public alpha hard blocker remains open.
+
 - Created initial project README.
 - Added provider-neutral agent instructions and compatibility shims.
 - Added `.local/` workspace convention and templates.
@@ -29,3 +34,5 @@ The project has not published a release yet.
   managed registry configuration, and diagnostics.
 - Tightened user-facing and agent-facing documentation for durable roadmap,
   alpha boundaries, and LLM-ingestion guidance.
+- Added public-alpha release-readiness docs, validation evidence templates, demo
+  evidence slots, and release-note draft for `v0.1.0-alpha`.

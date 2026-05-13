@@ -9,6 +9,9 @@ No public demo artifact is claimed here yet. The project has documentation,
 contracts, and validation plans, but this page should not pretend a completed
 demo exists before evidence is captured.
 
+Status: planned and incomplete. Demo evidence is not ready for a public alpha
+tag.
+
 ## Planned Demo Path
 
 The first useful demo should show:
@@ -36,10 +39,23 @@ The first useful demo should show:
 
 Expected public artifacts may include:
 
-- Short terminal transcript.
-- Sanitized validation record excerpt.
-- Generated Compose excerpt.
-- Architecture diagram derived from the current docs.
-- Troubleshooting example for one common failure mode.
+- [ ] Planned/incomplete: short terminal transcript.
+- [ ] Planned/incomplete: sanitized validation record excerpt.
+- [ ] Planned/incomplete: generated Compose excerpt.
+- [ ] Planned/incomplete: architecture diagram derived from the current docs.
+- [ ] Planned/incomplete: troubleshooting example for one common failure mode.
 
 Do not add placeholder screenshots or invented command output.
+
+## Release Evidence Slots
+
+These slots must stay incomplete until real sanitized evidence exists:
+
+| Artifact | Status | Evidence Source |
+| --- | --- | --- |
+| Fresh checkout bootstrap transcript | Planned/incomplete | Not recorded yet |
+| `chimerai validate` transcript | Planned/incomplete | Not recorded yet |
+| First apply excerpt | Planned/incomplete | Not recorded yet |
+| Second apply idempotency excerpt | Planned/incomplete | Not recorded yet |
+| Diagnostics excerpt | Planned/incomplete | Not recorded yet |
+| Backup and restore excerpt | Planned/incomplete | Not recorded yet |
