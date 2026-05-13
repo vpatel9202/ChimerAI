@@ -41,9 +41,9 @@ platform claims aligned with [Platform Support](../platform-support.md).
 
 ## Non-Goals
 
-- Broad MCP or app catalog coverage. Catalog expansion belongs to Milestone 4.
+- Broad MCP or app catalog coverage. Catalog expansion belongs to Milestone 5.
 - Additional agent runtimes beyond the first validated runtime path.
 - Multi-server deployment support.
 - Full update lifecycle, service-specific observability, or operations maturity;
-  those belong to Milestone 5.
+  those belong to Milestone 6.
 - Full Authentik user, group, policy, or identity-provider automation.

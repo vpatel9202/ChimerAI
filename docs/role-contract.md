@@ -75,6 +75,24 @@ Roles that manage services should:
 - create explicit Docker networks rather than relying on accidental defaults;
 - provide a validation path that can run without destructive side effects.
 
+## Managed App Auth/Ingress Contract
+
+Roles that expose public app routes should follow the shared
+[Auth And Ingress](auth-and-ingress.md) contract:
+
+- attach routed services to the shared public Traefik network;
+- set `traefik.enable=true` only for services intended to be routed;
+- route through `websecure` with TLS and the configured certificate resolver;
+- keep app service ports on Docker networks or localhost unless a role documents
+  another exposure model;
+- attach `authentik@docker` when the app's `auth_required` value is true;
+- default `auth_required` to
+  `chimerai_ingress.auth.protect_apps_by_default` when the role does not set an
+  explicit value;
+- let the `authentik` role own Authentik proxy provider, application, outpost,
+  and forward-auth middleware automation;
+- document any unauthenticated public route as an intentional exception.
+
 Roles that manage host tools should:
 
 - install into user-scoped paths by default;

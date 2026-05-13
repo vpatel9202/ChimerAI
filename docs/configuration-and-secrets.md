@@ -120,15 +120,19 @@ When adding new secret fields, use explicit names such as `api_key`,
 
 ## Public Ingress Settings
 
-The first real stack uses Traefik and Let's Encrypt HTTP-01. These values are
-not secrets, but they are deployment-specific:
+The first real stack uses Traefik, Authentik, and Let's Encrypt HTTP-01. These
+values are not secrets, but they are deployment-specific and control the shared
+[auth and ingress contract](auth-and-ingress.md):
 
 ```yaml
 chimerai_domain: example.com
 chimerai_acme_email: admin@example.com
 chimerai_ingress:
+  enabled: true
+  provider: traefik
   tls:
     enabled: true
+    ca: letsencrypt
     resolver: letsencrypt
     challenge: http-01
     staging: true
@@ -143,6 +147,10 @@ production certificates.
 
 HTTP-01 requires public inbound access to ports `80` and `443`. If another
 service already owns those ports, Traefik will not start.
+
+`chimerai_ingress.auth.protect_apps_by_default` is the default for managed app
+`auth_required` fields. Leave it `true` for public deployments unless a role
+explicitly documents why a route is safe without Authentik forward auth.
 
 ## Authentik Automation Settings
 
@@ -161,6 +169,10 @@ The token is rendered as `AUTHENTIK_BOOTSTRAP_TOKEN`, which Authentik uses to
 create a bootstrap API token. If an existing Authentik deployment was started
 without a bootstrap token, create an API token in Authentik, store it as
 `bootstrap_token`, and rerun `chimerai apply`.
+
+Automation only wires ChimerAI-managed protected apps into Authentik. Operators
+still own Authentik users, groups, policies, external identity providers, OAuth
+client setup, and app-specific authorization.
 
 ## Todoist MCP Settings
 

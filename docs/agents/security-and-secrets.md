@@ -27,6 +27,12 @@ powerful automation tools. Security guidance must be conservative by default.
 
 - Do not expose internal services publicly without a deliberate ingress and
   authentication policy.
+- Use `docs/auth-and-ingress.md` as the source of truth for the Traefik and
+  Authentik contract before changing routed app behavior.
+- Keep Let's Encrypt staging enabled until DNS, firewall, and routing are
+  verified.
+- Treat `auth_required: false` on a public app route as a security-sensitive
+  exception that needs role documentation.
 - Treat Authentik, Authelia, Cloudflare, Tailscale, firewall, and reverse proxy
   changes as security-sensitive.
 - Document exposure assumptions clearly.

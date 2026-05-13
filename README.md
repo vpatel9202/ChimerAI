@@ -46,7 +46,8 @@ ChimerAI gives operators a repo-local way to:
 - initialize encrypted local config with SOPS and age;
 - validate host and config assumptions before deployment;
 - generate and run Docker Compose through Ansible roles;
-- expose selected services through Traefik and shared Authentik forward auth;
+- expose multiple AI services through one Traefik ingress and Authentik
+  forward-auth layer;
 - keep service state under predictable app-local paths;
 - run backup and restore actions for configured state;
 - keep AI-coding-agent instructions provider-neutral;
@@ -130,8 +131,11 @@ Implemented foundation pieces include:
   `inventories/local/chimerai.sops.yaml`;
 - Ansible-driven lifecycle through `chimerai.yml`;
 - Docker Compose as the visible service runtime;
-- Traefik public ingress with Let's Encrypt HTTP-01 certificate management;
-- Authentik as the shared forward-auth layer for protected apps;
+- shared [Traefik and Authentik auth/ingress](docs/auth-and-ingress.md) for
+  protected app routing;
+- Traefik public ingress with HTTP-to-HTTPS redirect and Let's Encrypt HTTP-01
+  certificate management;
+- Authentik as one shared forward-auth layer for multiple protected apps;
 - Authentik app, proxy provider, and embedded outpost automation for managed
   protected apps;
 - predictable app-local bind mounts for ChimerAI-managed service state;
@@ -168,8 +172,8 @@ The foundation layers are:
 
 - **Control plane:** repo-local `chimerai` wrapper plus Ansible playbooks and
   roles.
-- **Ingress and auth:** Traefik for public routing, TLS, and Authentik
-  forward-auth.
+- **Ingress and auth:** Traefik for public routing and TLS, plus Authentik
+  forward-auth for multiple managed apps.
 - **Secrets and config:** SOPS + age encrypted local config and explicit
   inventory variables.
 - **Service runtime:** generated Docker Compose projects that remain readable
@@ -204,9 +208,11 @@ Current roadmap pointers:
   foundation stack and reference integrations.
 - [Public Alpha Plan](docs/milestones/0003-public-alpha.md): release-readiness
   gates before a first public alpha tag.
-- [MCP and Agent Catalog Plan](docs/milestones/0004-mcp-and-agent-catalog.md):
+- [Authentik and Traefik Plan](docs/milestones/0004-authentik-and-traefik.md):
+  shared auth and ingress differentiation.
+- [MCP and Agent Catalog Plan](docs/milestones/0005-mcp-and-agent-catalog.md):
   planned MCP/runtime expansion.
-- [Operations Maturity Plan](docs/milestones/0005-operations-maturity.md):
+- [Operations Maturity Plan](docs/milestones/0006-operations-maturity.md):
   planned update, diagnostics, recovery, and operational maturity work.
 
 Core reference docs:
@@ -214,6 +220,8 @@ Core reference docs:
 - [Installation](docs/installation.md): bootstrap a fresh local checkout.
 - [Configuration and Secrets](docs/configuration-and-secrets.md): encrypted
   config, SOPS, age, and editing secrets.
+- [Auth and Ingress](docs/auth-and-ingress.md): shared Traefik and Authentik
+  contract for protected apps.
 - [Inventory Schema](docs/inventory-schema.md): current variable shape.
 - [Role Contract](docs/role-contract.md): expectations for future roles.
 - [Public Alpha Checklist](docs/public-alpha-checklist.md): release gates and

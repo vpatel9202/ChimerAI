@@ -20,8 +20,13 @@ credentials, tokens, private hostnames, or exploit details.
 - Public deployments should expose only SSH and Traefik ports `80` and `443`.
 - App ports should bind to localhost or Docker-only networks unless a role
   explicitly documents a public exposure model.
+- Public app routes should use the shared Traefik and Authentik contract in
+  `docs/auth-and-ingress.md`; unauthenticated routes must be explicit.
 - Keep Let's Encrypt staging enabled until DNS, firewall, and routing are
   verified.
+- Authentik automation wires applications, proxy providers, and outpost
+  membership only. Operators remain responsible for users, groups, policies,
+  external IdPs, OAuth clients, and app-local authorization.
 - Back up the SOPS age identity and Restic credentials before relying on a
   deployment.
 - Rotate API keys and tokens after testing if they were pasted into chat,

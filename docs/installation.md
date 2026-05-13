@@ -139,6 +139,11 @@ Compose access, and runs safe role diagnostics. Public deployments should route
 app traffic through Traefik on ports `80` and `443`; validation reports a
 warning when UFW is inactive or port exposure needs review.
 
+Before applying a public ingress configuration, review the shared
+[auth and ingress contract](auth-and-ingress.md) and confirm the non-secret
+values are intentional: base domain, ACME email, Traefik/Auth enabled roles,
+staging certificate mode, and each managed app hostname.
+
 If Docker access fails with a socket permission error, fix Docker access for
 your user or run the lower-level Ansible command with the appropriate privilege
 model for your host. ChimerAI does not silently escalate privileges.
@@ -163,6 +168,12 @@ verification note under the Authentik deployment directory, normally:
 If Authentik was first started without `bootstrap_token`, create an API token
 manually in Authentik, add it to the encrypted config as
 `chimerai_services.authentik.bootstrap_token`, and rerun `chimerai apply`.
+
+After apply, use the generated verification note and
+[auth and ingress contract](auth-and-ingress.md) to confirm Traefik routes,
+Authentik applications, provider membership, and app redirect behavior. Keep
+DNS, firewall, production certificate cutover, external identity providers,
+users, groups, and access policies outside this install flow.
 
 To enable the optional Todoist MCP role, add `mcp_todoist` and `mcp_gateway` to
 `chimerai_enabled_roles`, then store a real Todoist API key in the encrypted
@@ -245,6 +256,8 @@ complete these gates and record sanitized results in the
 - run `chimerai apply` twice and confirm the second run has no material changes;
 - confirm the generated Authentik automation verification note matches the
   protected apps you expect;
+- confirm each protected app follows the shared
+  [auth and ingress contract](auth-and-ingress.md);
 - verify OpenClaw is reachable only through the Authentik-protected Traefik
   route;
 - if Todoist MCP is enabled, verify OpenClaw's MCP registry contains the

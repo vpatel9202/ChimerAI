@@ -1,6 +1,6 @@
-# Milestone 5: Operations Maturity
+# Milestone 6: Operations Maturity
 
-Milestone 5 focuses on running ChimerAI over time: updates, diagnostics,
+Milestone 6 focuses on running ChimerAI over time: updates, diagnostics,
 recovery, and operator confidence.
 
 ## Goals

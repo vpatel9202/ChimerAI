@@ -1,6 +1,6 @@
-# Milestone 4: MCP And Agent Runtime Catalog
+# Milestone 5: MCP And Agent Runtime Catalog
 
-Milestone 4 expands beyond the Milestone 2 MCP core set and first OpenClaw
+Milestone 5 expands beyond the Milestone 2 MCP core set and first OpenClaw
 runtime into a broader catalog of MCP servers and agent runtimes.
 
 ## Goals

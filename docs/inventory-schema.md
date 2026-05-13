@@ -50,8 +50,11 @@ all:
             - open_webui
 
           chimerai_ingress:
+            enabled: true
+            provider: traefik
             tls:
               enabled: true
+              ca: letsencrypt
               resolver: letsencrypt
               challenge: http-01
               staging: true
@@ -257,12 +260,38 @@ all:
 | `chimerai_state_root` | Root directory for app-local runtime state. |
 | `chimerai_action` | Lifecycle action. Current alpha actions are `validate`, `apply`, `remove`, `backup`, and `restore`. |
 | `chimerai_enabled_roles` | Roles intended to run for this host. |
-| `chimerai_ingress` | Shared ingress, TLS, and auth defaults. |
+| `chimerai_ingress` | Shared Traefik, TLS, and Authentik defaults for the managed auth/ingress contract. |
 | `chimerai_runtime.engine` | Container runtime family. The current stack expects `docker`. |
 | `chimerai_runtime.compose_command` | Compose command exposed to operators. |
 | `chimerai_networks` | Shared networks roles may create or reference. |
 | `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `n8n`, `langfuse`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_chrome_devtools`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
+
+## Managed App Auth And Ingress Fields
+
+The canonical behavior is documented in
+[Auth And Ingress](auth-and-ingress.md). Inventory values should use these
+fields when a ChimerAI-managed app participates in public routing:
+
+| Field | Meaning |
+| --- | --- |
+| `chimerai_ingress.enabled` | Enables the shared ingress layer. Current managed public routing expects `true`. |
+| `chimerai_ingress.provider` | Ingress provider. Current implemented provider is `traefik`. |
+| `chimerai_ingress.tls.enabled` | Enables TLS routes for managed public apps. |
+| `chimerai_ingress.tls.ca` | Certificate authority family. Current public config uses `letsencrypt`. |
+| `chimerai_ingress.tls.resolver` | Traefik certificate resolver name, usually `letsencrypt`. |
+| `chimerai_ingress.tls.challenge` | ACME challenge type. Current implemented challenge is `http-01`. |
+| `chimerai_ingress.tls.staging` | Uses Let's Encrypt staging when `true`; keep enabled until DNS, firewall, and routing are verified. |
+| `chimerai_ingress.auth.provider` | Shared auth provider. Current implemented provider is `authentik`. |
+| `chimerai_ingress.auth.protect_apps_by_default` | Default value used by app `auth_required` fields when they are not set explicitly. |
+| `chimerai_services.<app>.ingress.enabled` | Enables a public Traefik route for app roles that use nested ingress config. |
+| `chimerai_services.<app>.ingress.host` | Public hostname for a nested-ingress app route. |
+| `chimerai_services.<app>.ingress.auth_required` | Attaches Authentik forward auth when `true`. Defaults to `protect_apps_by_default` when omitted. |
+| `chimerai_services.<app>.host` | Public hostname for roles that expose a single endpoint as a top-level app field, such as OpenClaw. |
+| `chimerai_services.<app>.auth_required` | Top-level auth toggle for single-endpoint app roles. Defaults to `protect_apps_by_default` when omitted. |
+
+OpenClaw currently uses top-level `host` and `auth_required`. Open WebUI uses
+nested `ingress.enabled`, `ingress.host`, and `ingress.auth_required`.
 
 ## Preferred Private Config File
 

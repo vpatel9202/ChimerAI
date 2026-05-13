@@ -50,8 +50,14 @@ The Traefik middleware expected by ChimerAI is named:
 authentik@docker
 ```
 
+For each protected app, verify the Traefik router uses `websecure`, TLS, the
+configured certificate resolver, and this middleware. Also verify the app host
+has an outpost route for `/outpost.goauthentik.io/`.
+
 ## Manual Tasks
 
 ChimerAI does not automate users, groups, policies, external identity
-providers, or app-specific authorization rules yet. Configure those in
-Authentik after the automated application/provider/outpost wiring is present.
+providers, OAuth clients, app-specific authorization rules, DNS, firewall
+policy, or the switch from Let's Encrypt staging to production certificates.
+Configure those after the automated application/provider/outpost wiring is
+present and verified.

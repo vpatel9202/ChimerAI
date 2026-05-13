@@ -93,8 +93,8 @@ Public alpha does not require a broad MCP/app catalog, multi-server support, or
 operations maturity beyond the foundation gates above. Those belong to later
 milestones:
 
-- [Milestone 4: MCP and Agent Runtime Catalog](milestones/0004-mcp-and-agent-catalog.md)
-- [Milestone 5: Operations Maturity](milestones/0005-operations-maturity.md)
+- [Milestone 5: MCP and Agent Runtime Catalog](milestones/0005-mcp-and-agent-catalog.md)
+- [Milestone 6: Operations Maturity](milestones/0006-operations-maturity.md)
 
 Public alpha does require a completed validation record with no blank, `TBD`, or
 placeholder evidence fields for required gates.
