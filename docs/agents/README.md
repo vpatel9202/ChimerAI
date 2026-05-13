@@ -35,6 +35,10 @@ Project-level references:
   flow.
 - [`../role-contract.md`](../role-contract.md) defines the initial role
   contract.
+- [`../role-governance.md`](../role-governance.md) defines role tier, support,
+  inclusion, and deprecation policy.
+- [`../role-catalog.md`](../role-catalog.md) lists current roles by tier and
+  support status.
 - [`../inventory-schema.md`](../inventory-schema.md) defines the initial
   inventory shape.
 - [`../configuration-and-secrets.md`](../configuration-and-secrets.md) defines

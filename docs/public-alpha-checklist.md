@@ -90,10 +90,11 @@ Restore evidence must show:
 ## Release Boundary
 
 Public alpha does not require a broad MCP/app catalog, multi-server support, or
-operations maturity beyond the foundation gates above. Those belong to later
-milestones:
+operations maturity beyond the foundation gates above. It does require the role
+catalog to stay internally consistent so the alpha surface is clear. Broader
+role governance and operations work belong to later milestones:
 
-- [Milestone 5: MCP and Agent Runtime Catalog](milestones/0005-mcp-and-agent-catalog.md)
+- [Milestone 5: Role Catalog Governance](milestones/0005-role-catalog-governance.md)
 - [Milestone 6: Operations Maturity](milestones/0006-operations-maturity.md)
 
 Public alpha does require a completed validation record with no blank, `TBD`, or

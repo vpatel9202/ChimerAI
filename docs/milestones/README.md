@@ -20,7 +20,7 @@ the task-oriented install and configuration guides.
 - [`0004-authentik-and-traefik.md`](0004-authentik-and-traefik.md): shared
   Traefik ingress and Authentik forward-auth differentiation for multiple
   managed apps.
-- [`0005-mcp-and-agent-catalog.md`](0005-mcp-and-agent-catalog.md): planned MCP
-  server and agent runtime expansion after the core set.
+- [`0005-role-catalog-governance.md`](0005-role-catalog-governance.md): role
+  catalog tiers, support status, contribution gates, and deprecation policy.
 - [`0006-operations-maturity.md`](0006-operations-maturity.md): planned update,
   diagnostics, recovery, and operational maturity work.

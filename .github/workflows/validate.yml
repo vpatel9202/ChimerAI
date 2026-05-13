@@ -35,6 +35,9 @@ jobs:
       - name: Install Ansible collections
         run: uv run ansible-galaxy collection install -r requirements.yml
 
+      - name: Validate role catalog
+        run: uv run python scripts/validate_role_catalog.py
+
       - name: Check Ansible syntax
         run: uv run ansible-playbook chimerai.yml --syntax-check
 

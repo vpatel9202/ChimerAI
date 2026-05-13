@@ -9,6 +9,8 @@ scratch repo.
 - Identify whether the task is documentation, architecture, role work,
   validation, or release hygiene.
 - Read the relevant `docs/agents/` context file instead of loading everything.
+- Before proposing or adding roles, check `docs/role-governance.md` and
+  `docs/role-catalog.md`.
 - If a high-impact product decision is unclear, ask before implementing.
 
 ## While Editing

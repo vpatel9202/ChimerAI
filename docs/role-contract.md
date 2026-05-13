@@ -1,9 +1,10 @@
 # Role Contract
 
-This reference defines the first ChimerAI role contract. It is intentionally
-small and optimized for the current single-server roles: `common`, `docker`,
-`networks`, `traefik`, `authentik`, `backup`, `openclaw`, `diag`, and
-`open_webui`, plus the first optional MCP role `mcp_todoist`.
+This reference defines the ChimerAI role contract. It works with
+[`role-governance.md`](role-governance.md) and
+[`role-catalog.md`](role-catalog.md): governance defines which roles belong in
+the project, and the catalog records every tracked role's tier and support
+status.
 
 ChimerAI roles should make host state reproducible while keeping Docker Compose
 output visible and debuggable where services are involved.
@@ -45,6 +46,9 @@ roles/<role_name>/
 
 Early roles should expand only as needed for real behavior. Avoid adding
 framework machinery before at least two roles need the same abstraction.
+
+New roles must also add a single catalog entry with an approved tier and support
+status before they are merged.
 
 ## Tags
 
@@ -134,11 +138,10 @@ config, and rendered with `no_log: true` when secret values are involved.
 ## Current Boundary
 
 The current stack proves the service-role contract with core roles, public
-ingress, shared auth, a first agent runtime, and a first optional MCP server.
-The expanded Milestone 2 roadmap adds host tool roles, model roles, broader MCP
-roles, automation, observability, notifications, and runner profiles. It still
-does not automate every app's inside-the-UI setup or provide a dedicated update
-lifecycle.
+ingress, shared auth, reference roles, and experimental MCP roles. Role
+governance keeps those examples from becoming an unbounded app catalog. It
+still does not automate every app's inside-the-UI setup or provide a dedicated
+update lifecycle.
 
 The current installer bootstraps local control tooling only. It does not make
 host-level changes such as Docker installation or firewall configuration.

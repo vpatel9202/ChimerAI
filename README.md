@@ -29,10 +29,10 @@ config, and host changes. It is not production-ready.
 
 ## What ChimerAI Is
 
-ChimerAI is not a generic app bundle. The app roles are examples and
-integrations that prove the foundation: Traefik, Authentik, OpenClaw,
-Open WebUI, Ollama, LiteLLM, Qdrant, n8n, Langfuse, and MCP services sit on top
-of the same operator model.
+ChimerAI is not a generic app bundle. Roles are governed examples of the
+operator model: core roles build the foundation, while reference and
+experimental roles prove selected patterns without turning the catalog into the
+product.
 
 The project is inspired by mature homelab stacks, but it targets the AI-era
 operational problem: agents, MCP servers, model providers, workflow automation,
@@ -143,26 +143,16 @@ Implemented foundation pieces include:
   alpha validation evidence;
 - diagnostics role and validation paths for the current stack.
 
-## Optional And Reference Integrations
+## Role Catalog
 
-These roles are part of the current alpha surface, but they should be read as
-optional/reference integrations on top of the foundation:
+ChimerAI tracks roles by tier and support status so operators can tell the
+foundation from examples and experiments. Core roles carry the strongest
+maintenance expectation. Reference roles demonstrate app, model, automation, and
+agent-runtime patterns without promising equal support for every integration.
+Experimental roles are explicitly unstable.
 
-- OpenClaw gateway deployment plus `chimerai openclaw onboard` helper;
-- Open WebUI chat interface;
-- host-installed Codex, Claude Code, Gemini CLI, and OpenCode role with
-  user-scoped npm paths;
-- containerized runner for Codex, Claude Code, Gemini CLI, and OpenCode with
-  an explicit workspace mount;
-- Ollama local model runtime with loopback API exposure and bind-mounted model
-  state;
-- LiteLLM model gateway with Postgres-backed proxy state;
-- Qdrant vector storage with loopback HTTP and gRPC exposure;
-- n8n workflow automation with Postgres-backed state;
-- Langfuse LLM observability stack with Postgres, ClickHouse, Redis, and
-  MinIO-backed state;
-- MCP roles for Todoist, filesystem, Playwright browser automation,
-  Chrome DevTools, Firecrawl, and gateway/profile wiring.
+See the [role catalog](docs/role-catalog.md) and
+[role governance](docs/role-governance.md) docs before proposing new roles.
 
 ## Architecture Summary
 
@@ -210,8 +200,8 @@ Current roadmap pointers:
   gates before a first public alpha tag.
 - [Authentik and Traefik Plan](docs/milestones/0004-authentik-and-traefik.md):
   shared auth and ingress differentiation.
-- [MCP and Agent Catalog Plan](docs/milestones/0005-mcp-and-agent-catalog.md):
-  planned MCP/runtime expansion.
+- [Role Catalog Governance Plan](docs/milestones/0005-role-catalog-governance.md):
+  tiers, support status, contribution gates, and deprecation policy.
 - [Operations Maturity Plan](docs/milestones/0006-operations-maturity.md):
   planned update, diagnostics, recovery, and operational maturity work.
 
@@ -224,6 +214,10 @@ Core reference docs:
   contract for protected apps.
 - [Inventory Schema](docs/inventory-schema.md): current variable shape.
 - [Role Contract](docs/role-contract.md): expectations for future roles.
+- [Role Catalog](docs/role-catalog.md): current roles by tier and support
+  status.
+- [Role Governance](docs/role-governance.md): role inclusion and deprecation
+  policy.
 - [Public Alpha Checklist](docs/public-alpha-checklist.md): release gates and
   trust criteria for a public alpha tag.
 - [Public Alpha Validation Record](docs/public-alpha-validation-record.md):

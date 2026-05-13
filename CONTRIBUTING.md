@@ -9,8 +9,26 @@ Ansible contract.
 Before proposing role changes, read:
 
 - [`docs/installation.md`](docs/installation.md)
+- [`docs/role-governance.md`](docs/role-governance.md)
+- [`docs/role-catalog.md`](docs/role-catalog.md)
 - [`docs/role-contract.md`](docs/role-contract.md)
 - [`docs/inventory-schema.md`](docs/inventory-schema.md)
+
+## Role Requests And Contributions
+
+Start with the
+[role request issue template](.github/ISSUE_TEMPLATE/role_request.md) before
+adding a new role. The request should state the operational problem, proposed
+tier, support owner, validation path, secrets and networking impact, and why the
+work belongs in ChimerAI instead of remaining a local Compose wrapper.
+
+Implementation pull requests for roles must:
+
+- add or update the role entry in [`docs/role-catalog.md`](docs/role-catalog.md);
+- follow the inclusion criteria in
+  [`docs/role-governance.md`](docs/role-governance.md);
+- document lifecycle, validation, state, secrets, ingress, and auth behavior;
+- include a removal or deprecation plan when replacing an existing role.
 
 Before submitting implementation changes, run the relevant local validation:
 

@@ -46,8 +46,9 @@ defined in [`../inventory-schema.md`](../inventory-schema.md). Durable
 architecture decisions are recorded in [`../adr/`](../adr/).
 
 The current stack validates the contract with core roles, Traefik, Authentik,
-diagnostics, backup/restore behavior, and optional/reference integrations such
-as OpenClaw, Open WebUI, model services, automation services, and MCP roles.
+diagnostics, backup/restore behavior, and governed reference or experimental
+roles. Role tiers are catalog governance, not a reason to expand the
+architecture around every possible app.
 
 Do not over-abstract early. A simple role that renders understandable Compose is
 better than a generic framework that hides app behavior.
