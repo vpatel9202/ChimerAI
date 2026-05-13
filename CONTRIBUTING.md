@@ -6,6 +6,19 @@ At this point, the most useful contributions are design feedback, issue reports,
 small documentation improvements, and focused improvements to the initial
 Ansible contract.
 
+ChimerAI is not ready for broad support requests, app-store requests, or large
+feature pull requests without prior agreement. Please keep issues and pull
+requests narrow enough for maintainers to review against the current prototype
+contracts.
+
+Use the available issue templates:
+
+- bug reports for reproducible behavior in the repo, generated config,
+  validation, or documented workflows;
+- role requests for proposed managed services that need governance review;
+- pull requests for focused docs, tests, validation, or approved implementation
+  changes.
+
 Before proposing role changes, read:
 
 - [`docs/installation.md`](docs/installation.md)
@@ -21,6 +34,11 @@ Start with the
 adding a new role. The request should state the operational problem, proposed
 tier, support owner, validation path, secrets and networking impact, and why the
 work belongs in ChimerAI instead of remaining a local Compose wrapper.
+
+A role request is a design and governance gate, not a promise that ChimerAI will
+package every useful application. New roles need a maintainer who can keep the
+role healthy through upstream changes, validation updates, backup and restore
+expectations, and eventual deprecation or removal.
 
 Implementation pull requests for roles must:
 

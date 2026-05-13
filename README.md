@@ -27,6 +27,7 @@ Compose files, generated config, and host changes before applying them.
 | Compare it with nearby projects | [Comparison guide](docs/comparison.md) |
 | See planned demo evidence | [Demo and sample output](docs/demo-and-sample-output.md) |
 | Contribute safely | [Contributing](CONTRIBUTING.md) and [agent context](docs/agents/) |
+| Understand community scope | [Community readiness](docs/community-readiness.md) |
 
 ## What It Does Now
 
@@ -88,6 +89,7 @@ The README intentionally does not duplicate that list.
 - [Demo and sample output](docs/demo-and-sample-output.md)
 - [Operations](docs/operations/README.md)
 - [Role catalog](docs/role-catalog.md)
+- [Community readiness](docs/community-readiness.md)
 - [Architecture decisions](docs/adr/)
 - [Agent context](docs/agents/)
 
