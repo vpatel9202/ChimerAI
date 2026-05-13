@@ -17,6 +17,7 @@ this file when adding, renaming, or retiring milestone documents.
 | [0007: Documentation and Discoverability](0007-documentation-and-discoverability.md) | README routing, architecture map, comparison guide, demo evidence plan, and agent context map. | In progress |
 | [0008: Community Readiness](0008-community-readiness.md) | Contribution paths, issue templates, role request governance, and maintainer load limits for public-alpha community use. | In progress |
 | [0009: Public Alpha Release Readiness](0009-public-alpha-release-readiness.md) | Hard pre-tag blocker, validation record, demo evidence slots, changelog/release notes, and repository polish for `v0.1.0-alpha`. | In progress |
+| [0010: Post-Alpha Strategic Decision Framework](0010-post-alpha-strategic-decision-framework.md) | Evidence-driven framework for post-alpha direction, decision paths, beta/stable meanings, and pivot guardrails. | Planned |
 
 ## Maintenance Rules
 

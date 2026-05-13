@@ -4,6 +4,16 @@ ChimerAI overlaps with several self-hosting projects, but it is not trying to
 replace all of them. This guide uses durable categories instead of popularity
 claims or feature-count scorecards.
 
+## Current Direction
+
+ChimerAI direction is evidence-driven. Public alpha feedback should decide
+whether the project deepens the full-stack foundation, extracts reusable
+Authentik automation, expands MCP wiring, or adds app roles.
+
+ChimerAI is not currently an MCP-only gateway, an app bundle, or an extracted
+Authentik collection. It may include MCP services, optional app roles, or
+Authentik automation when those pieces serve the validated foundation.
+
 ## Summary
 
 | Project or category | Source or basis | Strong fit | ChimerAI difference |

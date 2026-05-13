@@ -38,6 +38,30 @@ New roles should meet these criteria before they are added to `roles/`:
 - identify a proposed tier, support status, and owner;
 - explain why the role belongs in ChimerAI instead of local private Compose.
 
+## App Role And Extraction Guardrail
+
+App roles and extracted role collections need stronger evidence than ordinary
+examples because they increase support scope.
+
+Before ChimerAI adds an app role as more than an experimental or reference
+integration, or before it extracts a role into a reusable collection, the
+proposal must show:
+
+- mature contracts for config, secrets, ingress, Authentik protection, state,
+  backup, restore, update, validation, and removal behavior where applicable;
+- non-destructive validation that contributors can run without private host
+  context;
+- an explicit owner for support, review, upgrade tracking, and deprecation
+  decisions;
+- documented backup, restore, and update expectations, including what data is
+  in scope and what remains operator-owned;
+- real adoption evidence, such as multiple operator reports, maintained
+  community ownership, or repeated validated use outside one private host.
+
+Until those expectations are met, the role should stay local, experimental, or
+reference-only. ChimerAI should not present itself as an app bundle or extracted
+Authentik collection before the implementation and evidence support that shape.
+
 ## Deprecation Policy
 
 A deprecated role must document:
