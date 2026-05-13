@@ -4,7 +4,7 @@
     that:
       - item.name is defined
       - item.purpose is defined
-    fail_msg: "Each chimerai_networks item must define name and purpose."
+    fail_msg: "Each chimerai_networks item must define name and purpose. Check docs/inventory-schema.md for the expected network shape."
   loop: "{{ chimerai_networks }}"
   changed_when: false
 

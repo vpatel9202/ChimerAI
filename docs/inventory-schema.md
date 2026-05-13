@@ -244,6 +244,8 @@ all:
             engine: restic
             repository: /opt/chimerai/backups/restic
             password: replace-me
+            restore_target: /tmp/chimerai-restore
+            restore_allow_root_target: false
             tags:
               - chimerai
 ```
@@ -266,6 +268,9 @@ all:
 | `chimerai_networks` | Shared networks roles may create or reference. |
 | `chimerai_services` | Service configuration map. Current roles include `traefik`, `authentik`, `openclaw`, `agent_cli`, `runner`, `ollama`, `litellm`, `qdrant`, `n8n`, `langfuse`, `mcp_todoist`, `mcp_filesystem`, `mcp_browser`, `mcp_chrome_devtools`, `mcp_firecrawl`, `mcp_gateway`, and `open_webui`. |
 | `chimerai_backup` | Restic backup and restore settings for ChimerAI-managed state. |
+
+See [Backup and Restore](operations/backup-and-restore.md) for restore target
+behavior and the explicit opt-in required before restoring to `/`.
 
 ## Managed App Auth And Ingress Fields
 
@@ -360,6 +365,10 @@ chimerai remove
 chimerai backup
 chimerai restore
 ```
+
+See [Update Lifecycle](operations/update-lifecycle.md) and
+[Diagnostics](operations/diagnostics.md) for the operator sequence around these
+actions.
 
 ## Secrets And Private Values
 

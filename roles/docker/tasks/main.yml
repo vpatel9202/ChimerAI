@@ -4,18 +4,39 @@
   register: chimerai_docker_version
   check_mode: false
   changed_when: false
+  failed_when: false
 
 - name: Check Docker Compose v2
   ansible.builtin.command: docker compose version
   register: chimerai_compose_version
   check_mode: false
   changed_when: false
+  failed_when: false
 
 - name: Check Docker daemon access
   ansible.builtin.command: docker info
   register: chimerai_docker_info
   check_mode: false
   changed_when: false
+  failed_when: false
+
+- name: Validate Docker CLI availability
+  ansible.builtin.assert:
+    that:
+      - chimerai_docker_version.rc == 0
+    fail_msg: "Docker CLI is required before running ChimerAI. Install Docker Engine and ensure docker is on PATH."
+
+- name: Validate Docker Compose v2 availability
+  ansible.builtin.assert:
+    that:
+      - chimerai_compose_version.rc == 0
+    fail_msg: "Docker Compose v2 is required before running ChimerAI. The expected command is: docker compose."
+
+- name: Validate Docker daemon access
+  ansible.builtin.assert:
+    that:
+      - chimerai_docker_info.rc == 0
+    fail_msg: "Docker daemon access is required before running ChimerAI. Start Docker and ensure the Ansible user can run docker info."
 
 - name: Report Docker versions
   ansible.builtin.debug:

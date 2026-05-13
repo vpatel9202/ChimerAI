@@ -6,6 +6,18 @@
     fail_msg: "ChimerAI alpha backup support currently expects restic."
   when: chimerai_action in ["validate", "backup", "restore"]
 
+- name: Refuse root restore target without explicit opt-in
+  ansible.builtin.fail:
+    msg: >-
+      Restoring to / is destructive and disabled by default. Set
+      chimerai_backup.restore_target to a temporary restore directory, or set
+      chimerai_backup.restore_allow_root_target: true only for a disposable host
+      or a deliberately accepted full-host restore.
+  when:
+    - chimerai_action == "restore"
+    - chimerai_backup_restore_target == '/'
+    - not (chimerai_backup_restore_allow_root_target | bool)
+
 - name: Check Restic CLI
   ansible.builtin.command: restic version
   register: chimerai_backup_restic_version
@@ -155,6 +167,12 @@
     msg: "ChimerAI Restic backup completed for {{ chimerai_state_root }}."
   changed_when: false
   when: chimerai_action == "backup"
+
+- name: Report restore target
+  ansible.builtin.debug:
+    msg: "ChimerAI Restic restore will use snapshot={{ chimerai_backup_restore_snapshot }} target={{ chimerai_backup_restore_target }}."
+  changed_when: false
+  when: chimerai_action == "restore"
 
 - name: Check whether Authentik Compose file exists before restore
   ansible.builtin.stat:

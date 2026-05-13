@@ -202,12 +202,14 @@ Current roadmap pointers:
   shared auth and ingress differentiation.
 - [Role Catalog Governance Plan](docs/milestones/0005-role-catalog-governance.md):
   tiers, support status, contribution gates, and deprecation policy.
-- [Operations Maturity Plan](docs/milestones/0006-operations-maturity.md):
-  planned update, diagnostics, recovery, and operational maturity work.
+- [Operator Experience Plan](docs/milestones/0006-operations-maturity.md):
+  diagnostics, backup/restore, update lifecycle, and common failure modes.
 
 Core reference docs:
 
 - [Installation](docs/installation.md): bootstrap a fresh local checkout.
+- [Operator Operations](docs/operations/README.md): diagnostics,
+  backup/restore, updates, and common failure recovery.
 - [Configuration and Secrets](docs/configuration-and-secrets.md): encrypted
   config, SOPS, age, and editing secrets.
 - [Auth and Ingress](docs/auth-and-ingress.md): shared Traefik and Authentik

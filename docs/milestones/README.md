@@ -22,5 +22,5 @@ the task-oriented install and configuration guides.
   managed apps.
 - [`0005-role-catalog-governance.md`](0005-role-catalog-governance.md): role
   catalog tiers, support status, contribution gates, and deprecation policy.
-- [`0006-operations-maturity.md`](0006-operations-maturity.md): planned update,
-  diagnostics, recovery, and operational maturity work.
+- [`0006-operations-maturity.md`](0006-operations-maturity.md): operator
+  diagnostics, backup/restore, update lifecycle, and common failure modes.

@@ -3,7 +3,7 @@
   ansible.builtin.assert:
     that:
       - chimerai_action in ["validate", "apply", "remove", "backup", "restore"]
-    fail_msg: "chimerai_action must be one of: validate, apply, remove, backup, restore"
+    fail_msg: "chimerai_action must be one of: validate, apply, remove, backup, restore."
 
 - name: Validate required ChimerAI inventory values
   ansible.builtin.assert:
@@ -15,7 +15,7 @@
       - chimerai_enabled_roles is defined
       - chimerai_runtime is defined
       - chimerai_networks is defined
-    fail_msg: "The inventory is missing required ChimerAI variables."
+    fail_msg: "The inventory is missing required ChimerAI variables. Check docs/inventory-schema.md before running lifecycle actions."
 
 - name: Validate target OS family
   ansible.builtin.assert:

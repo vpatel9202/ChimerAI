@@ -355,6 +355,14 @@ chimerai_backup:
 Local filesystem repositories are useful for first tests, but public alpha
 operators should use an off-host repository for real recovery.
 
+Restore defaults to target `/` for Restic path compatibility, but the backup
+role refuses that target unless `chimerai_backup.restore_allow_root_target` is
+set to `true` explicitly. Prefer setting `chimerai_backup.restore_target` to a
+temporary directory for restore drills.
+
+See [Backup and Restore](operations/backup-and-restore.md) for the operator
+workflow.
+
 ## Manual SOPS Flow
 
 The wrapper above is preferred. If you need to perform the steps manually,
@@ -389,6 +397,10 @@ uv run ansible-playbook chimerai.yml \
 
 Use `chimerai_action=apply`, `remove`, `backup`, or `restore` for other
 lifecycle actions.
+
+See [Update Lifecycle](operations/update-lifecycle.md) and
+[Diagnostics](operations/diagnostics.md) for the operator sequence around these
+actions.
 
 ## Rules
 

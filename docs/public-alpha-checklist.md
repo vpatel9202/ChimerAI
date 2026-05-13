@@ -32,9 +32,9 @@ Record each gate with:
 | Validate | `chimerai validate` plus syntax/check commands, environment, sanitized result, pass/fail, and any validation limitation. |
 | First apply | `chimerai apply`, environment, sanitized convergence result, pass/fail, and any manual follow-up required. |
 | Second apply idempotency | Second `chimerai apply`, environment, sanitized changed-task summary, pass/fail, and explanation for any material change. |
-| Backup | `chimerai backup` and Restic snapshot listing, environment, sanitized snapshot proof, pass/fail, and any backup limitation. |
-| Restore drill | Restore target, restore command or documented action, generated state restored, confirmation that no secret output was printed, pass/fail, and any restore limitation. |
-| Diagnostics | Diagnostic command or runbook step, environment, sanitized result, pass/fail, and any diagnostic gap. |
+| Backup | `chimerai backup` and Restic snapshot listing, environment, sanitized snapshot proof, pass/fail, and any backup limitation. Follow [Backup and Restore](operations/backup-and-restore.md). |
+| Restore drill | Restore target, restore command or documented action, generated state restored, confirmation that no secret output was printed, pass/fail, and any restore limitation. Follow [Backup and Restore](operations/backup-and-restore.md). |
+| Diagnostics | Diagnostic command or runbook step, environment, sanitized result, pass/fail, and any diagnostic gap. Follow [Diagnostics](operations/diagnostics.md). |
 | Known limitations | Public list of accepted alpha limitations with no private host details. |
 
 ## Second Apply Definition
@@ -95,7 +95,7 @@ catalog to stay internally consistent so the alpha surface is clear. Broader
 role governance and operations work belong to later milestones:
 
 - [Milestone 5: Role Catalog Governance](milestones/0005-role-catalog-governance.md)
-- [Milestone 6: Operations Maturity](milestones/0006-operations-maturity.md)
+- [Milestone 6: Operator Experience](milestones/0006-operations-maturity.md)
 
 Public alpha does require a completed validation record with no blank, `TBD`, or
 placeholder evidence fields for required gates.

@@ -1,10 +1,22 @@
 ---
+- name: Report diagnostics group - runtime prerequisites
+  ansible.builtin.debug:
+    msg: "Diagnostics: runtime prerequisites - Docker runtime and Compose settings."
+  changed_when: false
+  when: chimerai_action in ["validate", "apply"]
+
 - name: Validate Docker runtime setting
   ansible.builtin.assert:
     that:
       - chimerai_runtime.engine == "docker"
       - chimerai_runtime.compose_command == "docker compose"
-    fail_msg: "Milestone 1 expects Docker and Docker Compose v2."
+    fail_msg: "ChimerAI expects Docker Engine and Docker Compose v2. Set chimerai_runtime.engine=docker and chimerai_runtime.compose_command='docker compose'."
+
+- name: Report diagnostics group - host exposure
+  ansible.builtin.debug:
+    msg: "Diagnostics: host exposure - firewall state and listening TCP ports."
+  changed_when: false
+  when: chimerai_action == "validate"
 
 - name: Check UFW status when available
   ansible.builtin.command: ufw status
@@ -40,6 +52,12 @@
     - chimerai_action == "validate"
     - chimerai_diag_listening_tcp.rc | default(1) == 0
 
+- name: Report diagnostics group - Docker network state
+  ansible.builtin.debug:
+    msg: "Diagnostics: Docker network state - configured ChimerAI networks."
+  changed_when: false
+  when: chimerai_action == "apply"
+
 - name: Inspect configured ChimerAI networks
   ansible.builtin.command: "docker network inspect {{ item.name }}"
   register: chimerai_network_inspect
@@ -50,6 +68,17 @@
     - chimerai_action == "apply"
     - not ansible_check_mode
     - chimerai_network_inspect.rc != 0
+  when: chimerai_action == "apply"
+
+- name: Report diagnostics group - service health
+  ansible.builtin.debug:
+    msg: "Diagnostics: service health - post-apply HTTP endpoints."
+  changed_when: false
+  when:
+    - chimerai_action == "apply"
+    - >-
+      ('open_webui' in chimerai_enabled_roles)
+      or ('mcp_todoist' in chimerai_enabled_roles)
 
 - name: Check Open WebUI HTTP endpoint after apply
   ansible.builtin.uri:
@@ -98,6 +127,15 @@
     - chimerai_action == "apply"
     - not ansible_check_mode
     - "'mcp_todoist' in chimerai_enabled_roles"
+
+- name: Report diagnostics group - MCP registry
+  ansible.builtin.debug:
+    msg: "Diagnostics: MCP registry - OpenClaw registry entries for configured MCP servers."
+  changed_when: false
+  when:
+    - chimerai_action == "apply"
+    - "'openclaw' in chimerai_enabled_roles"
+    - chimerai_mcp_servers | default([]) | length > 0
 
 - name: Check OpenClaw MCP registry entries after apply
   ansible.builtin.command:

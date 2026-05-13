@@ -211,7 +211,7 @@ chimerai remove
 Persistent app state should not be deleted unless a role explicitly documents
 and requires an opt-in for state removal.
 
-## Back Up And Restore
+## Backup and Restore
 
 ChimerAI alpha backups use Restic. Enable backups in the encrypted config before
 running them:
@@ -241,11 +241,15 @@ Authentik Postgres dump when the Authentik Compose project exists. Restore with:
 chimerai restore
 ```
 
-Restore uses the configured repository and restores the latest snapshot to `/`
-by default. For public alpha drills, do not restore over `/` on a live host
-unless that risk is deliberately accepted. Prefer a disposable host, temporary
+Restore uses the configured repository and the configured
+`chimerai_backup.restore_target`. The default target is `/`, but ChimerAI
+refuses that target unless `chimerai_backup.restore_allow_root_target: true` is
+set explicitly. For public alpha drills, prefer a disposable host, temporary
 restore directory, or controlled generated-state path, and record the restore
 target in the validation record.
+
+See [Backup and Restore](operations/backup-and-restore.md) for restore safety
+details and drill expectations.
 
 ## Alpha Operational Gates
 
@@ -269,6 +273,8 @@ complete these gates and record sanitized results in the
   controlled generated-state path;
 - capture diagnostics proof for validation, apply, service, backup, and restore
   failure inspection paths;
+- review the [operator operations docs](operations/README.md) for diagnostics,
+  update, backup/restore, and common failure expectations;
 - review and record known public alpha limitations without private host details;
 - keep Let's Encrypt staging enabled until DNS, firewall, and routing are
   confirmed, then switch to production certificates.
@@ -295,6 +301,10 @@ Skip `sops` and `age` installation. Use this if you manage those tools through
 your operating system package manager.
 
 ## Update An Existing Checkout
+
+Use the supported operator sequence from
+[Update Lifecycle](operations/update-lifecycle.md): pull the checkout, refresh
+tooling with `./install.sh`, run `chimerai validate`, then run `chimerai apply`.
 
 Pull the latest repo changes, then rerun the installer:
 

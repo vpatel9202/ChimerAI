@@ -46,6 +46,11 @@ not fill expected or assumed results as evidence.
 
 ## Gate Records
 
+Use the operator docs for repeatable evidence:
+[Diagnostics](operations/diagnostics.md),
+[Backup and Restore](operations/backup-and-restore.md), and
+[Update Lifecycle](operations/update-lifecycle.md).
+
 ### Fresh Clone Setup
 
 - **Command run**:

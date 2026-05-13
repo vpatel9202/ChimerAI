@@ -9,6 +9,7 @@ chimerai_backup_dumps_dir: "{{ chimerai_backup_work_dir }}/dumps"
 chimerai_backup_tags: "{{ (chimerai_backup | default({})).tags | default(['chimerai']) }}"
 chimerai_backup_restore_snapshot: "{{ (chimerai_backup | default({})).restore_snapshot | default('latest') }}"
 chimerai_backup_restore_target: "{{ (chimerai_backup | default({})).restore_target | default('/') }}"
+chimerai_backup_restore_allow_root_target: "{{ (chimerai_backup | default({})).restore_allow_root_target | default(false) }}"
 chimerai_backup_paths:
   - "{{ chimerai_state_root }}"
   - "{{ chimerai_backup_work_dir }}"
