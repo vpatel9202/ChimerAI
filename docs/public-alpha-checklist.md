@@ -12,7 +12,9 @@ Use this checklist before tagging a public alpha release.
 
 ## Fresh Host Validation
 
-- Bootstrap a clean Ubuntu 24.04 host.
+- Bootstrap a clean Linux server in the current validation environment.
+  Current validation records use Ubuntu Server 24.04; see
+  [`platform-support.md`](platform-support.md).
 - Run `chimerai config init` and back up the age identity.
 - Configure real DNS, Authentik secrets, and Let's Encrypt staging.
 - Run `chimerai validate`.

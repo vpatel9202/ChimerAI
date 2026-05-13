@@ -15,15 +15,27 @@ chimerai backup
 
 ## Prerequisites
 
-ChimerAI currently targets Linux hosts, with Ubuntu 24.04 as the primary test
-platform. The installer also has basic macOS detection for controller-side
-tooling, but the service roles are not yet validated for macOS targets.
+ChimerAI's first full path is a single Linux server deployment. Ubuntu Server
+24.04 is the current fresh-host validation environment, but the project does not
+make an Ubuntu-only support promise. See
+[Platform Support](platform-support.md) for the canonical support matrix.
+
+### Control And Evaluation Environment
+
+Use a Linux environment for the current evaluated path. Non-Linux controller
+and provisioning paths are unvalidated and should not be treated as supported
+ways to provision a Linux host yet.
 
 Install these before starting:
 
 - `git`
 - `curl`
 - `tar`
+
+### Deployment Target
+
+The deployment target must be a Linux server. Install or provide:
+
 - Docker with Compose v2, if you want validation to check the Docker runtime
 - a DNS zone you control, if you want public Traefik ingress and Let's Encrypt
 - public inbound access to ports `80` and `443`, if you use HTTP-01

@@ -1,7 +1,9 @@
 # Milestone 3: Public Alpha
 
 Milestone 3 turns the expanded Milestone 2 stack into a documented public alpha
-that a careful operator can evaluate on a clean Ubuntu 24.04 host.
+that a careful operator can evaluate on a clean Linux server in the current
+validation environment. Current validation records use Ubuntu Server 24.04; see
+the [platform support matrix](../platform-support.md).
 
 ## Goals
 

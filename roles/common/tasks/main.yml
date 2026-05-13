@@ -21,7 +21,7 @@
   ansible.builtin.assert:
     that:
       - ansible_system == "Linux"
-    fail_msg: "Milestone 1 supports Linux targets only."
+    fail_msg: "ChimerAI alpha deployment targets must report ansible_system=Linux."
 
 - name: Report common configuration in validate mode
   ansible.builtin.debug:

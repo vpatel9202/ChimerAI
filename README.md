@@ -5,7 +5,7 @@
 [![Project status: prototype alpha](https://img.shields.io/badge/status-prototype%20alpha-orange)](#current-alpha-status)
 [![Ansible first](https://img.shields.io/badge/Ansible-first-ee0000?logo=ansible&logoColor=white)](#architecture-summary)
 [![Docker Compose runtime](https://img.shields.io/badge/runtime-Docker%20Compose-2496ed?logo=docker&logoColor=white)](#architecture-summary)
-[![Target OS: Ubuntu 24.04](https://img.shields.io/badge/target-Ubuntu%2024.04-e95420?logo=ubuntu&logoColor=white)](#current-alpha-status)
+[![Target: Linux server alpha](https://img.shields.io/badge/target-Linux%20server%20alpha-2ea44f)](docs/platform-support.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
 ChimerAI is a self-hosted AI operations foundation: the repeatable control
@@ -62,14 +62,18 @@ bind-mounted state.
 The current alpha is best treated as an inspectable foundation for careful
 operators, not a turnkey production platform.
 
-## Supported Platforms And Requirements
+## Platform Support
 
-- Primary tested target: Ubuntu 24.04 on a single Linux server.
-- Target family: Linux hosts. Multi-server deployments are not validated yet.
-- macOS: controller tooling only; service roles are not validated on macOS.
-- Windows: not validated.
-- Public ingress: a real domain pointed at the host, with ports `80` and `443`
-  reachable for Traefik and Let's Encrypt.
+The first full ChimerAI path is a single Linux server deployment. Ubuntu Server
+24.04 is the current fresh-host validation environment, but ChimerAI is not an
+Ubuntu-only project. Other Linux server distributions, multi-server
+deployments, and non-Linux controller paths remain unvalidated.
+
+See [Platform Support](docs/platform-support.md) for the canonical support
+matrix.
+
+Public ingress requires a real domain pointed at the host, with ports `80` and
+`443` reachable for Traefik and Let's Encrypt.
 
 ## Quick Start
 
@@ -223,7 +227,8 @@ Useful first contributions:
 - improve docs;
 - add validation around existing roles;
 - propose narrowly scoped roles;
-- test the install flow on a fresh Ubuntu 24.04 host;
+- test the install flow on a clean Linux server in the current validation
+  environment;
 - write ADRs for major design changes before implementing them.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before

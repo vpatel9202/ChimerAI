@@ -9,6 +9,11 @@ validated, and documented without hiding too much behavior behind one generic
 role. App roles such as OpenClaw, Open WebUI, model services, automation
 services, and MCP services are reference integrations on top of the foundation.
 
+Platform-support outcome: ChimerAI now keeps platform claims in the canonical
+[Platform Support](../platform-support.md) matrix. The first full path is a
+single Linux server, with Ubuntu Server 24.04 recorded as the current
+fresh-host validation environment rather than an Ubuntu-only support promise.
+
 ## 2A: Core Ingress And Identity
 
 Status: available now.
